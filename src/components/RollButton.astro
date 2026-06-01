@@ -1,0 +1,43 @@
+
+---
+import RollText from "./RollText.astro"
+
+const variantStyles = {
+		primary: "bg-tint text-inverted",
+		dimmed: "bg-text text-inverted",
+		outline: "border-1 text-text",
+		plain: "",
+	},
+	sizeStyles = { md: "py-[15px] px-[30px]", sm: "py-[10px] px-[15px]" }
+
+let { class: cls, variant = "primary", size = "md" } = Astro.props
+---
+
+<roll-button>
+  <button
+    class:list={[
+      "cursor-pointer relative leading-none bg-cta inline-flex items-center justify-center uppercase rounded-[24px] w-max",
+      variantStyles[variant],sizeStyles[size],
+      cls,
+    ]}
+  >
+    <RollText inactive><slot /></RollText>
+  </button>
+</roll-button>
+
+<script>
+  class MyButton extends HTMLElement {
+    connectedCallback() {
+      let button = this.children[0],
+        text = this.querySelector("roll-text")
+      if(!text)return
+      button.addEventListener("pointerenter", () => {
+        text.play()
+      })
+      button.addEventListener("pointerleave", () => {
+        text.reverse()
+      })
+    }
+  }
+  customElements.define("roll-button", MyButton)
+</script>

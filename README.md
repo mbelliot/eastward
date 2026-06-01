@@ -1,46 +1,53 @@
-# Astro Starter Kit: Basics
+# Eastward — Astro Travel Theme
 
-```sh
-pnpm create astro@latest -- --template basics
+A luxury travel theme built with Astro. Ported from [my Framer template](https://contra.com/products/bc3hkcW9-luxury-travel-template-for-framer). Same editorial feel, zero React.
+
+| | |
+| :---: | :---: |
+| ![]('./src/assets/1.png') | ![]('./src/assets/2.png') |
+| ![]('./src/assets/3.png') | ![]('./src/assets/4.png') |
+
+## Features
+
+- Editorial design system
+- Custom GSAP animations
+- Destination pages with MDX
+- Itinerary layouts
+- Journal with content collections
+- Inquiry form
+- Fully responsive
+
+## Stack
+
+- Astro
+- Tailwind CSS
+- GSAP
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Content
 
-## 🚀 Project Structure
+All content lives in `/src/content`:
 
-Inside of your Astro project, you'll see the following folders and files:
+- `/destinations` — destination pages
+- `/itineraries` — multi-day itinerary layouts  
+- `/journal` — editorial blog posts
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+Replace the demo content with your own. Images sourced from Unsplash.
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Customization
 
-## 🧞 Commands
+Design tokens in `global.css`. Fonts via Google Fonts. Swap out freely.
 
-All commands are run from the root of the project, from a terminal:
+## License
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+Code © Elliot Li — MIT | Assets © Elliot Li — CC BY-NC-ND 4.0
 
-## 👀 Want to learn more?
+## Built by
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+[Elliot Li](https://elliotli.dev)

@@ -1,0 +1,66 @@
+
+---
+let { inactive, class: cls, underline } = Astro.props
+---
+
+<roll-text
+  data-inactive={inactive}
+  class:list={["inline-flex items-center text-[17px] font-medium leading-none tracking-[.03em]", cls]}
+>
+  <span
+    class:list={[
+      "relative perspective-normal overflow-hidden block",
+      underline &&
+        "bg-[linear-gradient(currentColor)] bg-size-[100%_1px] bg-bottom-left bg-no-repeat",
+    ]}
+  >
+    <span class="inline-block"><slot /></span>
+    <span class="absolute inline-block left-0 invisible" aria-hidden='true'><slot /></span>
+  </span>
+</roll-text>
+
+<script>
+  import gsap from "gsap"
+  class RollText extends HTMLElement {
+    connectedCallback() {
+      let span = this.children[0],
+        [a, b] = span.children
+      this.tl = gsap
+        .timeline({
+          paused: true,
+          defaults: { duration: 0.8, ease: "expo.inOut" },
+        })
+        .to(a, {
+          opacity: 0,
+          yPercent: -100,
+          rotateX: 80,
+          // z: -20
+        })
+        // what autoAlpha does: when opacity reaches its value, change visibility to inherit
+        .from(
+          b,
+          { opacity: 0, yPercent: 100, rotateX: -60, z: -20, autoAlpha: 0 },
+          "<",
+        )
+      if (!this.dataset.inactive) {
+        this.addEventListener("pointerenter", this.play)
+        this.addEventListener("pointerleave", this.reverse)
+      }
+    }
+    disconnectedCallback() {
+      let span = this.children[0]
+      if (span && !this.dataset.inactive) {
+        this.removeEventListener("pointerenter", this.play)
+        this.removeEventListener("pointerleave", this.reverse)
+      }
+      this.tl?.kill()
+    }
+    play() {
+      this.tl?.play()
+    }
+    reverse() {
+      this.tl?.reverse()
+    }
+  }
+  customElements.define("roll-text", RollText)
+</script>

@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@plugin "tailwind-clamp" {
+	minSize: 400px;
+	maxSize: 2560px;
+}
+
+@theme {
+	--color-tint: rgb(158, 28, 100);
+	--color-neutral: rgb(122, 122, 122);
+	--color-brand: rgb(19, 16, 33);
+	--color-inverted: rgb(255, 255, 255);
+	--color-text: rgb(21, 19, 27);
+
+	--font-body: var(--font-jost);
+  --font-title: var(--font-tenor);
+}
+
+@layer components {
+	.text-h2 {
+		@apply text-[42px] leading-[1.2em] font-body;
+	}
+	.text-h3 {
+		@apply text-[26px] leading-[1.4em] tracking-[0.04em] font-body;
+	}
+	.text-h4 {
+		@apply text-[24px] leading-[1.4em] tracking-[0.04em] font-body;
+	}
+	.text-byline {
+		@apply text-[24px] leading-[1.6em] font-body italic font-light;
+	}
+	.text-medium {
+		@apply text-[16px] leading-[1.6em] tracking-[0.026em] font-body;
+	}
+	.text-journal-excerpt {
+		@apply text-[18px] leading-[1.6em] tracking-[0.026em] font-body italic font-light;
+	}
+	.text-curator-bio {
+		@apply text-[40px] leading-[1.6em] tracking-[0.026em] font-body font-light;
+	}
+	.text-label {
+		@apply text-[14px] leading-[1.4em] tracking-[0.03em] font-body uppercase;
+	}
+	.text-curator-desc {
+		@apply text-[16px] leading-[1.6em] tracking-[-0.02em] font-body;
+	}
+	.text-journal-body {
+		@apply text-[21px] leading-[1.9em] tracking-[0.04em] font-body;
+	}
+  .text-masthead {
+    @apply font-title clamp-[text,40px,130px] leading-none tracking-[-.04em] uppercase;
+  }
+
+  .aspect-cover {
+    height: auto;
+    aspect-ratio: 17 / 11;
+  }
+
+  .aspect-page {
+    height: auto;
+    aspect-ratio: 17 / 22;
+  }
+
+  .aspect-page-fixed {
+    width: auto;
+    aspect-ratio: 17 / 22;
+  }
+
+  .aspect-anamorphic {
+    height: auto;
+    aspect-ratio: 2.39 / 1;
+  }
+
+  .main-container {
+    @apply clamp-[px,20px,50px];
+  }
+
+  .main-grid {
+    @apply clamp-[gap-x,15px,20px];
+  }
+
+  .main-margin {
+    @apply clamp-[mt,100px,200px] clamp-[mb,50px,150px];
+  }
+}
+
+@layer base {
+	body {
+		@apply text-[20px] leading-[1.7em] tracking-[0.026em] font-body;
+	}
+}
