@@ -4,8 +4,8 @@ A luxury travel theme built with Astro. Ported from [my Framer template](https:/
 
 | | |
 | :---: | :---: |
-| ![]('./src/assets/1.png') | ![]('./src/assets/2.png') |
-| ![]('./src/assets/3.png') | ![]('./src/assets/4.png') |
+| ![](src/assets/preview/1.png) | ![](src/assets/preview/2.png) |
+| ![](src/assets/preview/3.png) | ![](src/assets/preview/4.png) |
 
 ## Features
 
