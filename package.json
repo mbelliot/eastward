@@ -14,10 +14,12 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.4.2",
+    "class-variance-authority": "^0.7.1",
     "gsap": "^3.15.0",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
+    "@astrojs/ts-plugin": "^1.10.9",
     "@biomejs/biome": "2.4.16",
     "tailwind-clamp": "^4.5.1"
   }

@@ -1,12 +1,16 @@
 ---
 import RollButton from "@/RollButton.astro"
+import RollText from "@/RollText.astro"
 import Layout from "../layouts/Layout.astro"
 ---
 
 <Layout>
-  <h1 class="text-masthead">Welcome to Eastward</h1>
-  <RollButton>Hello</RollButton>
-  <RollButton variant='dimmed' size='sm'>Hello</RollButton>
-  <RollButton variant='outline'>Hello</RollButton>
-  <RollButton variant='plain'>Hello</RollButton>
+	<h1 class="text-masthead w-3xl">Welcome to Eastward</h1>
+	<RollButton>Hello</RollButton>
+	<RollButton variant="dimmed" size="sm">Hello</RollButton>
+	<RollButton variant="outline">Hello</RollButton>
+	<RollButton variant="outline" size="sm">Hello</RollButton>
+	<RollButton variant="plain">Hello</RollButton>
+	<RollText underline>Roll</RollText>
+	<RollText>Roll</RollText>
 </Layout>

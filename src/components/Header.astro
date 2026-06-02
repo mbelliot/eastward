@@ -1,0 +1,9 @@
+---
+import Mandala from "@/Mandala.astro"
+
+let gap = "clamp-[gap,15px,25px]",
+	px = "clamp-[px,15px,25px]"
+---
+<header   class:list={["fixed top-0 left-0 right-0 clamp-[h,60px,100px] flex justify-between items-center z-30",px]} >
+<Mandala inert color='firebrick' class='size-20' />
+</header>

@@ -1,5 +1,11 @@
 
 ---
+interface Props {
+	inactive?: boolean
+	underline?: boolean
+	class?: string
+}
+
 let { inactive, class: cls, underline } = Astro.props
 ---
 
@@ -22,6 +28,8 @@ let { inactive, class: cls, underline } = Astro.props
 <script>
   import gsap from "gsap"
   class RollText extends HTMLElement {
+    tl!: gsap.core.Timeline
+
     connectedCallback() {
       let span = this.children[0],
         [a, b] = span.children
@@ -63,4 +71,12 @@ let { inactive, class: cls, underline } = Astro.props
     }
   }
   customElements.define("roll-text", RollText)
+
+  // exposes custom element methods, not needed for Astro props
+  declare global {
+    interface HTMLElementTagNameMap {
+      "roll-text": RollText
+    }
+  }
+
 </script>

@@ -1,36 +1,48 @@
 
 ---
+import { cva, type VariantProps } from "class-variance-authority"
 import RollText from "./RollText.astro"
 
-const variantStyles = {
-		primary: "bg-tint text-inverted",
-		dimmed: "bg-text text-inverted",
-		outline: "border-1 text-text",
-		plain: "",
+const variants = cva(
+	"cursor-pointer relative leading-none bg-cta inline-flex items-center justify-center uppercase rounded-[24px] w-max",
+	{
+		variants: {
+			variant: {
+				primary: "bg-tint text-inverted",
+				dimmed: "bg-text text-inverted",
+				outline: "border-1 text-text",
+				plain: "",
+			},
+			size: {
+				md: "py-[15px] px-[30px]",
+				sm: "py-[10px] px-[15px]",
+			},
+		},
+		defaultVariants: {
+			variant: "primary",
+			size: "md",
+		},
 	},
-	sizeStyles = { md: "py-[15px] px-[30px]", sm: "py-[10px] px-[15px]" }
+)
 
-let { class: cls, variant = "primary", size = "md" } = Astro.props
+type Props = VariantProps<typeof variants>
+
+let { variant, size } = Astro.props
 ---
 
 <roll-button>
-  <button
-    class:list={[
-      "cursor-pointer relative leading-none bg-cta inline-flex items-center justify-center uppercase rounded-[24px] w-max",
-      variantStyles[variant],sizeStyles[size],
-      cls,
-    ]}
-  >
+  <button class={variants({variant, size})}>
     <RollText inactive><slot /></RollText>
   </button>
 </roll-button>
 
 <script>
-  class MyButton extends HTMLElement {
+  class RollButton extends HTMLElement {
     connectedCallback() {
       let button = this.children[0],
         text = this.querySelector("roll-text")
       if(!text)return
+    
       button.addEventListener("pointerenter", () => {
         text.play()
       })
@@ -39,5 +51,5 @@ let { class: cls, variant = "primary", size = "md" } = Astro.props
       })
     }
   }
-  customElements.define("roll-button", MyButton)
+  customElements.define("roll-button", RollButton)
 </script>

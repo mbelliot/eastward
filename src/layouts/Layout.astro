@@ -1,6 +1,7 @@
 ---
-import { Font } from "astro:assets";
-import "../styles/global.css";
+import { Font } from "astro:assets"
+import "../styles/global.css"
+import Header from "@/Header.astro"
 ---
 
 <!doctype html>
@@ -11,11 +12,12 @@ import "../styles/global.css";
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>Eastward</title>
 		<Font cssVariable="--font-jost" preload />
 		<Font cssVariable="--font-tenor" preload />
 	</head>
 	<body>
+<Header/>
 		<slot />
 	</body>
 </html>
