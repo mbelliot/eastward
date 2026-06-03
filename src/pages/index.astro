@@ -1,16 +1,25 @@
 ---
+import Hairline from "@/Hairline.astro"
+import Header from "@/Header.astro"
 import RollButton from "@/RollButton.astro"
-import RollText from "@/RollText.astro"
-import Layout from "../layouts/Layout.astro"
+import RollLink from "@/RollLink.astro"
+import Car from "$/icons/Car.svg"
+import Layout from "~/layouts/Layout.astro"
 ---
 
 <Layout>
+	<Header />
+	<div class="h-25 bg-black flex items-center">
+		<Hairline />
+	</div>
 	<h1 class="text-masthead w-3xl">Welcome to Eastward</h1>
 	<RollButton>Hello</RollButton>
 	<RollButton variant="dimmed" size="sm">Hello</RollButton>
 	<RollButton variant="outline">Hello</RollButton>
 	<RollButton variant="outline" size="sm">Hello</RollButton>
 	<RollButton variant="plain">Hello</RollButton>
-	<RollText underline>Roll</RollText>
-	<RollText>Roll</RollText>
+	<RollLink variant="title" class="text-text">Roll</RollLink>
+	<RollLink>Roll</RollLink>
+	<RollLink>Hello you</RollLink>
+	<Car class="stroke-tint" />
 </Layout>

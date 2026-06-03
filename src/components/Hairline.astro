@@ -1,0 +1,55 @@
+---
+interface Props {
+	id?: string
+	class?: string
+	direction?: "x" | "y"
+}
+
+const { id, class: cls, direction = "x" } = Astro.props
+---
+
+<hair-line data-direction={direction} class="contents" id={id}>
+	<div
+		aria-hidden="true"
+		class:list={[
+    "bg-white self-stretch invisible",
+    direction==='x' ? "w-full h-px origin-left" : "h-full w-px origin-top",
+     "hairline",
+    cls,
+  ]}
+	></div>
+</hair-line>
+
+<script>
+import gsap from "gsap"
+
+class Hairline extends HTMLElement {
+	// _tl!: gsap.core.Timeline
+
+	connectedCallback() {
+		let el = this.children[0],
+			dir = this.dataset.direction,
+			isX = dir === "x"
+
+		this._tl = gsap
+			.timeline({ paused: true, defaults: { ease: "none", duration: 1 } })
+			.fromTo(
+				el,
+				{ autoAlpha: 1, scaleX: isX ? 0 : 1, scaleY: isX ? 1 : 0 },
+				{ opacity: 0.2, scaleX: 1, scaleY: 1 },
+			)
+	}
+
+	get tl() {
+		return this._tl
+	}
+}
+
+customElements.define("hair-line", Hairline)
+
+declare global {
+	interface HTMLElementTagNameMap {
+		"hair-line": Hairline
+	}
+}
+</script>
