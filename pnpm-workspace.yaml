@@ -1,3 +1,13 @@
 allowBuilds:
   esbuild: true
   sharp: true
+minimumReleaseAgeExclude:
+  - '@sanity/cli-build@0.2.0'
+  - '@sanity/cli@6.7.0'
+  - '@sanity/diff@5.29.0'
+  - '@sanity/mutator@5.29.0'
+  - '@sanity/schema@5.29.0'
+  - '@sanity/types@5.29.0'
+  - '@sanity/util@5.29.0'
+  - sanity@5.29.0
+  - '@astrojs/react@5.0.7'

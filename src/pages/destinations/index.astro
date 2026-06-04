@@ -1,0 +1,17 @@
+---
+import { sanityClient } from "sanity:client"
+import { defineQuery } from "groq"
+import RollLink from "@/RollLink.astro"
+import Layout from "~/layouts/Layout.astro"
+
+let query = defineQuery('*[_type == "destination"]')
+let data = await sanityClient.fetch(query)
+---
+
+<Layout>
+	<div class="flex flex-col gap-10 items-start">
+		{data.map(d=>( 
+  <RollLink href={`/destinations/${d.slug.current}`}>{d.name}</RollLink>
+  ))}
+	</div>
+</Layout>

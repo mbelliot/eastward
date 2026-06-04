@@ -1,26 +1,43 @@
 {
-  "name": "eastward",
-  "type": "module",
-  "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.4.2",
-    "class-variance-authority": "^0.7.1",
-    "gsap": "^3.15.0",
-    "tailwindcss": "^4.3.0"
-  },
-  "devDependencies": {
-    "@astrojs/ts-plugin": "^1.10.9",
-    "@biomejs/biome": "2.4.16",
-    "tailwind-clamp": "^4.5.1"
-  }
+	"name": "eastward",
+	"type": "module",
+	"version": "0.0.1",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"dev:astro": "astro dev",
+		"disabled:schema": "sanity schemas extract --watch",
+		"dev:typegen": "sanity typegen generate --watch",
+		"dev": "pnpm run --parallel /dev:.*/",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"validate": "sanity-template-validate"
+	},
+	"dependencies": {
+		"@astrojs/react": "^5.0.7",
+		"@sanity/astro": "^3.4.0",
+		"@sanity/client": "^7.22.1",
+		"@sanity/vision": "^5.28.0",
+		"@tailwindcss/vite": "^4.3.0",
+		"@types/react": "^19.2.16",
+		"@types/react-dom": "^19.2.3",
+		"astro": "^6.4.2",
+		"class-variance-authority": "^0.7.1",
+		"groq": "^5.29.0",
+		"gsap": "^3.15.0",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"react-is": "^19.2.7",
+		"sanity": "^5.29.0",
+		"styled-components": "^6.4.2",
+		"tailwindcss": "^4.3.0"
+	},
+	"devDependencies": {
+		"@astrojs/ts-plugin": "^1.10.9",
+		"@biomejs/biome": "2.4.16",
+		"@sanity/template-validator": "^3.1.0",
+		"tailwind-clamp": "^4.5.1"
+	}
 }

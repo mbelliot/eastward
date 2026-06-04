@@ -53,6 +53,7 @@
 						"useImportType": "off"
 					},
 					"correctness": {
+						"useJsxKeyInIterable": "off",
 						"noUnusedVariables": "off",
 						"noUnusedImports": "off"
 					}
