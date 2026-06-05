@@ -1,0 +1,27 @@
+---
+import type { HTMLAttributes } from "astro/types"
+import type { Theme } from "../../sanity.types"
+import Icon, { type IconName } from "./Icon.astro"
+
+interface Props extends HTMLAttributes<"svg"> {
+	theme: Theme
+}
+
+let { theme, ...attrs } = Astro.props
+
+function themeIconName(name: string): IconName {
+	const map: Record<string, IconName> = {
+		"Nature & Wildlife": "Nature",
+		History: "History",
+		Spiritual: "Spiritual",
+		"Wellness Retreat": "Wellness",
+		"Art & Architecture": "Art",
+		Culinary: "Culinary",
+		Adventure: "Adventure",
+	}
+
+	return map[name] ?? "Adventure"
+}
+---
+
+<Icon name={themeIconName(theme.name)} {...attrs} />

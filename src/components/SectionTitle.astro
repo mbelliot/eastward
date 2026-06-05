@@ -1,0 +1,12 @@
+---
+let { title, desc, class: cls } = Astro.props
+---
+
+<div class={cls}>
+	<h2
+		class="font-title uppercase leading-none tracking-[-.04em] clamp-[text,42px,110px,390px,2400px]"
+	>
+		{title}
+	</h2>
+	<p class="italic leading-[1.2] tracking-normal">{desc}</p>
+</div>

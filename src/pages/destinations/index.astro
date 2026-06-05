@@ -9,7 +9,7 @@ let data = await sanityClient.fetch(query)
 ---
 
 <Layout>
-	<div class="flex flex-col gap-10 items-start">
+	<div class="flex flex-col gap-10 items-start mt-30">
 		{data.map(d=>( 
   <RollLink href={`/destinations/${d.slug.current}`}>{d.name}</RollLink>
   ))}

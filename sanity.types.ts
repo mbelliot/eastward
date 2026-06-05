@@ -577,7 +577,7 @@ export type AllSanitySchemaTypes =
 
 // Source: src/pages/destinations/[slug].astro
 // Variable: destinationQuery
-// Query: *[_type=="destination" && slug.current == $slug][0]
+// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      themes[]->,      "numItineraries": count(*[_type == 'itinerary' && references(^._id)])}
 export type DestinationQueryResult = {
   _id: string;
   _type: "destination";
@@ -696,12 +696,18 @@ export type DestinationQueryResult = {
     alt?: string;
     _type: "image";
   };
-  themes?: Array<
-    {
-      _key: string;
-    } & ThemeReference
-  >;
+  themes: Array<{
+    _id: string;
+    _type: "theme";
+    _createdAt: string;
+    _updatedAt: string;
+    _rev: string;
+    name?: string;
+    description?: string;
+    slug: Slug;
+  }> | null;
   slug: Slug;
+  numItineraries: number;
 } | null;
 
 // Source: src/pages/destinations/index.astro
@@ -837,7 +843,7 @@ export type QueryResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type=="destination" && slug.current == $slug][0]': DestinationQueryResult;
+    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      themes[]->,\n      "numItineraries": count(*[_type == \'itinerary\' && references(^._id)])\n}': DestinationQueryResult;
     '*[_type == "destination"]': QueryResult;
   }
 }

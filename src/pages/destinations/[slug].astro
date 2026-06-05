@@ -2,7 +2,13 @@
 import { sanityClient } from "sanity:client"
 import type { GetStaticPaths } from "astro"
 import { defineQuery } from "groq"
+import Divider from "@/Divider.astro"
+import RollLink from "@/RollLink.astro"
+import SectionTitle from "@/SectionTitle.astro"
+import TextBlock from "@/TextBlock.astro"
+import Theme from "@/Theme.astro"
 import Layout from "~/layouts/Layout.astro"
+import { urlFor } from "~/sanity/lib"
 
 export const getStaticPaths = (async () => {
 	let dests = await sanityClient.fetch('*[_type == "destination"]')
@@ -13,12 +19,100 @@ export const getStaticPaths = (async () => {
 let { params } = Astro
 
 let destinationQuery = defineQuery(
-	'*[_type=="destination" && slug.current == $slug][0]',
+	`*[_type=="destination" && slug.current == $slug][0] {
+      ...,
+      themes[]->,
+      "numItineraries": count(*[_type == 'itinerary' && references(^._id)])
+}`,
 )
-let dest = await sanityClient.fetch(destinationQuery, params)
+let dest = (await sanityClient.fetch(destinationQuery, params))!
 
 // sanity typegen chokes on return here
+// code path unreachable on SSG, problematic on SSR
+//
 // if (!dest) return Astro.rewrite("/404")
 ---
 
-<Layout>{dest?.name} </Layout>
+<Layout title={dest.name}>
+	<section class="relative main-grid main-container h-dvh items-end">
+		<img
+			class="absolute inset-0 object-cover w-full h-full object-center brightness-70"
+			src={urlFor(dest.cover).width(1920).auto('format').url()}
+			alt={dest.cover?.alt??''}
+			loading="eager"
+			decoding="async"
+		>
+		<div class="relative col-[2/13] mb-[8vh] flex flex-col gap-1.5">
+			<div
+				aria-hidden="true"
+				class="absolute inset-0 -left-8 bg-inverted w-2"
+			/>
+			<p
+				class="text-byline text-inverted clamp-[text,24px,30px,375px,2400px] leading-none"
+			>
+				{dest.tagline}
+			</p>
+			<h1
+				class="text-masthead clamp-[text,60px,240px,375px,2400px] text-inverted"
+			>
+				{dest.name}
+			</h1>
+			<ul
+				class="flex items-center gap-2.5 text-label text-inverted leading-none pt-8"
+			>
+				<li>{dest.country}</li>
+				<li aria-hidden="true" class="size-1.5 rounded-full bg-inverted" />
+				<li>
+					{dest.numItineraries}
+					{dest.numItineraries===1?'itinerary':'itineraries'}
+				</li>
+			</ul>
+		</div>
+	</section>
+	<section class="main-grid main-container h-dvh mb-[100px]">
+		<div class="col-span-6 clamp-[pt,20px,30px] min-h-0">
+			<img
+				class="w-full h-full object-cover"
+				src={urlFor(dest.portrait).height(800).auto('format').url()}
+				alt={dest.portrait?.alt??''}
+			>
+		</div>
+		<div class="mt-[150px] col-[8/12] flex flex-col items-start gap-[2em]">
+			<h2 class="text-h2">{dest.tagline}</h2>
+			<div class="flex flex-col gap-[1em]">
+				<TextBlock class="text-balance" text={dest.appeal??''} />
+			</div>
+			<RollLink href="#itineraries">View itineraries</RollLink>
+		</div>
+	</section>
+	<Divider />
+	<section class="main-grid main-container main-margin">
+		<h2 class="text-h2 col-[2/6] mb-5">Curated Perspectives</h2>
+		<div class="col-[2/6]">
+			<p class="text-balance">
+				True luxury lies in the meaning we find beneath the surface. Our
+				curators identify the essential threads that weave a location’s
+				identity, providing a structured framework for your exploration. We
+				don’t just show you a place; we reveal the themes that define its soul.
+			</p>
+		</div>
+		<div class="col-[7/12] flex flex-col gap-5">
+			{(dest.themes??[]).map((theme,i)=><>
+      {i>0&&<Divider/>} 
+      <div class='flex gap-[30px] items-center'>
+      <Theme class='size-[50px]' theme={theme}/>
+        <p>{theme.name}</p>
+      </div>
+    </>)}
+		</div>
+	</section>
+	<Divider />
+	<section class="main-grid main-container main-margin">
+		<SectionTitle
+			class="col-[9/12]"
+			title="The Sights"
+			desc="The iconic silhouettes that anchor the local horizon."
+		/>
+	</section>
+	<Divider />
+</Layout>

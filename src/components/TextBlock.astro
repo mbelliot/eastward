@@ -1,0 +1,21 @@
+---
+import type { HTMLTag, Polymorphic } from "astro/types"
+
+type Props<Tag extends HTMLTag> = Polymorphic<{
+	as: Tag
+	text: string
+}>
+
+const {
+	as: As = "p",
+	text,
+	class: cls,
+	...attrs
+} = Astro.props as Props<HTMLTag>
+---
+
+{text.split('\n').filter(Boolean).map((t) => (
+    <As class={cls} {...attrs}>
+      {t}
+    </As>
+  ))}
