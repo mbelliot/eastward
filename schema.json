@@ -1004,6 +1004,13 @@
                       },
                       "optional": true
                     },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
                     "_type": {
                       "type": "objectAttribute",
                       "value": {
@@ -1264,6 +1271,13 @@
                       "value": {
                         "type": "inline",
                         "name": "sanity.imageCrop"
+                      },
+                      "optional": true
+                    },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
                       },
                       "optional": true
                     },
@@ -1561,6 +1575,39 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
+        },
+        "optional": true
+      },
+      "type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "Resort"
+            },
+            {
+              "type": "string",
+              "value": "Boutique"
+            },
+            {
+              "type": "string",
+              "value": "Glamping"
+            },
+            {
+              "type": "string",
+              "value": "Villa"
+            },
+            {
+              "type": "string",
+              "value": "Palace"
+            },
+            {
+              "type": "string",
+              "value": "Lodge"
+            }
+          ]
         },
         "optional": true
       },
@@ -1935,6 +1982,13 @@
                       },
                       "optional": true
                     },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
                     "_type": {
                       "type": "objectAttribute",
                       "value": {
@@ -2198,6 +2252,13 @@
                       },
                       "optional": true
                     },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
+                      },
+                      "optional": true
+                    },
                     "_type": {
                       "type": "objectAttribute",
                       "value": {
@@ -2458,6 +2519,13 @@
                       "value": {
                         "type": "inline",
                         "name": "sanity.imageCrop"
+                      },
+                      "optional": true
+                    },
+                    "alt": {
+                      "type": "objectAttribute",
+                      "value": {
+                        "type": "string"
                       },
                       "optional": true
                     },
@@ -2875,14 +2943,14 @@
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "description": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "slug": {
         "type": "objectAttribute",

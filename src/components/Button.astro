@@ -1,0 +1,36 @@
+---
+import { Icon } from 'astro-icon/components'
+import IconButton from '@/IconButton.astro'
+import { cva, type VariantProps } from 'class-variance-authority'
+import type { HTMLAttributes } from 'astro/types'
+
+const variants = cva('', {
+  variants: {
+    variant: {
+      mono: 'text-mono',
+      inverted: 'text-inverted',
+    },
+  },
+  defaultVariants: { variant: 'mono' },
+})
+
+type Name = 'arrow-left' | 'arrow-right'
+
+type Props = VariantProps<typeof variants> & HTMLAttributes<'button'> & { name: Name }
+
+const iconNames = {
+    'arrow-right': 'ph:arrow-right-light',
+    'arrow-left': 'ph:arrow-left-light',
+  } as const,
+  directions = { 'arrow-right': 'right', 'arrow-left': 'left' } as const
+
+const { class: cls, variant, name, ...attrs } = Astro.props
+---
+
+<IconButton
+  class:list={['size-[45px]', variants({ variant }), cls]}
+  {...attrs}
+  direction={directions[name]}
+>
+  <Icon class:list={['size-[28px]', variants({ variant })]} name={iconNames[name]} />
+</IconButton>

@@ -1,0 +1,62 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import { sanityClient } from 'sanity:client'
+import { createImageUrlBuilder, type FitMode, type SanityImageSource } from '@sanity/image-url'
+
+type Source = { media: string; sizes: string; widths: number[]; aspect?: number; fit?: FitMode }
+
+interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {
+  src: SanityImageSource
+  sources?: Source[]
+}
+
+const builder = createImageUrlBuilder(sanityClient)
+
+function genSrcset(source: Source): string {
+  return source.widths
+    .map((w) => {
+      let imgBuilder = builder.image(src).width(w).auto('format')
+
+      if (source.aspect) {
+        const targetHeight = Math.round(w / source.aspect)
+        imgBuilder = imgBuilder.height(targetHeight).fit(source.fit ?? 'crop')
+      }
+
+      return `${imgBuilder.url()} ${w}w`
+    })
+    .join(', ')
+}
+
+export const fullscreenSources: Source[] = [
+  {
+    media: '(min-width: 1200px)',
+    sizes: '100vw',
+    widths: [1280, 1920, 2560],
+    aspect: 16 / 9,
+  },
+  {
+    media: '(min-width: 640px) and (max-width: 1199px)',
+    sizes: '100vw',
+    widths: [800, 1280],
+    aspect: 16 / 9,
+  },
+  {
+    media: '(max-width: 639px)',
+    sizes: '100vw',
+    widths: [480, 800],
+    aspect: 9 / 16,
+  },
+]
+
+const { src, sources, ...attrs } = Astro.props
+---
+
+<picture>
+  {
+    sources &&
+      sources.map((source) => (
+        <source media={source.media} srcset={genSrcset(source)} sizes={source.sizes} />
+      ))
+  }
+  <img src={builder.image(src).auto('format').url()} {...attrs} />
+</picture>

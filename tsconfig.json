@@ -1,17 +1,18 @@
 {
-	"extends": "astro/tsconfigs/strict",
-	"include": [".astro/types.d.ts", "**/*", "sanity.types.ts"],
-	"exclude": ["dist"],
-	"compilerOptions": {
-		"paths": {
-			"~/*": ["./src/*"],
-			"@/*": ["./src/components/*"],
-			"$/*": ["./src/assets/*"]
-		},
-		"plugins": [
-			{
-				"name": "@astrojs/ts-plugin"
-			}
-		]
-	}
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*", "sanity.types.ts"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "paths": {
+      "~/*": ["./src/*"],
+      "@/*": ["./src/components/*"],
+      "$/*": ["./src/assets/*"],
+      "sanity.types": ["./sanity.types.ts"]
+    },
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ]
+  }
 }

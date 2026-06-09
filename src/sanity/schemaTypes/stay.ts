@@ -15,6 +15,21 @@ export const stayType = defineType({
 			title: "Description",
 		}),
 		defineField({
+			name: "type",
+			type: "string",
+			title: "Type",
+			options: {
+				list: [
+					{ title: "Resort", value: "Resort" },
+					{ title: "Boutique", value: "Boutique" },
+					{ title: "Glamping", value: "Glamping" },
+					{ title: "Villa", value: "Villa" },
+					{ title: "Palace", value: "Palace" },
+					{ title: "Lodge", value: "Lodge" },
+				],
+			},
+		}),
+		defineField({
 			name: "destination",
 			type: "reference",
 			title: "Destination",

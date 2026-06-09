@@ -1,0 +1,67 @@
+---
+import { type HTMLAttributes } from 'astro/types'
+
+interface Props extends HTMLAttributes<'button'> {
+  direction?: 'left' | 'right'
+}
+
+const { class: cls, direction, ...attrs } = Astro.props
+---
+
+<icon-button data-dir={direction} class="contents">
+  <button
+    class:list={[
+      'cursor-pointer aspect-square rounded-full border overflow-clip relative **:pointer-events-none',
+      cls,
+    ]}
+    {...attrs}
+  >
+    <div class="grid place-items-center absolute inset-0">
+      <slot />
+    </div>
+    {
+      direction && (
+        <div
+          aria-hidden="true"
+          class:list={[
+            'grid place-items-center absolute inset-0',
+            direction === 'left' && 'translate-x-full',
+            direction === 'right' && '-translate-x-full',
+          ]}
+        >
+          <slot />
+        </div>
+      )
+    }
+  </button>
+</icon-button>
+
+<script>
+  import gsap from 'gsap'
+
+  class IconButton extends HTMLElement {
+    connectedCallback() {
+      const button = this.querySelector('button')
+      if (!button) return
+      const dir = this.dataset.dir,
+        tween =
+          dir &&
+          gsap.to(button.children, {
+            ...(dir === 'left' && { xPercent: -100 }),
+            ...(dir === 'right' && { xPercent: 100 }),
+            duration: 0.5,
+            ease: 'power1.inOut',
+            paused: true,
+          })
+      if (tween) {
+        button.addEventListener('pointerenter', () => {
+          tween.play()
+        })
+        button.addEventListener('pointerleave', () => {
+          tween.reverse()
+        })
+      }
+    }
+  }
+  customElements.define('icon-button', IconButton)
+</script>

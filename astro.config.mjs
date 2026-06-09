@@ -6,6 +6,8 @@ import { defineConfig, fontProviders } from "astro/config"
 
 import react from "@astrojs/react";
 
+import icon from "astro-icon";
+
 export default defineConfig({
     fonts: [
         {
@@ -26,6 +28,11 @@ export default defineConfig({
 
     vite: {
         plugins: [tailwindcss()],
+        server: {
+            watch: {
+                ignored: ["**/sanity.types.ts"],
+            },
+        },
     },
 
     integrations: [sanity({
@@ -34,5 +41,5 @@ export default defineConfig({
         useCdn: false,
         apiVersion: "2026-06-03",
         studioBasePath: "/cms",
-		}), react()],
+        }), react(), icon()],
 })

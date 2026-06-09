@@ -1,0 +1,99 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import type { Destination } from 'sanity.types'
+import Picture from '@/Picture.astro'
+
+interface Props extends HTMLAttributes<'div'> {
+  attractions: NonNullable<Destination['attractions']>
+}
+
+const { attractions, class: cls, ...attrs } = Astro.props
+---
+
+<attractions-reel
+  class:list={[
+    'relative flex clamp-[gap-x,20px,25px] items-end overflow-visible',
+    'min-[640px]:-mt-45 min-[1200px]:clamp-[mt,-85px,-155px,1200px,2560px]',
+    cls,
+  ]}
+  {...attrs}
+>
+  {
+    attractions.map((attraction) => (
+      <button>
+        <figure class="flex flex-col gap-2.5 h-full min-h-0">
+          <div class="flex-1 relative">
+            <Picture
+              draggable="false"
+              alt={attraction.image.alt ?? ''}
+              class="absolute inset-0 size-full object-cover select-none"
+              src={attraction.image}
+              sources={[
+                {
+                  media: '(min-width: 1200px)',
+                  sizes: '56vw',
+                  widths: [800, 1280, 1600],
+                  aspect: 7 / 5,
+                },
+                {
+                  media: '(min-width: 640px) and (max-width: 1199px)',
+                  sizes: '56vw',
+                  widths: [640, 1024],
+                  aspect: 4 / 5,
+                },
+                {
+                  media: '(max-width: 639px)',
+                  sizes: '92vw',
+                  widths: [480, 800],
+                  aspect: 4 / 5,
+                },
+              ]}
+            />
+          </div>
+          <figcaption>
+            <p class="text-left">{attraction.title}</p>
+          </figcaption>
+        </figure>
+      </button>
+    ))
+  }
+</attractions-reel>
+
+<script>
+  import { focusReel } from '~/lib/focusReel'
+
+  class AttractionsReel extends HTMLElement {
+    #abortController!: AbortController
+
+    connectedCallback() {
+      this.#abortController = new AbortController()
+
+      const move = focusReel(this, this.#abortController.signal),
+        root = this.closest('[data-focus-reel-root]')
+
+      if (root) {
+        root.querySelector('[data-previous-slide]')?.addEventListener(
+          'click',
+          () => {
+            move(1)
+          },
+          { signal: this.#abortController.signal },
+        )
+
+        root.querySelector('[data-next-slide]')?.addEventListener(
+          'click',
+          () => {
+            move(-1)
+          },
+          { signal: this.#abortController.signal },
+        )
+      }
+    }
+
+    disconnectedCallback() {
+      this.#abortController.abort()
+    }
+  }
+
+  customElements.define('attractions-reel', AttractionsReel)
+</script>

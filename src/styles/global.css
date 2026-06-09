@@ -6,7 +6,7 @@
 
 @theme {
 	--color-tint: rgb(158, 28, 100);
-	--color-neutral: rgb(122, 122, 122);
+	--color-mono: rgb(122, 122, 122);
 	--color-brand: rgb(19, 16, 33);
 	--color-inverted: rgb(255, 255, 255);
 	--color-text: rgb(21, 19, 27);
@@ -84,7 +84,7 @@
 }
 
 @layer base {
-	body {
+	p {
 		@apply text-[20px] leading-[1.8] tracking-[0.026em] font-body;
 	}
 }
