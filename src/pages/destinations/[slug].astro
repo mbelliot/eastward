@@ -11,23 +11,37 @@ import Theme from '@/Theme.astro'
 import Layout from '~/layouts/Layout.astro'
 import Attractions from '@/destinations/Attractions.astro'
 import Picture, { fullscreenSources } from '@/Picture.astro'
+import Activities from '@/destinations/Activities.astro'
+import FlexSlider from '@/FlexSlider.astro'
+import OverlayCard from '@/OverlayCard.astro'
+import RichText from '@/RichText.astro'
+import ItineraryCover from '@/itineraries/ItineraryCover.astro'
+import DestinationFAQs from '@/destinations/DestinationFAQs.astro'
 
 export const getStaticPaths = (async () => {
-  let dests = await sanityClient.fetch('*[_type == "destination"]')
+  const q = defineQuery('*[_type == "destination"]{ slug }'),
+    dests = await sanityClient.fetch(q)
 
   return dests.map(({ slug }) => ({ params: { slug: slug.current } }))
 }) satisfies GetStaticPaths
 
-let { params } = Astro
+const { params } = Astro
 
-let destinationQuery = defineQuery(
+const destinationQuery = defineQuery(
   `*[_type=="destination" && slug.current == $slug][0] {
       ...,
       themes[]->,
-      "numItineraries": count(*[_type == 'itinerary' && references(^._id)])
+      "itineraries": *[_type == 'itinerary' && references(^._id)] {
+        slug,
+        title,
+        tagline,
+        cover,
+        price,
+        themes[0..2]->
+      }
 }`,
 )
-let dest = (await sanityClient.fetch(destinationQuery, params))!
+const dest = (await sanityClient.fetch(destinationQuery, params))!
 
 // sanity typegen chokes on return here
 // code path unreachable on SSG, problematic on SSR
@@ -45,7 +59,8 @@ let dest = (await sanityClient.fetch(destinationQuery, params))!
           src={dest.cover}
           sources={fullscreenSources}
           loading="eager"
-          decoding="async"
+          decoding="sync"
+          fetchpriority="high"
         />
       )
     }
@@ -61,8 +76,8 @@ let dest = (await sanityClient.fetch(destinationQuery, params))!
         <li>{dest.country}</li>
         <li aria-hidden="true" class="size-1.5 rounded-full bg-inverted"></li>
         <li>
-          {dest.numItineraries}
-          {dest.numItineraries === 1 ? 'itinerary' : 'itineraries'}
+          {dest.itineraries.length}
+          {dest.itineraries.length === 1 ? 'itinerary' : 'itineraries'}
         </li>
       </ul>
     </div>
@@ -114,36 +129,83 @@ let dest = (await sanityClient.fetch(destinationQuery, params))!
       }
     </div>
   </section>
-  <Divider />
   {
     dest.attractions && (
-      <section class="main-grid main-container main-margin overflow-x-clip" data-focus-reel-root>
-        <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
-          <SectionTitle
-            title="The Sights"
-            desc="The iconic silhouettes that anchor the local horizon."
-          />
-          <div class="flex gap-5">
+      <>
+        <Divider />
+        <section class="main-grid main-container main-margin" data-focus-reel-root>
+          <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
+            <SectionTitle
+              title="The Sights"
+              desc="The iconic silhouettes that anchor the local horizon."
+            />
+            <div class="flex gap-5">
+              <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
+              <Button name="arrow-right" data-next-slide aria-label="Next slide" />
+            </div>
+          </div>
+          <Attractions class="col-span-full" attractions={dest.attractions} />
+        </section>
+      </>
+    )
+  }
+  {
+    dest.activities && (
+      <>
+        <Divider />
+        <section class="main-grid main-container main-margin">
+          <div class="col-[2/6]">
+            <SectionTitle
+              title="The Moments"
+              desc="The unscripted grace found in the rituals of the everyday."
+            />
+          </div>
+          <div class="mt-20 grid grid-cols-subgrid row-start-2 col-span-full">
+            <Activities activities={dest.activities} />
+          </div>
+        </section>
+      </>
+    )
+  }
+  {
+    dest.foods && (
+      <>
+        <Divider />
+        <section class="main-grid main-container main-margin" data-flex-slider-root>
+          <div class="flex gap-5 col-[2/8] items-end">
             <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
             <Button name="arrow-right" data-next-slide aria-label="Next slide" />
           </div>
-        </div>
-        <Attractions class="col-span-full" attractions={dest.attractions} />
-      </section>
+          <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
+            <SectionTitle
+              title="The Flavors"
+              desc="An aromatic heritage told through ancestral culinary craft."
+            />
+          </div>
+          <FlexSlider class="col-[2/13] pt-7.5" trackClass="clamp-[gap-x,20px,25px]">
+            {dest.foods.map((food) => (
+              <OverlayCard class="aspect-3/4 clamp-[w,300px,512px,390px,2000px]">
+                <h4 class="text-h4" slot="title">
+                  {food.title}
+                </h4>
+                <Picture
+                  sources={[{ media: '(min-width:0px)', widths: [512], aspect: 3 / 4 }]}
+                  src={food.image}
+                  slot="image"
+                />
+                <RichText text={food.body} />
+              </OverlayCard>
+            ))}
+          </FlexSlider>
+        </section>
+      </>
     )
   }
-  <Divider />
   {
-    dest.activities && (
-      <section class="main-grid main-container main-margin">
-        <div class="col-[2/6]">
-          <SectionTitle
-            title="The Moments"
-            desc="The unscripted grace found in the rituals of the everyday."
-          />
-        </div>
-        <div class="col-[2/13]">Hello</div>
-      </section>
-    )
+    dest.itineraries?.length &&
+      dest.itineraries.map((itn, i) => <ItineraryCover itinerary={itn} flipped={Boolean(i % 2)} />)
   }
+  <section class="main-container main-margin">
+    <DestinationFAQs />
+  </section>
 </Layout>

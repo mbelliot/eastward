@@ -1,0 +1,63 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import type { Destination } from 'sanity.types'
+import Picture, { fullscreenSources } from '@/Picture.astro'
+import RichText from '@/RichText.astro'
+import Template from '@/Template.astro'
+
+interface Props extends HTMLAttributes<'div'> {
+  activity: NonNullable<Destination['activities']>[number]
+}
+
+const { class: cls, activity } = Astro.props
+---
+
+<button data-cursor-area="magnifier" class:list={['flex flex-col activity', cls]}>
+  <figure class="flex flex-col gap-2.5">
+    <Picture
+      src={activity.image}
+      alt={activity.image.alt ?? ''}
+      sources={[
+        {
+          media: '(min-width: 1200px)',
+          sizes: '42vw',
+          widths: [800, 1280, 1600],
+        },
+        {
+          media: '(min-width: 640px) and (max-width: 1199px)',
+          sizes: '42vw',
+          widths: [640, 1024],
+        },
+        {
+          media: '(max-width: 639px)',
+          sizes: '92vw',
+          widths: [480, 800],
+        },
+      ]}
+    />
+    <figcaption>
+      <p class="text-left">{activity.title}</p>
+    </figcaption>
+  </figure>
+  <Template class="modalPayload">
+    <Picture
+      class="absolute inset-0 w-full h-full object-cover"
+      src={activity.image}
+      alt={activity.image.alt ?? ''}
+      sources={fullscreenSources}
+    />
+    <RichText text={activity.body} />
+  </Template>
+</button>
+
+<script>
+  document.querySelectorAll('.activity').forEach((att) => {
+    att.addEventListener('click', () => {
+      const template = att.querySelector('.modalPayload') as HTMLTemplateElement
+      const modal = document.querySelector('slide-modal')
+      if (template && modal) {
+        modal.show(template.content)
+      }
+    })
+  })
+</script>

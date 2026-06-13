@@ -3,11 +3,12 @@ import type { HTMLAttributes } from 'astro/types'
 import { sanityClient } from 'sanity:client'
 import { createImageUrlBuilder, type FitMode, type SanityImageSource } from '@sanity/image-url'
 
-type Source = { media: string; sizes: string; widths: number[]; aspect?: number; fit?: FitMode }
+type Source = { media: string; sizes?: string; widths: number[]; aspect?: number; fit?: FitMode }
 
 interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {
   src: SanityImageSource
   sources?: Source[]
+  pictureClass?: string
 }
 
 const builder = createImageUrlBuilder(sanityClient)
@@ -38,7 +39,7 @@ export const fullscreenSources: Source[] = [
     media: '(min-width: 640px) and (max-width: 1199px)',
     sizes: '100vw',
     widths: [800, 1280],
-    aspect: 16 / 9,
+    aspect: 9 / 16,
   },
   {
     media: '(max-width: 639px)',
@@ -48,15 +49,15 @@ export const fullscreenSources: Source[] = [
   },
 ]
 
-const { src, sources, ...attrs } = Astro.props
+const { pictureClass, src, sources, ...attrs } = Astro.props
 ---
 
-<picture>
+<picture class={pictureClass}>
   {
     sources &&
       sources.map((source) => (
-        <source media={source.media} srcset={genSrcset(source)} sizes={source.sizes} />
+        <source media={source.media} srcset={genSrcset(source)} sizes={source.sizes ?? '100vw'} />
       ))
   }
-  <img src={builder.image(src).auto('format').url()} {...attrs} />
+  <img loading="lazy" decoding="async" src={builder.image(src).auto('format').url()} {...attrs} />
 </picture>

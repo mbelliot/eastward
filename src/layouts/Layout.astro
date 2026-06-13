@@ -1,25 +1,31 @@
 ---
-import { Font } from "astro:assets"
-import "../styles/global.css"
-import Header from "@/Header.astro"
+import { Font } from 'astro:assets'
+import '~/styles/global.css'
+import Header from '@/Header.astro'
+import Cursor from '@/Cursor.astro'
+import SlideModal from '@/SlideModal.astro'
 
-let { title } = Astro.props
+const { title, class: cls } = Astro.props
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width">
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-		<link rel="icon" href="/favicon.ico">
-		<meta name="generator" content={Astro.generator}>
-		<title>{(title?`${title} | `:'')+'Eastward'}</title>
-		<Font cssVariable="--font-jost" preload />
-		<Font cssVariable="--font-tenor" preload />
-	</head>
-	<body>
-		<Header />
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{(title ? `${title} | ` : '') + 'Eastward'}</title>
+    <Font cssVariable="--font-jost" preload />
+    <Font cssVariable="--font-tenor" preload />
+  </head>
+  <body class={cls}>
+    <Cursor />
+    <SlideModal />
+    <Header />
+    <main>
+      <slot />
+    </main>
+  </body>
 </html>

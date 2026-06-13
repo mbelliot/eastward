@@ -1,0 +1,90 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import { Icon } from 'astro-icon/components'
+
+const iconNames = { magnifier: 'ph:magnifying-glass-plus-fill' } as const
+
+type Props = HTMLAttributes<'svg'>
+
+const { class: cls, ...attrs } = Astro.props
+---
+
+<div
+  id="cursor"
+  aria-hidden="true"
+  class="invisible mix-blend-exclusion fixed w-min pointer-events-none z-9999 -translate-1/2"
+  {...attrs}
+>
+  <Icon
+    name={iconNames.magnifier}
+    data-cursor-name="magnifier"
+    class:list={['size-25 text-inverted', cls]}
+  />
+</div>
+
+<script>
+  import gsap from 'gsap'
+
+  export function createCursor(
+    cursor: HTMLElement | null,
+    // animateProps = { ease: 'power1.inOut', duration: 0.01 },
+    tweenProps?: GSAPTweenVars,
+  ) {
+    if (typeof window === 'undefined' || !cursor) return
+    if (window.matchMedia('(pointer: coarse)').matches) return
+
+    let isVisible = false,
+      lastX = -100,
+      lastY = -100,
+      xTo = tweenProps
+        ? gsap.quickTo(cursor, 'x', tweenProps)
+        : (x: number) => gsap.set(cursor, { x }),
+      yTo = tweenProps
+        ? gsap.quickTo(cursor, 'y', tweenProps)
+        : (y: number) => gsap.set(cursor, { y })
+
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        lastX = e.clientX
+        lastY = e.clientY
+      },
+      { passive: true },
+    )
+
+    const ticker: GSAPTickerCallback = () => {
+      const pointElem = document.elementFromPoint(lastX, lastY),
+        areaElem = pointElem?.closest('[data-cursor-area]')
+
+      xTo(lastX)
+      yTo(lastY)
+
+      if (areaElem instanceof HTMLElement) {
+        // TODO: switch icons based on cursorName
+        // const cursorName = areaElem.dataset.cursorArea
+        if (!isVisible) {
+          isVisible = true
+          document.body.setAttribute('data-hide-native-cursor', '')
+          gsap.to(cursor, { autoAlpha: 1, scale: 1, duration: 0.3, overwrite: 'auto' })
+        }
+      } else {
+        if (isVisible) {
+          isVisible = false
+          document.body.removeAttribute('data-hide-native-cursor')
+          gsap.to(cursor, { autoAlpha: 0, scale: 0, duration: 0.3, overwrite: 'auto' })
+        }
+      }
+    }
+
+    gsap.ticker.add(ticker)
+  }
+
+  createCursor(document.getElementById('cursor'))
+</script>
+
+<style is:global>
+  body[data-hide-native-cursor],
+  body[data-hide-native-cursor] * {
+    cursor: none !important;
+  }
+</style>

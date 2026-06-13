@@ -738,14 +738,14 @@
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "tagline": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "days": {
         "type": "objectAttribute",
@@ -759,7 +759,7 @@
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "featured": {
         "type": "objectAttribute",
@@ -1367,7 +1367,7 @@
             }
           }
         },
-        "optional": true
+        "optional": false
       },
       "portrait": {
         "type": "objectAttribute",
@@ -1443,7 +1443,7 @@
             }
           }
         },
-        "optional": true
+        "optional": false
       },
       "destinations": {
         "type": "objectAttribute",
@@ -1487,7 +1487,7 @@
             }
           }
         },
-        "optional": true
+        "optional": false
       },
       "curator": {
         "type": "objectAttribute",

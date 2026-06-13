@@ -1,25 +1,25 @@
 ---
-import { type HTMLAttributes } from "astro/types"
-import { cva, type VariantProps } from "class-variance-authority"
-import RollText from "./RollText.astro"
+import { type HTMLAttributes } from 'astro/types'
+import { cva, type VariantProps } from 'class-variance-authority'
+import RollText from './RollText.astro'
 
-let variants = cva("cursor-pointer uppercase", {
-	variants: {
-		variant: {
-			title: "text-inverted",
-			text: "text-text",
-		},
-	},
-	defaultVariants: { variant: "text" },
+let variants = cva('cursor-pointer uppercase', {
+  variants: {
+    variant: {
+      title: 'text-inverted leading-none',
+      text: 'text-text leading-[1.5]',
+    },
+  },
+  defaultVariants: { variant: 'text' },
 })
 
-type Props = VariantProps<typeof variants> & HTMLAttributes<"a">
+type Props = VariantProps<typeof variants> & HTMLAttributes<'a'>
 
-let { variant = "text", class: cls, ...rest } = Astro.props
+let { variant = 'text', class: cls, ...rest } = Astro.props
 ---
 
-<a data-roll-trigger class:list={[ variants({variant}), cls ]} {...rest}>
-	<RollText underline={variant==='text'}>
-		<slot />
-	</RollText>
+<a data-roll-trigger {...rest}>
+  <RollText underline={variant === 'text'} class:list={[variants({ variant }), cls]}>
+    <slot />
+  </RollText>
 </a>

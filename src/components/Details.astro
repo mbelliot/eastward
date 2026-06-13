@@ -1,0 +1,24 @@
+---
+import { Icon } from 'astro-icon/components'
+
+const { summary } = Astro.props
+---
+
+<details
+  class:list={[
+    'bg-linear-(--color-mono-a) bg-size-[100%_1px] bg-bottom-left bg-no-repeat',
+    'group *:last:pb-5 overflow-hidden',
+    'details-content:h-0 open:details-content:h-auto details-content:transition-all details-content:duration-500 details-content:transition-discrete',
+  ]}
+>
+  <summary
+    class="list-none text-h4 flex justify-between items-center select-none cursor-pointer py-5"
+    >{summary}
+    <Icon
+      name="ph:caret-down"
+      class="size-[1cap] group-open:rotate-180 transition-all duration-500"
+      aria-hidden="true"
+    />
+  </summary>
+  <slot />
+</details>

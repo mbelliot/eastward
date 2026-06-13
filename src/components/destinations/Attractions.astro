@@ -1,7 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
 import type { Destination } from 'sanity.types'
-import Picture from '@/Picture.astro'
+import Picture, { fullscreenSources } from '@/Picture.astro'
+import RichText from '@/RichText.astro'
+import Template from '@/Template.astro'
 
 interface Props extends HTMLAttributes<'div'> {
   attractions: NonNullable<Destination['attractions']>
@@ -20,7 +22,7 @@ const { attractions, class: cls, ...attrs } = Astro.props
 >
   {
     attractions.map((attraction) => (
-      <button>
+      <button data-slide data-cursor-area="magnifier">
         <figure class="flex flex-col gap-2.5 h-full min-h-0">
           <div class="flex-1 relative">
             <Picture
@@ -54,6 +56,15 @@ const { attractions, class: cls, ...attrs } = Astro.props
             <p class="text-left">{attraction.title}</p>
           </figcaption>
         </figure>
+        <Template class="modalPayload">
+          <Picture
+            class="absolute inset-0 w-full h-full object-cover"
+            src={attraction.image}
+            alt={attraction.image.alt ?? ''}
+            sources={fullscreenSources}
+          />
+          <RichText text={attraction.body} />
+        </Template>
       </button>
     ))
   }
@@ -88,6 +99,16 @@ const { attractions, class: cls, ...attrs } = Astro.props
           { signal: this.#abortController.signal },
         )
       }
+
+      this.querySelectorAll('[data-slide]').forEach((slide) => {
+        slide.addEventListener('click', () => {
+          const template = slide.querySelector('.modalPayload') as HTMLTemplateElement
+          const modal = document.querySelector('slide-modal')
+          if (template && modal) {
+            modal.show(template.content)
+          }
+        })
+      })
     }
 
     disconnectedCallback() {

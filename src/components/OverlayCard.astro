@@ -1,0 +1,29 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = HTMLAttributes<'figure'>
+
+const { class: cls, ...attrs } = Astro.props
+---
+
+<figure class:list={['relative overflow-hidden', cls]} {...attrs}>
+  <div class="absolute inset-0 w-full h-full *:w-full *:h-full *:object-cover">
+    <slot name="image" />
+  </div>
+
+  <div
+    aria-hidden="true"
+    class="absolute inset-x-0 bottom-0 h-[70%] bg-linear-to-t from-black via-black/30 to-transparent backdrop-blur-[10px]"
+    style="mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5), black); -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5), black);"
+  >
+  </div>
+
+  <figcaption class="absolute inset-0 flex flex-col justify-end p-5 gap-2.5 text-inverted">
+    <div class="*:text-inverted">
+      <slot name="title" />
+    </div>
+    <div class="*:text-inverted *:leading-normal opacity-85">
+      <slot />
+    </div>
+  </figcaption>
+</figure>

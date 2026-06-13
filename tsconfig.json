@@ -4,9 +4,9 @@
   "exclude": ["dist"],
   "compilerOptions": {
     "paths": {
-      "~/*": ["./src/*"],
       "@/*": ["./src/components/*"],
       "$/*": ["./src/assets/*"],
+      "~/*": ["./src/*"],
       "sanity.types": ["./sanity.types.ts"]
     },
     "plugins": [

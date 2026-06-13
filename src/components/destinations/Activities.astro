@@ -1,0 +1,17 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import type { Destination } from 'sanity.types'
+import Activity from './Activity.astro'
+
+interface Props extends HTMLAttributes<'div'> {
+  activities: NonNullable<Destination['activities']>
+}
+
+const { activities } = Astro.props
+---
+
+{
+  activities.map((att, i) => (
+    <Activity class:list={[i % 2 ? 'col-[8/13]' : 'col-[2/7]', 'max-h-[70dvh]']} activity={att} />
+  ))
+}

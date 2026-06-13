@@ -1,0 +1,44 @@
+---
+// Assets inside <template> are not fetched until the content is cloned into
+// DOM, which might be too late if it contains heavy assets such as fullscreen
+// images. We preload template content when it's about to enter the viewport.
+
+const { class: cls } = Astro.props
+---
+
+<div
+  class="sr-only select-none pointer-events-none preloadTemplateLoadArea"
+  inert
+  style="position:relative;"
+>
+  <template class:list={['preloadTemplate', cls]}>
+    <slot />
+  </template>
+</div>
+
+<script>
+  const loadAreas = document.querySelectorAll('.preloadTemplateLoadArea')
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const loadArea = entry.target as HTMLElement
+          const template = loadArea.querySelector('.preloadTemplate') as HTMLTemplateElement
+
+          if (template) {
+            const clone = template.content.cloneNode(true)
+            loadArea.appendChild(clone)
+          }
+
+          observer.unobserve(loadArea)
+        }
+      })
+    },
+    {
+      rootMargin: '0px 0px 300px 0px', // Starts the download 300px before scrolling into view
+    },
+  )
+
+  loadAreas.forEach((area) => observer.observe(area))
+</script>

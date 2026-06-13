@@ -1,88 +1,84 @@
 ---
 interface Props {
-	underline?: boolean
-	class?: string
+  underline?: boolean
+  class?: string
 }
 
 let { class: cls, underline } = Astro.props
 ---
 
 <roll-text
-	class:list={["inline-flex items-center text-[17px] font-medium leading-none tracking-[.03em]", cls]}
+  class:list={[
+    'inline-flex items-center text-[17px] font-medium tracking-[.03em]',
+    underline &&
+      'bg-[linear-gradient(currentColor)] bg-size-[100%_1px] bg-bottom-left bg-no-repeat',
+    cls,
+  ]}
 >
-	<span
-		class:list={[
-      "relative perspective-normal overflow-hidden block",
-      underline &&
-        "bg-[linear-gradient(currentColor)] bg-size-[100%_1px] bg-bottom-left bg-no-repeat",
-    ]}
-	>
-		<span class="inline-block"><slot /></span>
-		<span class="absolute inline-block left-0 invisible" aria-hidden="true"
-			><slot /></span
-		>
-	</span>
+  <span class:list={['relative perspective-normal overflow-hidden block']}>
+    <span class="inline-block will-change-transform backface-hidden"><slot /></span>
+    <span
+      class="absolute inline-block left-0 invisible will-change-transform backface-hidden"
+      aria-hidden="true"><slot /></span
+    >
+  </span>
 </roll-text>
 
 <script>
-import gsap from "gsap"
+  import gsap from 'gsap'
 
-class RollText extends HTMLElement {
-	tl!: gsap.core.Timeline
+  class RollText extends HTMLElement {
+    tl!: gsap.core.Timeline
 
-	connectedCallback() {
-		let span = this.children[0],
-			[a, b] = span.children
-		this.tl = gsap
-			.timeline({
-				paused: true,
-				defaults: { duration: 0.8, ease: "expo.inOut" },
-			})
-			.to(a, {
-				opacity: 0,
-				yPercent: -100,
-				rotateX: 80,
-				// z: -20
-			})
-			// what autoAlpha does: when opacity reaches its value, change visibility to inherit
-			.from(
-				b,
-				{ opacity: 0, yPercent: 100, rotateX: -60, z: -20, autoAlpha: 0 },
-				"<",
-			)
+    connectedCallback() {
+      let span = this.children[0],
+        [a, b] = span.children
+      this.tl = gsap
+        .timeline({
+          paused: true,
+          defaults: { duration: 0.8, ease: 'expo.inOut' },
+        })
+        .to(a, {
+          opacity: 0,
+          yPercent: -100,
+          rotateX: 80,
+          // z: -20
+        })
+        // autoAlpha = opacity + automatic visibility switch at zero
+        .from(b, { yPercent: 100, rotateX: -60, z: -20, autoAlpha: 0 }, '<')
 
-		let el = this.closest("[data-roll-trigger]")
-		if (!el) {
-			console.warn("roll text: no trigger found")
-			return
-		}
-		el.addEventListener("pointerenter", this.play)
-		el.addEventListener("pointerleave", this.reverse)
-	}
+      let el = this.closest('[data-roll-trigger]')
+      if (!el) {
+        console.warn('roll text: no trigger found')
+        return
+      }
+      el.addEventListener('pointerenter', this.play)
+      el.addEventListener('pointerleave', this.reverse)
+    }
 
-	disconnectedCallback() {
-		let el = this.closest("[data-roll-trigger]")
-		if (!el) return
-		el.removeEventListener("pointerenter", this.play)
-		el.removeEventListener("pointerleave", this.reverse)
-		this.tl?.kill()
-	}
+    disconnectedCallback() {
+      let el = this.closest('[data-roll-trigger]')
+      if (!el) return
+      el.removeEventListener('pointerenter', this.play)
+      el.removeEventListener('pointerleave', this.reverse)
+      this.tl?.kill()
+    }
 
-	play = () => {
-		this.tl?.play()
-	}
+    play = () => {
+      this.tl?.play()
+    }
 
-	reverse = () => {
-		this.tl?.reverse()
-	}
-}
+    reverse = () => {
+      this.tl?.reverse()
+    }
+  }
 
-customElements.define("roll-text", RollText)
+  customElements.define('roll-text', RollText)
 
-// exposes custom element methods, not needed for Astro props
-declare global {
-	interface HTMLElementTagNameMap {
-		"roll-text": RollText
-	}
-}
+  // exposes custom element methods, not needed for Astro props
+  declare global {
+    interface HTMLElementTagNameMap {
+      'roll-text': RollText
+    }
+  }
 </script>

@@ -1,0 +1,197 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = HTMLAttributes<'div'> & { trackClass?: string }
+
+const { trackClass, class: cls, ...attrs } = Astro.props
+---
+
+<flex-slider class={cls} {...attrs}>
+  <div class:list={['sliderTrack flex *:flex-none', trackClass]}>
+    <slot />
+  </div>
+</flex-slider>
+
+<script>
+  class FlexSlider extends HTMLElement {
+    private idx = 0
+    private steps: number[] = []
+    private track!: HTMLElement
+    #abortController!: AbortController
+    #resizeObserver!: ResizeObserver
+
+    private prevControl: HTMLButtonElement | null = null
+    private nextControl: HTMLButtonElement | null = null
+
+    private touchStartX = 0
+    private touchEndX = 0
+    private minSwipeDistance = 50
+
+    connectedCallback() {
+      this.#abortController = new AbortController()
+      this.track = this.querySelector('.sliderTrack') as HTMLElement
+      if (!this.track) return
+
+      const root = this.closest('[data-flex-slider-root]')
+      if (root) {
+        this.prevControl = root.querySelector('[data-previous-slide]')
+        this.nextControl = root.querySelector('[data-next-slide]')
+
+        if (this.prevControl) this.attachControl(this.prevControl, 'prev')
+        if (this.nextControl) this.attachControl(this.nextControl, 'next')
+      }
+
+      this.#resizeObserver = new ResizeObserver(() => {
+        this.recalculateDimensions()
+      })
+      this.#resizeObserver.observe(this)
+
+      this.initSwipeSupport()
+    }
+
+    disconnectedCallback() {
+      this.#abortController.abort()
+      this.#resizeObserver.disconnect()
+    }
+
+    private recalculateDimensions() {
+      if (!this.track) return
+
+      const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0
+      const widths = [...this.track.children].map((c) => c.getBoundingClientRect().width)
+
+      const containerWidth = this.offsetWidth
+      const trackWidth = this.track.scrollWidth
+      const maxScroll = Math.max(0, trackWidth - containerWidth)
+
+      const rawSteps = widths.reduce((acc, _, i) => {
+        if (i === 0) {
+          acc.push(0)
+        } else {
+          const previousOffset = acc[i - 1]
+          const previousWidth = widths[i - 1]
+          acc.push(previousOffset + previousWidth + gap)
+        }
+        return acc
+      }, [] as number[])
+
+      this.steps = rawSteps.filter((s) => s < maxScroll)
+      if (maxScroll > 0) {
+        this.steps.push(maxScroll)
+      }
+
+      if (this.steps.length === 0) {
+        this.steps = [0]
+      }
+
+      if (this.idx >= this.steps.length) {
+        this.idx = this.steps.length - 1
+      }
+
+      this.updatePosition()
+    }
+
+    private updatePosition() {
+      const targetOffset = this.steps[this.idx]
+      this.track.style.transform = `translateX(-${targetOffset}px)`
+      this.updateButtonStates()
+    }
+
+    private updateButtonStates() {
+      if (this.prevControl) {
+        this.prevControl.toggleAttribute('disabled', this.idx === 0)
+      }
+
+      if (this.nextControl) {
+        this.nextControl.toggleAttribute('disabled', this.idx >= this.steps.length - 1)
+      }
+    }
+
+    private initSwipeSupport() {
+      const signal = this.#abortController.signal
+
+      this.addEventListener(
+        'touchstart',
+        (e: TouchEvent) => {
+          this.touchStartX = e.changedTouches[0].screenX
+        },
+        { signal, passive: true },
+      )
+
+      this.addEventListener(
+        'touchmove',
+        (e: TouchEvent) => {
+          this.touchEndX = e.changedTouches[0].screenX
+        },
+        { signal, passive: true },
+      )
+
+      this.addEventListener(
+        'touchend',
+        () => {
+          this.handleSwipeGesture()
+        },
+        { signal, passive: true },
+      )
+    }
+
+    private handleSwipeGesture() {
+      const swipeDistance = this.touchStartX - this.touchEndX
+
+      // Swipe Left (Next)
+      if (swipeDistance > this.minSwipeDistance) {
+        this.next()
+      }
+      // Swipe Right (Previous)
+      else if (swipeDistance < -this.minSwipeDistance) {
+        this.prev()
+      }
+
+      // Reset coordinates
+      this.touchStartX = 0
+      this.touchEndX = 0
+    }
+
+    public prev() {
+      if (this.idx === 0) return
+      this.idx--
+      this.updatePosition()
+    }
+
+    public next() {
+      if (this.idx >= this.steps.length - 1) return
+      this.idx++
+      this.updatePosition()
+    }
+
+    attachControl(el: Element, dir: 'prev' | 'next') {
+      if (el) {
+        el.addEventListener(
+          'click',
+          () => {
+            if (dir === 'prev') this.prev()
+            else this.next()
+          },
+          { signal: this.#abortController.signal },
+        )
+      }
+    }
+  }
+
+  customElements.define('flex-slider', FlexSlider)
+</script>
+
+<style>
+  .sliderTrack {
+    display: flex;
+    will-change: transform;
+    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+
+  flex-slider {
+    display: block;
+    width: 100%;
+    touch-action: pan-y;
+    /*overflow: hidden;*/
+  }
+</style>

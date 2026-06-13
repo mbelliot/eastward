@@ -1,28 +1,23 @@
 ---
 import IconButton from './IconButton.astro'
-import Picture, { fullscreenSources } from '@/Picture.astro'
-
-const { imgSrc, text } = Astro.props
 ---
 
-<slide-modal id="slideModal" class="invisible cursor-default fixed z-20 inset-0 bg-brand">
+<slide-modal
+  role="dialog"
+  aria-modal="true"
+  tabindex="-1"
+  id="slideModal"
+  class="invisible cursor-default fixed z-20 inset-0 bg-brand"
+>
   <div class="main-grid main-container">
     <div class="flex flex-col col-span-full pt-25 h-screen gap-8 pb-16">
-      <div class="relative grow basis-0">
-        <Picture
-          class="absolute inset-0 w-full h-full rounded-xl object-cover"
-          src={imgSrc}
-          sources={fullscreenSources}
-        />
-      </div>
+      <div class="relative flex-1 imgContainer"></div>
       <div class="main-grid px-0">
-        <div class="col-span-11">
-          <p class="text-white text-body slideText">{text}</p>
-        </div>
+        <div class="col-span-11 textContainer *:text-inverted"></div>
         <div class="col-start-12 justify-self-end">
-          <IconButton class="-rotate-45 p-5">
-            <span class="bg-white w-6 h-px"></span>
-            <span class="bg-white w-6 h-px absolute rotate-90 origin-center"></span>
+          <IconButton aria-label="Close modal" class="-rotate-45 p-5 border-inverted">
+            <span class="bg-inverted w-6 h-px"></span>
+            <span class="bg-inverted w-6 h-px absolute rotate-90 origin-center"></span>
           </IconButton>
         </div>
       </div>
@@ -38,37 +33,63 @@ const { imgSrc, text } = Astro.props
   class SlideModal extends HTMLElement {
     connectedCallback() {
       this.querySelector('icon-button > button')?.addEventListener('click', () => {
-        let modalFlex = this.querySelector('.flex'),
-          tl = gsap.timeline({
-            defaults: { duration: 0.6 },
-            onComplete: () => {
-              window.dispatchEvent(new CustomEvent('resume-overlay-scroll'))
-              gsap.set(this, { clearProps: 'all' })
-              gsap.set(modalFlex, { clearProps: 'all' })
-            },
-          })
-
-        tl.to(modalFlex, { opacity: 0 }).to(
-          this,
-          {
-            clipPath: 'inset(0 0 100% 0)',
-          },
-          '-=0.3',
-        )
+        this.close()
+      })
+      this.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') this.close()
       })
     }
 
-    show() {
-      let img = this.querySelector('img'),
-        text = this.querySelector('.slideText')
+    close() {
+      let modalFlex = this.querySelector('.flex'),
+        tl = gsap.timeline({
+          defaults: { duration: 0.6 },
+          onComplete: () => {
+            window.dispatchEvent(new CustomEvent('resume-overlay-scroll'))
+            gsap.set(this, { clearProps: 'all' })
+            gsap.set(modalFlex, { clearProps: 'all' })
 
-      let modalLines = SplitText.create(text, {
-        type: 'lines',
-      })
+            this.querySelector('.imgContainer')!.innerHTML = ''
+            this.querySelector('.textContainer')!.innerHTML = ''
+          },
+        })
+
+      tl.to(modalFlex, { opacity: 0 }).to(
+        this,
+        {
+          clipPath: 'inset(0 0 100% 0)',
+        },
+        '-=0.3',
+      )
+    }
+
+    show(templateContent: DocumentFragment) {
+      const imgContainer = this.querySelector('.imgContainer')!
+      const textContainer = this.querySelector('.textContainer')!
+      const clone = templateContent.cloneNode(true) as DocumentFragment
+      const picture = clone.querySelector('picture')
+
+      if (picture) {
+        imgContainer.appendChild(picture)
+      }
+      textContainer.append(...clone.children)
+
+      const img = imgContainer.querySelector('img')
+      const lines = Array.from(textContainer.querySelectorAll('p')).flatMap(
+        (p) =>
+          SplitText.create(p, {
+            type: 'lines',
+          }).lines,
+      )
 
       window.dispatchEvent(new CustomEvent('pause-overlay-scroll'))
       gsap
-        .timeline({ defaults: { ease: 'expo.out' } })
+        .timeline({
+          defaults: { ease: 'expo.out' },
+          onComplete: () => {
+            this.focus()
+          },
+        })
         .fromTo(
           this,
           { clipPath: 'inset(0 0 100% 0)', autoAlpha: 1 },
@@ -83,9 +104,15 @@ const { imgSrc, text } = Astro.props
           },
           0.4,
         )
-        .from(modalLines.lines, { yPercent: 60, autoAlpha: 0, stagger: 0.1 }, '-=0.4')
+        .from(lines, { yPercent: 60, autoAlpha: 0, stagger: 0.1 }, '-=0.4')
         .from(this.querySelector('icon-button > button'), { opacity: 0, duration: 1.2 }, 0.4)
     }
   }
   customElements.define('slide-modal', SlideModal)
+
+  declare global {
+    interface HTMLElementTagNameMap {
+      'slide-modal': SlideModal
+    }
+  }
 </script>

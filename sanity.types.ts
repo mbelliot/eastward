@@ -153,10 +153,10 @@ export type Itinerary = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  title?: string
-  tagline?: string
+  title: string
+  tagline: string
   days?: number
-  price?: string
+  price: string
   featured?: boolean
   overview?: string
   schedule?: Array<{
@@ -221,7 +221,7 @@ export type Itinerary = {
     _type: 'food'
     _key: string
   }>
-  cover?: {
+  cover: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -237,7 +237,7 @@ export type Itinerary = {
     alt?: string
     _type: 'image'
   }
-  features?: Array<
+  features: Array<
     {
       _key: string
     } & FeatureReference
@@ -247,7 +247,7 @@ export type Itinerary = {
       _key: string
     } & DestinationReference
   >
-  themes?: Array<
+  themes: Array<
     {
       _key: string
     } & ThemeReference
@@ -582,8 +582,15 @@ export type AllSanitySchemaTypes =
   | Geopoint
 
 // Source: src/pages/destinations/[slug].astro
+// Variable: q
+// Query: *[_type == "destination"]{ slug }
+export type QResult = Array<{
+  slug: Slug
+}>
+
+// Source: src/pages/destinations/[slug].astro
 // Variable: destinationQuery
-// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      themes[]->,      "numItineraries": count(*[_type == 'itinerary' && references(^._id)])}
+// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      themes[]->,      "itineraries": *[_type == 'itinerary' && references(^._id)] {        slug,        title,        tagline,        cover,        price,        themes[0..2]->      }}
 export type DestinationQueryResult = {
   _id: string
   _type: 'destination'
@@ -716,7 +723,30 @@ export type DestinationQueryResult = {
     slug: Slug
   }> | null
   slug: Slug
-  numItineraries: number
+  itineraries: Array<{
+    slug: Slug
+    title: string
+    tagline: string
+    cover: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    price: string
+    themes: Array<{
+      _id: string
+      _type: 'theme'
+      _createdAt: string
+      _updatedAt: string
+      _rev: string
+      name: string
+      description: string
+      slug: Slug
+    }>
+  }>
 } | null
 
 // Source: src/pages/destinations/index.astro
@@ -855,7 +885,8 @@ export type QueryResult = Array<{
 import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
-    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      themes[]->,\n      "numItineraries": count(*[_type == \'itinerary\' && references(^._id)])\n}': DestinationQueryResult
+    '*[_type == "destination"]{ slug }': QResult
+    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      themes[]->,\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] {\n        slug,\n        title,\n        tagline,\n        cover,\n        price,\n        themes[0..2]->\n      }\n}': DestinationQueryResult
     '*[_type == "destination"]': QueryResult
   }
 }

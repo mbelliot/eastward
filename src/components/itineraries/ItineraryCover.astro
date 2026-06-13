@@ -1,0 +1,45 @@
+---
+import Picture from '@/Picture.astro'
+import RollLink from '@/RollLink.astro'
+import Theme from '@/Theme.astro'
+import type { HTMLAttributes } from 'astro/types'
+import type { Itinerary, Theme as ThemeType } from 'sanity.types'
+
+interface Props extends HTMLAttributes<'div'> {
+  itinerary: NonNullable<Pick<Itinerary, 'slug' | 'cover' | 'title' | 'tagline' | 'price'>> & {
+    themes: ThemeType[]
+  }
+  flipped?: boolean
+}
+
+const { itinerary, flipped, class: cls, ...attrs } = Astro.props
+---
+
+<div class:list={['grid grid-cols-2 aspect-17/11 max-h-dvh w-full', cls]} {...attrs}>
+  <Picture
+    class:list={['object-cover h-full w-full', flipped ? 'order-2' : 'order-1']}
+    pictureClass="min-h-0 block"
+    src={itinerary.cover}
+    sources={[
+      { media: '(min-width:0px)', sizes: '50vw', widths: [300, 600, 1200], aspect: 17 / 22 },
+    ]}
+  />
+  <div
+    class:list={[
+      'flex flex-col gap-[50px] items-center justify-center place-self-center px-7.5',
+      flipped ? 'order-1' : 'order-2',
+    ]}
+  >
+    <div class="flex flex-col items-center gap-[10px]">
+      <h3 class="text-masthead text-center">{itinerary.title}</h3>
+      <p class="text-byline text-center">{itinerary.tagline}</p>
+    </div>
+    <div class="flex flex-col items-center gap-[20px]">
+      <div class="flex gap-[40px]">
+        {itinerary.themes.map((th) => <Theme class="size-[55px]" theme={th} />)}
+      </div>
+      <p class="text-h3">{itinerary.price}</p>
+    </div>
+    <RollLink href={`/itineraries/${itinerary.slug.current}`}>Explore Details</RollLink>
+  </div>
+</div>
