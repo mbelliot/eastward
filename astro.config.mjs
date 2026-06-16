@@ -38,18 +38,18 @@ export default defineConfig({
   },
 
   integrations: [
-    ...(isProd
-      ? []
-      : [
-          sanity({
-            projectId: '4cflhpla',
-            dataset: 'production',
-            useCdn: false,
-            apiVersion: '2026-06-03',
+    sanity({
+      projectId: '4cflhpla',
+      dataset: 'production',
+      useCdn: false,
+      apiVersion: '2026-06-03',
+      ...(isProd
+        ? {}
+        : {
             studioBasePath: '/cms',
           }),
-          react(),
-        ]),
+    }),
+    ...(isProd ? [] : [react()]),
     icon(),
   ],
 })
