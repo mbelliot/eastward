@@ -7,7 +7,7 @@ const { summary } = Astro.props
 <details
   class:list={[
     'bg-linear-(--color-mono-a) bg-size-[100%_1px] bg-bottom-left bg-no-repeat',
-    'group *:last:pb-5 overflow-hidden',
+    'group *:nth-2:pt-1.25 *:last:pb-5 overflow-hidden',
     'details-content:h-0 open:details-content:h-auto details-content:transition-all details-content:duration-500 details-content:transition-discrete',
   ]}
 >
@@ -16,7 +16,7 @@ const { summary } = Astro.props
     >{summary}
     <Icon
       name="ph:caret-down"
-      class="size-[1cap] group-open:rotate-180 transition-all duration-500"
+      class="size-[1cap] group-open:rotate-180 transition-transform duration-500"
       aria-hidden="true"
     />
   </summary>

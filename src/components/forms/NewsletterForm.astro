@@ -1,0 +1,17 @@
+---
+import RollButton from '@/RollButton.astro'
+import Input from './Input.astro'
+---
+
+<div class="flex flex-col gap-10 w-105 pb-25">
+  <h2 class="text-h2">Letters from the East</h2>
+  <form class="flex flex-col gap-8.5">
+    <Input name="name" id="name" placeholder="Name" />
+    <Input name="email" id="email" placeholder="Email" />
+    <p>
+      Field notes, rare access, and journeys worth taking. Sent when there's something worth saying.
+      See our privacy policy.
+    </p>
+    <RollButton variant="outline">Sign up</RollButton>
+  </form>
+</div>

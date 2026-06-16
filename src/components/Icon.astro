@@ -1,40 +1,43 @@
 ---
-import { type HTMLAttributes } from "astro/types"
-import Adventure from "$/icons/Adventure.svg"
-import Art from "$/icons/Art.svg"
-import Car from "$/icons/Car.svg"
-import Compass from "$/icons/Compass.svg"
-import Culinary from "$/icons/Culinary.svg"
-import History from "$/icons/History.svg"
-import Hotel from "$/icons/Hotel.svg"
-import Menu from "$/icons/Menu.svg"
-import Nature from "$/icons/Nature.svg"
-import Spiritual from "$/icons/Spiritual.svg"
-import VIP from "$/icons/VIP.svg"
-import Wellness from "$/icons/Wellness.svg"
+import { type HTMLAttributes } from 'astro/types'
+import Adventure from '$/icons/Adventure.svg'
+import Art from '$/icons/Art.svg'
+import Car from '$/icons/Car.svg'
+import Compass from '$/icons/Compass.svg'
+import Culinary from '$/icons/Culinary.svg'
+import History from '$/icons/History.svg'
+import Hotel from '$/icons/Hotel.svg'
+import Menu from '$/icons/Menu.svg'
+import Nature from '$/icons/Nature.svg'
+import Spiritual from '$/icons/Spiritual.svg'
+import VIP from '$/icons/VIP.svg'
+import Wellness from '$/icons/Wellness.svg'
+import Quotes from '$/icons/Quotes.svg'
 
-const icons: Record<string, any> = {
-	Adventure,
-	Art,
-	Car,
-	Compass,
-	Culinary,
-	History,
-	Hotel,
-	Menu,
-	Nature,
-	Spiritual,
-	VIP,
-	Wellness,
-}
+const icons = {
+  Adventure,
+  Art,
+  Car,
+  Compass,
+  Culinary,
+  History,
+  Hotel,
+  Menu,
+  Nature,
+  Spiritual,
+  VIP,
+  Wellness,
+  Quotes,
+} as const
 
 export type IconName = keyof typeof icons
 
-interface Props extends HTMLAttributes<"svg"> {
-	name: IconName
+interface Props extends Omit<HTMLAttributes<'svg'>, 'name'> {
+  name: IconName
 }
-let { name, ...attrs } = Astro.props,
-	Icon = icons[name]
+
+const { name, ...attrs } = Astro.props,
+  Icon = icons[name]
 ---
 
 {Icon ? <Icon {...attrs} /> : <span>Icon {name} not found</span>}

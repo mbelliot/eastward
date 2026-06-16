@@ -7,6 +7,7 @@ type Source = { media: string; sizes?: string; widths: number[]; aspect?: number
 
 interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {
   src: SanityImageSource
+  lqip?: string
   sources?: Source[]
   pictureClass?: string
 }
@@ -49,15 +50,33 @@ export const fullscreenSources: Source[] = [
   },
 ]
 
-const { pictureClass, src, sources, ...attrs } = Astro.props
+const {
+  pictureClass,
+  src,
+  sources,
+  loading = 'lazy',
+  decoding = 'async',
+  lqip,
+  class: cls,
+  ...attrs
+} = Astro.props
 ---
 
-<picture class={pictureClass}>
+<picture
+  class:list={[pictureClass, lqip && 'bg-(image:--lqip) bg-center bg-cover']}
+  style={lqip && `--lqip:url(${lqip})`}
+>
   {
     sources &&
       sources.map((source) => (
         <source media={source.media} srcset={genSrcset(source)} sizes={source.sizes ?? '100vw'} />
       ))
   }
-  <img loading="lazy" decoding="async" src={builder.image(src).auto('format').url()} {...attrs} />
+  <img
+    loading={loading}
+    decoding={decoding}
+    src={builder.image(src).auto('format').url()}
+    class:list={[cls, lqip && 'starting:opacity-0 transition-opacity duration-800']}
+    {...attrs}
+  />
 </picture>

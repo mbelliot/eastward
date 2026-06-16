@@ -1,13 +1,13 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
-import type { Theme } from '../../sanity.types'
+import type { Theme } from 'sanity.types'
 import Icon, { type IconName } from './Icon.astro'
 
-interface Props extends HTMLAttributes<'svg'> {
+interface Props extends Omit<HTMLAttributes<'svg'>, 'name'> {
   theme: Theme
 }
 
-let { theme, ...attrs } = Astro.props
+const { theme, ...attrs } = Astro.props
 
 function themeIconName(name: string): IconName {
   const map: Record<string, IconName> = {

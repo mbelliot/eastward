@@ -2629,7 +2629,7 @@
             }
           }
         },
-        "optional": true
+        "optional": false
       },
       "portrait": {
         "type": "objectAttribute",

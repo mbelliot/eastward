@@ -1,0 +1,44 @@
+---
+import Picture, { fullscreenSources } from '@/Picture.astro'
+import SectionTitle from '@/SectionTitle.astro'
+import type { SanityImageSource } from '@sanity/image-url'
+import type { HTMLAttributes } from 'astro/types'
+import type { Testimonial as TT } from 'sanity.types'
+import Testimonial from './Testimonial.astro'
+
+interface Props extends HTMLAttributes<'section'> {
+  testimonials: TT[]
+  bgSrc: SanityImageSource
+}
+
+const { bgSrc, testimonials } = Astro.props
+---
+
+<section class="relative isolate h-dvh">
+  <Picture
+    pictureClass="absolute inset-0 -z-10"
+    class="size-full object-cover"
+    src={bgSrc}
+    sources={fullscreenSources}
+  />
+  <div class="size-full flex bg-black/90 backdrop-blur-lg">
+    <div
+      class="main-grid main-container main-margin **:text-inverted grid-rows-[minmax(0,1fr)_min-content]"
+    >
+      <div class="col-span-full row-[2/3] main-grid">
+        <SectionTitle class="col-[2/5]" title="The Memories" />
+        <div class="col-[2/6]">
+          <p class="text-balance">
+            Journeys are measured in moments — in quiet mornings, shared laughter, unfamiliar
+            streets, and the subtle realization that you’ve stepped outside your usual rhythm.
+            Travelers immersed themselves fully, discovering experiences that lingered long after
+            the journey itself had ended.
+          </p>
+        </div>
+      </div>
+      <div class="col-[6/13] row-span-full justify-self-center">
+        {testimonials.map((tm) => <Testimonial testimonial={tm} />)}
+      </div>
+    </div>
+  </div>
+</section>

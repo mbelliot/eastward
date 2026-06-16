@@ -6,6 +6,8 @@
 
 :root {
   interpolate-size: allow-keywords;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 @theme {
@@ -39,20 +41,17 @@
   .text-journal-excerpt {
     @apply text-[18px] leading-[1.6em] tracking-[0.026em] font-body italic font-light;
   }
-  .text-curator-bio {
-    @apply text-[40px] leading-[1.6em] tracking-[0.026em] font-body font-light;
+  .text-quote {
+    @apply clamp-[text,32px,40px,390px,1800px] leading-[1.6em] tracking-[0.026em] font-body font-light;
   }
   .text-label {
     @apply text-[16px] leading-[1.4em] tracking-[0.03em] font-body uppercase;
-  }
-  .text-curator-desc {
-    @apply text-[16px] leading-[1.6em] tracking-[-0.02em] font-body;
   }
   .text-journal-body {
     @apply text-[21px] leading-[1.9em] tracking-[0.04em] font-body;
   }
   .text-masthead {
-    @apply font-title clamp-[text,40px,130px,375px,2560px] leading-none tracking-[-.04em] uppercase;
+    @apply font-title clamp-[text,40px,130px,390px,2560px] leading-none tracking-[-.04em] uppercase;
   }
 
   .aspect-cover {
@@ -89,11 +88,9 @@
 }
 
 @layer base {
-  p {
-    @apply text-[20px] leading-[1.8] tracking-[0.026em] font-body;
-  }
   body {
-    background-color: white;
+    @apply text-text bg-inverted font-body;
+    @apply text-[20px] leading-[1.8] tracking-[0.026em];
   }
   button:focus-visible {
     outline: none;

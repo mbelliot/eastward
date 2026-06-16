@@ -388,7 +388,7 @@ export type Destination = {
   }>
   commentary?: string
   featured?: boolean
-  cover?: {
+  cover: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -581,6 +581,21 @@ export type AllSanitySchemaTypes =
   | SanityImageAsset
   | Geopoint
 
+// Source: src/components/destinations/DestinationPolaroid.astro
+// Variable: query
+// Query: *[_type == "destination" && slug.current == $slug][0] {    "images": (      attractions[].image {        ...,        "dimensions": asset->metadata.dimensions      }      + activities[].image {        ...,        "dimensions": asset->metadata.dimensions      }      + foods[].image {        ...,        "dimensions": asset->metadata.dimensions      }    )  }
+export type QueryResult = {
+  images: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+    dimensions: SanityImageDimensions | null
+  }> | null
+} | null
+
 // Source: src/pages/destinations/[slug].astro
 // Variable: q
 // Query: *[_type == "destination"]{ slug }
@@ -590,7 +605,7 @@ export type QResult = Array<{
 
 // Source: src/pages/destinations/[slug].astro
 // Variable: destinationQuery
-// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      themes[]->,      "itineraries": *[_type == 'itinerary' && references(^._id)] {        slug,        title,        tagline,        cover,        price,        themes[0..2]->      }}
+// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      cover {        ...,        "lqip": asset->metadata.lqip      },      themes[]->,      "testimonials": *[_type == 'testimonial' && references(^._id)],      "itineraries": *[_type == 'itinerary' && references(^._id)] {        slug,        title,        tagline,        cover,        price,        themes[0..2]->      }}
 export type DestinationQueryResult = {
   _id: string
   _type: 'destination'
@@ -696,13 +711,14 @@ export type DestinationQueryResult = {
   }>
   commentary?: string
   featured?: boolean
-  cover?: {
+  cover: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string
     _type: 'image'
+    lqip: string | null
   }
   portrait?: {
     asset?: SanityImageAssetReference
@@ -723,6 +739,28 @@ export type DestinationQueryResult = {
     slug: Slug
   }> | null
   slug: Slug
+  testimonials: Array<{
+    _id: string
+    _type: 'testimonial'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name?: string
+    title?: string
+    quote?: string
+    featured?: boolean
+    destination?: DestinationReference
+    itinerary?: ItineraryReference
+    headshot?: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    slug: Slug
+  }>
   itineraries: Array<{
     slug: Slug
     title: string
@@ -749,144 +787,12 @@ export type DestinationQueryResult = {
   }>
 } | null
 
-// Source: src/pages/destinations/index.astro
-// Variable: query
-// Query: *[_type == "destination"]
-export type QueryResult = Array<{
-  _id: string
-  _type: 'destination'
-  _createdAt: string
-  _updatedAt: string
-  _rev: string
-  name?: string
-  country?: string
-  tagline?: string
-  appeal?: string
-  attractions?: Array<{
-    title: string
-    body?: Array<{
-      children?: Array<{
-        marks?: Array<string>
-        text?: string
-        _type: 'span'
-        _key: string
-      }>
-      style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
-      listItem?: 'bullet' | 'number'
-      markDefs?: Array<{
-        href?: string
-        _type: 'link'
-        _key: string
-      }>
-      level?: number
-      _type: 'block'
-      _key: string
-    }>
-    image: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-    _type: 'attraction'
-    _key: string
-  }>
-  activities?: Array<{
-    title: string
-    body?: Array<{
-      children?: Array<{
-        marks?: Array<string>
-        text?: string
-        _type: 'span'
-        _key: string
-      }>
-      style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
-      listItem?: 'bullet' | 'number'
-      markDefs?: Array<{
-        href?: string
-        _type: 'link'
-        _key: string
-      }>
-      level?: number
-      _type: 'block'
-      _key: string
-    }>
-    image: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-    _type: 'activity'
-    _key: string
-  }>
-  foods?: Array<{
-    title: string
-    body?: Array<{
-      children?: Array<{
-        marks?: Array<string>
-        text?: string
-        _type: 'span'
-        _key: string
-      }>
-      style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
-      listItem?: 'bullet' | 'number'
-      markDefs?: Array<{
-        href?: string
-        _type: 'link'
-        _key: string
-      }>
-      level?: number
-      _type: 'block'
-      _key: string
-    }>
-    image: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-    _type: 'food'
-    _key: string
-  }>
-  commentary?: string
-  featured?: boolean
-  cover?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  portrait?: {
-    asset?: SanityImageAssetReference
-    media?: unknown
-    hotspot?: SanityImageHotspot
-    crop?: SanityImageCrop
-    alt?: string
-    _type: 'image'
-  }
-  themes?: Array<
-    {
-      _key: string
-    } & ThemeReference
-  >
-  slug: Slug
-}>
-
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
+    '\n  *[_type == "destination" && slug.current == $slug][0] {\n    "images": (\n      attractions[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n      + activities[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n      + foods[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n    )\n  }\n': QueryResult
     '*[_type == "destination"]{ slug }': QResult
-    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      themes[]->,\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] {\n        slug,\n        title,\n        tagline,\n        cover,\n        price,\n        themes[0..2]->\n      }\n}': DestinationQueryResult
-    '*[_type == "destination"]': QueryResult
+    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      cover {\n        ...,\n        "lqip": asset->metadata.lqip\n      },\n      themes[]->,\n      "testimonials": *[_type == \'testimonial\' && references(^._id)],\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] {\n        slug,\n        title,\n        tagline,\n        cover,\n        price,\n        themes[0..2]->\n      }\n}': DestinationQueryResult
   }
 }

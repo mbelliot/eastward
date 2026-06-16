@@ -1,0 +1,24 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = HTMLAttributes<'input'>
+
+const { name, id, placeholder, class: cls, ...attrs } = Astro.props
+---
+
+<div class="flex flex-col-reverse">
+  <input
+    class:list={[
+      'w-full border-b border-text focus:outline-none placeholder-transparent peer',
+      cls,
+    ]}
+    name={name}
+    id={id}
+    placeholder={placeholder}
+    {...attrs}
+  />
+  <label
+    class="pointer-events-none uppercase text-mono font-medium leading-[1.2] translate-y-full peer-focus:translate-y-0 not-peer-placeholder-shown:translate-y-0 transition-all duration-500"
+    for={id}>{placeholder}</label
+  >
+</div>

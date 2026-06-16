@@ -1,15 +1,61 @@
-MIT License — Code Only
-
+--------------------------------------------------------------------------------
+Eastward License
 Copyright (c) 2026 Elliot Li <contact@elliotli.dev>
+--------------------------------------------------------------------------------
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software (excluding assets defined below) to deal in the Software
-without restriction, including without limitation the rights to use, copy,
-modify, merge, publish, distribute, sublicense, and/or sell copies of the
-Software, subject to the following conditions:
+STANDARD LICENSE
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+Grants one non-exclusive, non-transferable license to a single purchaser.
+
+Permitted:
+- Use in one (1) personal or commercial end project (a single website or
+  web application)
+- Modify code and assets for that specific project
+- Deploy the end product publicly
+
+Prohibited:
+- Use in more than one end project, or using a single deployment to host
+  multiple independent client sites
+- Redistribution, resale, or sublicensing of template source code or
+  modified variants
+- Sharing access to the repository or source files with non-purchasers
+
+
+--------------------------------------------------------------------------------
+WHITELABEL LICENSE
+
+Grants one non-exclusive, non-transferable license to a single purchasing
+agency or freelancer.
+
+Permitted:
+- Use across unlimited client projects
+- Modify code, animations, and assets per client requirements
+- Deliver modified source code directly to clients as part of a finished project
+- Remove Elliot Li attribution from end products
+
+Prohibited:
+- Public redistribution, marketplace resale, or standalone sublicensing of
+  the template source itself
+- Clients further sublicensing, redistributing, or reusing the delivered
+  source for separate projects
+- Sharing template source access with parties outside a direct client
+  relationship
+
+Client recipients of delivered source are bound by the same prohibitions above
+and receive no independent redistribution rights.
+
+
+--------------------------------------------------------------------------------
+ALL TIERS — ASSET USAGE
+
+Custom SVG graphics, interactive animations, and brand elements are included
+solely for use within projects licensed above. Modification is permitted within
+the scope of your license tier. Standalone redistribution or resale of these
+assets in any form is strictly prohibited.
+
+
+--------------------------------------------------------------------------------
+DISCLAIMER
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -18,25 +64,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Asset License — CC BY-NC-ND 4.0
-
-Copyright (c) 2026 Elliot Li <contact@elliotli.dev>
-
-The following assets are NOT covered by the MIT license above and are instead
-licensed under Creative Commons Attribution-NonCommercial-NoDerivatives 4.0
-International (CC BY-NC-ND 4.0):
-
-- Custom SVG graphics and illustrations
-- Custom animations and motion compositions  
-- Brand identity elements and visual compositions
-
-You are free to use these assets as an integrated part of this template,
-provided that:
-- Attribution is given to Elliot Li (contact@elliotli.dev)
-- Assets are not used for commercial purposes outside this template
-- Assets are not modified or redistributed in any form
-
-Full license text: https://creativecommons.org/licenses/by-nc-nd/4.0/

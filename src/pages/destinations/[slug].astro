@@ -17,6 +17,9 @@ import OverlayCard from '@/OverlayCard.astro'
 import RichText from '@/RichText.astro'
 import ItineraryCover from '@/itineraries/ItineraryCover.astro'
 import DestinationFAQs from '@/destinations/DestinationFAQs.astro'
+import TestimonialSection from '@/testimonials/TestimonialSection.astro'
+import NewsletterForm from '@/forms/NewsletterForm.astro'
+import DestinationPolaroid from '@/destinations/DestinationPolaroid.astro'
 
 export const getStaticPaths = (async () => {
   const q = defineQuery('*[_type == "destination"]{ slug }'),
@@ -30,7 +33,12 @@ const { params } = Astro
 const destinationQuery = defineQuery(
   `*[_type=="destination" && slug.current == $slug][0] {
       ...,
+      cover {
+        ...,
+        "lqip": asset->metadata.lqip
+      },
       themes[]->,
+      "testimonials": *[_type == 'testimonial' && references(^._id)],
       "itineraries": *[_type == 'itinerary' && references(^._id)] {
         slug,
         title,
@@ -51,19 +59,17 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
 
 <Layout title={dest.name}>
   <section class="relative main-grid main-container h-dvh items-end">
-    {
-      dest.cover && (
-        <Picture
-          class="absolute inset-0 object-cover w-full h-full object-center brightness-70"
-          alt={dest.cover?.alt ?? ''}
-          src={dest.cover}
-          sources={fullscreenSources}
-          loading="eager"
-          decoding="sync"
-          fetchpriority="high"
-        />
-      )
-    }
+    <Picture
+      class="object-cover size-full object-center brightness-70"
+      pictureClass="absolute inset-0"
+      alt={dest.cover?.alt ?? ''}
+      src={dest.cover}
+      lqip={dest.cover.lqip ?? undefined}
+      sources={fullscreenSources}
+      loading="eager"
+      decoding="sync"
+      fetchpriority="high"
+    />
     <div class="relative col-[2/13] mb-[8vh] flex flex-col gap-1.5">
       <div aria-hidden="true" class="absolute inset-0 -left-8 bg-inverted w-2"></div>
       <p class="text-byline text-inverted clamp-[text,24px,30px,375px,2400px] leading-none">
@@ -82,7 +88,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
       </ul>
     </div>
   </section>
-  <section class="main-grid main-container h-dvh mb-[100px]">
+  <section class="main-grid main-container h-dvh pb-25">
     <div class="col-span-6 clamp-[pt,20px,30px] min-h-0">
       {
         dest.portrait && (
@@ -202,9 +208,22 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     )
   }
   {
+    dest.testimonials?.length && (
+      <TestimonialSection testimonials={dest.testimonials} bgSrc={dest.cover} />
+    )
+  }
+  {
     dest.itineraries?.length &&
       dest.itineraries.map((itn, i) => <ItineraryCover itinerary={itn} flipped={Boolean(i % 2)} />)
   }
+  <section class="main-container main-grid h-dvh place-items-center">
+    <div class="col-[2/6]">
+      <NewsletterForm />
+    </div>
+    <div class="col-[7/13] place-self-stretch mr-[-10vw] my-[5dvh]">
+      <DestinationPolaroid slug={dest.slug.current} />
+    </div>
+  </section>
   <section class="main-container main-margin">
     <DestinationFAQs />
   </section>

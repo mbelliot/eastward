@@ -1,0 +1,215 @@
+---
+/**
+ * DestinationPolaroid
+ * Scatter-layout image collage using Mitchell's Best-Candidate algorithm.
+ *
+ */
+import { sanityClient } from 'sanity:client'
+import { createImageUrlBuilder } from '@sanity/image-url'
+import { defineQuery } from 'groq'
+
+interface Props {
+  slug: string
+  density?: number
+  imageSize?: number
+}
+
+const { slug, density = 0.6, imageSize = 300 } = Astro.props
+
+const query = defineQuery(`
+  *[_type == "destination" && slug.current == $slug][0] {
+    "images": (
+      attractions[].image {
+        ...,
+        "dimensions": asset->metadata.dimensions
+      }
+      + activities[].image {
+        ...,
+        "dimensions": asset->metadata.dimensions
+      }
+      + foods[].image {
+        ...,
+        "dimensions": asset->metadata.dimensions
+      }
+    )
+  }
+`)
+
+const result = await sanityClient.fetch(query, { slug })
+const images = result?.images ?? []
+const builder = createImageUrlBuilder(sanityClient)
+---
+
+<destination-polaroid
+  class="block relative size-full overflow-visible"
+  data-density={density}
+  data-image-size={imageSize}
+  aria-hidden="true"
+>
+  {
+    images.map((img) => (
+      <img
+        class="absolute"
+        src={builder.image(img).width(300).url()}
+        loading="lazy"
+        decoding="async"
+      />
+    ))
+  }
+</destination-polaroid>
+
+<script>
+  function shuffle<T>(arr: T[]): T[] {
+    const a = [...arr]
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[a[i], a[j]] = [a[j], a[i]]
+    }
+    return a
+  }
+
+  function getScatterLayout(
+    imgs: HTMLImageElement[],
+    containerWidth: number,
+    containerHeight: number,
+    imageSize: number,
+  ) {
+    const placed: any[] = []
+    const candidatesPerImage = 15
+    const targetArea = imageSize * imageSize
+
+    return imgs.map((img) => {
+      const aspect = img.naturalWidth / img.naturalHeight || 1
+      const h = Math.sqrt(targetArea / aspect)
+      const w = h * aspect
+
+      let bestCandidate = null
+      let maxMinDist = -1
+
+      for (let i = 0; i < candidatesPerImage; i++) {
+        const x = Math.random() * (containerWidth - w)
+        const y = Math.random() * (containerHeight - h)
+        const candidate = { x, y, w, h, cx: x + w / 2, cy: y + h / 2 }
+
+        if (placed.length === 0) {
+          bestCandidate = candidate
+          break
+        }
+
+        let minDistToOthers = Infinity
+        let tooMuchOverlap = false
+
+        for (const p of placed) {
+          const d = Math.hypot(candidate.cx - p.cx, candidate.cy - p.cy)
+
+          const horizontalOverlap =
+            Math.min(candidate.x + candidate.w, p.x + p.w) - Math.max(candidate.x, p.x)
+          const verticalOverlap =
+            Math.min(candidate.y + candidate.h, p.y + p.h) - Math.max(candidate.y, p.y)
+
+          if (horizontalOverlap > 0 && verticalOverlap > 0) {
+            const overlapArea = horizontalOverlap * verticalOverlap
+            const selfArea = candidate.w * candidate.h
+            if (overlapArea / selfArea > 0.2) {
+              tooMuchOverlap = true
+              break
+            }
+          }
+
+          if (d < minDistToOthers) minDistToOthers = d
+        }
+
+        if (tooMuchOverlap) continue
+        if (minDistToOthers > maxMinDist) {
+          maxMinDist = minDistToOthers
+          bestCandidate = candidate
+        }
+      }
+
+      const result = bestCandidate ?? { x: 0, y: 0, w, h, cx: w / 2, cy: h / 2 }
+      placed.push(result)
+      return result
+    })
+  }
+
+  class DestinationPolaroid extends HTMLElement {
+    resizeObserver!: ResizeObserver
+    resizeTimer!: ReturnType<typeof setTimeout>
+
+    connectedCallback() {
+      this.layout()
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.resizeTimer) clearTimeout(this.resizeTimer)
+        this.resizeTimer = setTimeout(() => this.layout(), 150)
+      })
+      this.resizeObserver.observe(this)
+    }
+
+    disconnectedCallback() {
+      this.resizeObserver?.disconnect()
+      if (this.resizeTimer) clearTimeout(this.resizeTimer)
+    }
+
+    layout() {
+      const density = parseFloat(this.dataset.density ?? '0.6')
+      const imageSize = parseFloat(this.dataset.imageSize ?? '300')
+      const { offsetWidth: width, offsetHeight: height } = this
+
+      if (width === 0 || height === 0) {
+        requestAnimationFrame(() => this.layout())
+        return
+      }
+
+      const allImgs = shuffle(Array.from(this.querySelectorAll('img')))
+
+      const idealCount = Math.floor((width * height * density) / (imageSize * imageSize))
+      const finalLimit = Math.min(idealCount, allImgs.length)
+      const subset = allImgs.slice(0, finalLimit)
+
+      const waitForLoad = subset.map(
+        (img) =>
+          new Promise((resolve) => {
+            if (img.complete) resolve(null)
+            else img.addEventListener('load', resolve, { once: true })
+          }),
+      )
+
+      Promise.all(waitForLoad).then(() => {
+        allImgs.forEach((img) => {
+          if (!subset.includes(img)) img.style.display = 'none'
+        })
+
+        const layoutData = getScatterLayout(subset, width, height, imageSize)
+
+        subset.forEach((img, i) => {
+          const pos = layoutData[i]
+          if (!pos) return
+
+          const rotate = Math.random() * 10 - 5
+          const z = Math.random() * 10 - 20
+
+          Object.assign(img.style, {
+            display: 'block',
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: `${pos.w}px`,
+            height: `${pos.h}px`,
+            objectFit: 'cover',
+            opacity: '1',
+            pointerEvents: 'none',
+            transform: `translate3d(${pos.x}px, ${pos.y}px, ${z}px) rotate(${rotate}deg)`,
+            transformOrigin: 'center center',
+            willChange: 'transform',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+          })
+        })
+
+        this.style.perspective = '1000px'
+        this.style.transformStyle = 'preserve-3d'
+      })
+    }
+  }
+
+  customElements.define('destination-polaroid', DestinationPolaroid)
+</script>

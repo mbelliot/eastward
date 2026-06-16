@@ -1,6 +1,6 @@
 # Eastward — Astro Travel Theme
 
-A luxury travel theme built with Astro. Ported from [my Framer template](https://contra.com/products/bc3hkcW9-luxury-travel-template-for-framer). Same editorial feel, zero React.
+A luxury travel theme built with Astro.
 
 | | |
 | :---: | :---: |
@@ -26,8 +26,8 @@ A luxury travel theme built with Astro. Ported from [my Framer template](https:/
 ## Getting Started
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ## Content
@@ -40,13 +40,9 @@ All content lives in `/src/content`:
 
 Replace the demo content with your own. Images sourced from Unsplash.
 
-## Customization
-
-Design tokens in `global.css`. Fonts via Google Fonts. Swap out freely.
-
 ## License
 
-Code © Elliot Li — MIT | Assets © Elliot Li — CC BY-NC-ND 4.0
+See `LICENSE` for full terms. Standard and Whitelabel tiers available.
 
 ## Built by
 
