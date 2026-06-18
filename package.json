@@ -35,6 +35,7 @@
 		"react-dom": "^19.2.7",
 		"react-is": "^19.2.7",
 		"sanity": "^5.30.0",
+		"sharp": "^0.35.1",
 		"styled-components": "^6.4.2",
 		"tailwindcss": "^4.3.0"
 	},
