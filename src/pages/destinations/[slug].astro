@@ -22,8 +22,8 @@ import NewsletterForm from '@/forms/NewsletterForm.astro'
 import DestinationPolaroid from '@/destinations/DestinationPolaroid.astro'
 
 export const getStaticPaths = (async () => {
-  const q = defineQuery('*[_type == "destination"]{ slug }'),
-    dests = await sanityClient.fetch(q)
+  const destinationSlugsQuery = defineQuery('*[_type == "destination"]{ slug }'),
+    dests = await sanityClient.fetch(destinationSlugsQuery)
 
   return dests.map(({ slug }) => ({ params: { slug: slug.current } }))
 }) satisfies GetStaticPaths
@@ -88,12 +88,15 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
       </ul>
     </div>
   </section>
-  <section class="main-grid main-container h-dvh pb-25">
-    <div class="col-span-6 clamp-[pt,20px,30px] min-h-0">
+  <section class="grid lg:main-grid main-container xl:min-h-dvh pb-25">
+    <div
+      class="col-span-full max-lg:row-start-2 lg:col-span-6 clamp-[pt,20px,30px] min-h-0 max-h-dvh relative flex flex-col justify-end"
+    >
       {
         dest.portrait && (
           <Picture
-            class="w-full h-full object-cover"
+            pictureClass="block min-h-0 max-h-full w-full aspect-page max-lg:mt-12.5"
+            class="size-full object-cover"
             src={dest.portrait}
             alt={dest.portrait?.alt ?? ''}
             sources={[
@@ -103,7 +106,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
         )
       }
     </div>
-    <div class="mt-[150px] col-[8/12] flex flex-col items-start gap-[2em]">
+    <div class="clamp-[mt,50px,150px] lg:col-[8/12] flex flex-col items-start gap-[2em]">
       <h2 class="text-h2">{dest.tagline}</h2>
       <div class="flex flex-col gap-[1em]">
         <TextBlock class="text-balance" text={dest.appeal ?? ''} />
@@ -112,16 +115,16 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     </div>
   </section>
   <Divider />
-  <section class="main-grid main-container main-margin">
-    <h2 class="text-h2 col-[2/6] mb-5">Curated Perspectives</h2>
-    <div class="col-[2/6]">
+  <section class="max-md:gap-y-10 main-grid main-container main-margin">
+    <h2 class="text-h2 col-span-full lg:col-[2/6] mb-5">Curated Perspectives</h2>
+    <div class="col-span-full lg:col-[2/6]">
       <p class="text-balance">
         True luxury lies in the meaning we find beneath the surface. Our curators identify the
         essential threads that weave a location’s identity, providing a structured framework for
         your exploration. We don’t just show you a place; we reveal the themes that define its soul.
       </p>
     </div>
-    <div class="col-[7/12] flex flex-col gap-5">
+    <div class="col-span-full lg:col-[7/12] flex flex-col gap-5">
       {
         (dest.themes ?? []).map((theme, i) => (
           <>
@@ -166,7 +169,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
               desc="The unscripted grace found in the rituals of the everyday."
             />
           </div>
-          <div class="mt-20 grid grid-cols-subgrid row-start-2 col-span-full">
+          <div class="clamp-[mt,20px,50px] clamp-[gap-y,20px,50px] grid grid-cols-subgrid row-start-2 col-span-full">
             <Activities activities={dest.activities} />
           </div>
         </section>
@@ -212,15 +215,16 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
       <TestimonialSection testimonials={dest.testimonials} bgSrc={dest.cover} />
     )
   }
+  <div aria-hidden="true" id="itineraries"></div>
   {
     dest.itineraries?.length &&
       dest.itineraries.map((itn, i) => <ItineraryCover itinerary={itn} flipped={Boolean(i % 2)} />)
   }
   <section class="main-container main-grid h-dvh place-items-center">
-    <div class="col-[2/6]">
+    <div class="col-[2/12] lg:col-[2/6]">
       <NewsletterForm />
     </div>
-    <div class="col-[7/13] place-self-stretch mr-[-10vw] my-[5dvh]">
+    <div class="max-lg:hidden col-[7/13] place-self-stretch mr-[-10vw] my-[5dvh]">
       <DestinationPolaroid slug={dest.slug.current} />
     </div>
   </section>

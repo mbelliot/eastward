@@ -22,69 +22,76 @@
   --font-title: var(--font-tenor);
 }
 
-@layer components {
-  .text-h2 {
-    @apply text-[42px] leading-[1.2em] font-body;
-  }
-  .text-h3 {
-    @apply text-[26px] leading-[1.4em] tracking-[0.04em] font-body;
-  }
-  .text-h4 {
-    @apply text-[24px] leading-[1.4em] tracking-[0.04em] font-body;
-  }
-  .text-byline {
-    @apply text-[24px] leading-[1.6em] font-body italic font-light;
-  }
-  .text-medium {
-    @apply text-[16px] leading-[1.6em] tracking-[0.026em] font-body;
-  }
-  .text-journal-excerpt {
-    @apply text-[18px] leading-[1.6em] tracking-[0.026em] font-body italic font-light;
-  }
-  .text-quote {
-    @apply clamp-[text,32px,40px,390px,1800px] leading-[1.6em] tracking-[0.026em] font-body font-light;
-  }
-  .text-label {
-    @apply text-[16px] leading-[1.4em] tracking-[0.03em] font-body uppercase;
-  }
-  .text-journal-body {
-    @apply text-[21px] leading-[1.9em] tracking-[0.04em] font-body;
-  }
-  .text-masthead {
-    @apply font-title clamp-[text,40px,130px,390px,2560px] leading-none tracking-[-.04em] uppercase;
-  }
+@utility text-h2 {
+  @apply text-[42px] leading-[1.2em] font-body;
+}
 
-  .aspect-cover {
-    height: auto;
-    aspect-ratio: 17 / 11;
-  }
+@utility text-h3 {
+  @apply text-[32px] leading-[1.4em] tracking-[0.04em] font-body;
+}
 
-  .aspect-page {
-    height: auto;
-    aspect-ratio: 17 / 22;
-  }
+@utility text-h4 {
+  @apply text-[24px] leading-[1.4em] tracking-[0.04em] font-body;
+}
 
-  .aspect-page-fixed {
-    width: auto;
-    aspect-ratio: 17 / 22;
-  }
+@utility text-byline {
+  @apply text-[24px] leading-[1.6em] font-body italic font-light;
+}
 
-  .aspect-anamorphic {
-    height: auto;
-    aspect-ratio: 2.39 / 1;
-  }
+@utility text-medium {
+  @apply text-[16px] leading-[1.6em] tracking-[0.026em] font-body;
+}
 
-  .main-container {
-    @apply clamp-[px,20px,50px] overflow-x-clip;
-  }
+@utility text-journal-excerpt {
+  @apply text-[18px] leading-[1.6em] tracking-[0.026em] font-body italic font-light;
+}
 
-  .main-grid {
-    @apply grid grid-cols-12 clamp-[gap,15px,20px];
-  }
+@utility text-quote {
+  @apply clamp-[text,22px,40px,390px,1800px] leading-[1.6em] tracking-[0.026em] font-body font-light;
+}
 
-  .main-margin {
-    @apply clamp-[mt,100px,200px] clamp-[mb,50px,150px];
-  }
+@utility text-label {
+  @apply text-[16px] leading-[1.4em] tracking-[0.03em] font-body uppercase;
+}
+
+@utility text-journal-body {
+  @apply text-[21px] leading-[1.9em] tracking-[0.04em] font-body;
+}
+
+@utility text-masthead {
+  @apply font-title clamp-[text,40px,130px,390px,2560px] leading-none tracking-[-.04em] uppercase;
+}
+
+@utility main-container {
+  @apply clamp-[px,20px,50px] overflow-x-clip;
+}
+
+@utility main-margin {
+  @apply clamp-[mt,100px,200px] clamp-[mb,50px,150px];
+}
+
+@utility main-grid {
+  @apply grid grid-cols-12 clamp-[gap,15px,20px];
+}
+
+@utility aspect-cover {
+  height: auto;
+  aspect-ratio: 17 / 11;
+}
+
+@utility aspect-page {
+  height: auto;
+  aspect-ratio: 17 / 22;
+}
+
+@utility aspect-page-fixed {
+  width: auto;
+  aspect-ratio: 17 / 22;
+}
+
+@utility aspect-anamorphic {
+  height: auto;
+  aspect-ratio: 2.39 / 1;
 }
 
 @layer base {

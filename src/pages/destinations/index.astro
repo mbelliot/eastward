@@ -1,17 +1,42 @@
 ---
-import { sanityClient } from "sanity:client"
-import { defineQuery } from "groq"
-import RollLink from "@/RollLink.astro"
-import Layout from "~/layouts/Layout.astro"
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import Layout from '~/layouts/Layout.astro'
+import Newari from '$/newari.jpg'
+import { Image } from 'astro:assets'
+import SeasonPicks from '@/destinations/SeasonPicks.astro'
 
-let query = defineQuery('*[_type == "destination"]')
-let data = await sanityClient.fetch(query)
+const destinationsQuery = defineQuery('*[_type == "destination"]')
+const destinations = await sanityClient.fetch(destinationsQuery)
 ---
 
 <Layout>
-	<div class="flex flex-col gap-10 items-start mt-30">
-		{data.map(d=>( 
-  <RollLink href={`/destinations/${d.slug.current}`}>{d.name}</RollLink>
-  ))}
-	</div>
+  <section class="w-full aspect-anamorphic relative flex items-end">
+    <div aria-hidden="true" class="absolute inset-0">
+      <Image
+        src={Newari}
+        class="size-full object-cover"
+        alt="Patan Durbar Square"
+        priority
+        layout="constrained"
+      />
+    </div>
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 top-auto h-7/10 bg-linear-to-t from-black to-black/0 mask-t-from-0 backdrop-blur-2xl"
+    >
+    </div>
+    <div class="main-grid main-container pb-12.5 relative">
+      <div
+        class="col-[2/8] flex flex-col gap-5 *:text-inverted bg-linear-[white] bg-left bg-size-[8px_100%] bg-no-repeat pl-[2em]"
+      >
+        <h1 class="text-masthead ml-[-.1em]">Destinations</h1>
+        <p class="text-byline w-[50ch]">
+          From the slow, mist-shrouded rhythms of the interior to the sharp energy of the coast, we
+          map the continent through its living heritage and silent spaces.
+        </p>
+      </div>
+    </div>
+  </section>
+  <SeasonPicks destinations={destinations} />
 </Layout>

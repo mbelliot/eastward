@@ -1,6 +1,5 @@
 ---
 import Picture, { fullscreenSources } from '@/Picture.astro'
-import SectionTitle from '@/SectionTitle.astro'
 import type { SanityImageSource } from '@sanity/image-url'
 import type { HTMLAttributes } from 'astro/types'
 import type { Testimonial as TT } from 'sanity.types'
@@ -14,20 +13,20 @@ interface Props extends HTMLAttributes<'section'> {
 const { bgSrc, testimonials } = Astro.props
 ---
 
-<section class="relative isolate h-dvh">
+<section class="relative isolate h-dvh testimonialSection">
   <Picture
     pictureClass="absolute inset-0 -z-10"
     class="size-full object-cover"
     src={bgSrc}
     sources={fullscreenSources}
   />
-  <div class="size-full flex bg-black/90 backdrop-blur-lg">
+  <div class="size-full flex bg-black/85 backdrop-blur-lg">
     <div
-      class="main-grid main-container main-margin **:text-inverted grid-rows-[minmax(0,1fr)_min-content]"
+      class="main-grid main-container main-margin gap-y-12.5 **:text-inverted grid-rows-[minmax(0,1fr)_min-content]"
     >
-      <div class="col-span-full row-[2/3] main-grid">
-        <SectionTitle class="col-[2/5]" title="The Memories" />
-        <div class="col-[2/6]">
+      <div class="max-lg:**:text-center max-xl:translate-y-8 col-span-full row-[2/3] main-grid">
+        <h2 class="max-lg:justify-self-center col-[2/12] xl:col-[2/5] text-h2">The Memories</h2>
+        <div class="max-lg:justify-self-center col-[2/12] xl:col-[2/5]">
           <p class="text-balance">
             Journeys are measured in moments — in quiet mornings, shared laughter, unfamiliar
             streets, and the subtle realization that you’ve stepped outside your usual rhythm.
@@ -36,9 +35,73 @@ const { bgSrc, testimonials } = Astro.props
           </p>
         </div>
       </div>
-      <div class="col-[6/13] row-span-full justify-self-center">
+      <div
+        class="col-[2/13] xl:col-[6/13] xl:row-span-full justify-self-center grid place-items-start *:col-[1/2] *:row-[1/2] *:invisible perspective-normal testimonialReel"
+      >
         {testimonials.map((tm) => <Testimonial testimonial={tm} />)}
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+  gsap.registerPlugin(ScrollTrigger)
+
+  const section = document.querySelector('.testimonialSection'),
+    container = section?.querySelector('.testimonialReel')
+
+  if (container) {
+    let testimonials = gsap.utils.toArray<HTMLElement>(container.children)
+    if (testimonials.length < 2 || window.matchMedia('(max-width:869px').matches) {
+      gsap.set(testimonials[0], { autoAlpha: 1 })
+    } else {
+      let loop = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 80%',
+          end: 'bottom top',
+        },
+        repeat: -1,
+      })
+      testimonials.forEach((tt) => {
+        let tl = gsap.timeline(),
+          bq = tt.querySelector('blockquote'),
+          cap = tt.querySelector('figcaption'),
+          pic = tt.querySelector('picture')
+        tl.set(tt, { perspective: '1000px' })
+        tl.from([pic, bq], {
+          duration: 5,
+          ease: 'power4.out',
+          z: -200,
+          '--alpha-top': 'rgba(0,0,0,1)',
+          autoAlpha: 0,
+          stagger: 1.6,
+        })
+        tl.from(
+          cap,
+          {
+            autoAlpha: 0,
+            xPercent: -2,
+            yPercent: 5,
+            scale: 0.9,
+            duration: 4.2,
+            ease: 'power4.out',
+          },
+          '<+=.8',
+        )
+        tl.to([bq, cap, pic], {
+          duration: 3,
+          stagger: 0.6,
+          ease: 'power4.in',
+          z: 150,
+          autoAlpha: 0,
+        })
+        tl.from(tt, { autoAlpha: 0, duration: 5 }, 0)
+        loop.add(tl)
+      })
+    }
+  }
+</script>

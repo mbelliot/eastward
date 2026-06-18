@@ -15,6 +15,7 @@ const { class: cls, activity } = Astro.props
 <button data-cursor-area="magnifier" class:list={['flex flex-col activity', cls]}>
   <figure class="flex flex-col gap-2.5">
     <Picture
+      class="max-xl:w-full max-h-[90dvh] object-cover"
       src={activity.image}
       alt={activity.image.alt ?? ''}
       sources={[

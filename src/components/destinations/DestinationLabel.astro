@@ -1,0 +1,18 @@
+---
+const { name, country, class: cls, as: As = 'span' } = Astro.props
+---
+
+<As class:list={['flex items-center whitespace-pre leading-none *:uppercase text-inverted', cls]}>
+  <svg
+    class="h-[1.4cap] mr-[.7cap] translate-y-[-.18cap]"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 12.667 16"
+    fill="none"
+    overflow="visible"
+    ><path
+      d="M 6.333 0 C 2.837 0.004 0.004 2.816 0 6.286 C 0 11.664 5.758 15.727 6.003 15.897 C 6.201 16.034 6.465 16.034 6.664 15.897 C 6.909 15.727 12.667 11.664 12.667 6.286 C 12.663 2.816 9.829 0.004 6.333 0 Z M 6.333 4 C 7.605 4 8.636 5.023 8.636 6.286 C 8.636 7.548 7.605 8.572 6.333 8.572 C 5.061 8.572 4.03 7.548 4.03 6.286 C 4.03 5.023 5.061 4 6.333 4 Z"
+      fill="rgb(255, 255, 255)"></path></svg
+  >
+  <span>{name}, </span>
+  <span>{country}</span>
+</As>

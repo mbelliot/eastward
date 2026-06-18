@@ -12,6 +12,9 @@ const { activities } = Astro.props
 
 {
   activities.map((att, i) => (
-    <Activity class:list={[i % 2 ? 'col-[8/13]' : 'col-[2/7]', 'max-h-[70dvh]']} activity={att} />
+    <Activity
+      class:list={[i % 2 ? 'xl:col-[8/13]' : 'xl:col-[2/7]', 'max-xl:col-[2/18] max-h-[70dvh]']}
+      activity={att}
+    />
   ))
 }
