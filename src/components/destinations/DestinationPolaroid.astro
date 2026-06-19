@@ -41,7 +41,7 @@ const builder = createImageUrlBuilder(sanityClient)
 ---
 
 <destination-polaroid
-  class="block relative size-full overflow-visible"
+  class="block relative size-full overflow-visible perspective-normal"
   data-density={density}
   data-image-size={imageSize}
   aria-hidden="true"
@@ -49,7 +49,7 @@ const builder = createImageUrlBuilder(sanityClient)
   {
     images.map((img) => (
       <img
-        class="absolute"
+        class="absolute invisible left-0 top-0 object-cover will-change-transform"
         src={builder.image(img).width(300).url()}
         loading="lazy"
         decoding="async"
@@ -59,6 +59,10 @@ const builder = createImageUrlBuilder(sanityClient)
 </destination-polaroid>
 
 <script>
+  import { gsap } from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  gsap.registerPlugin(ScrollTrigger)
+
   function shuffle<T>(arr: T[]): T[] {
     const a = [...arr]
     for (let i = a.length - 1; i > 0; i--) {
@@ -135,9 +139,11 @@ const builder = createImageUrlBuilder(sanityClient)
   class DestinationPolaroid extends HTMLElement {
     resizeObserver!: ResizeObserver
     resizeTimer!: ReturnType<typeof setTimeout>
+    tl!: gsap.core.Timeline
 
     connectedCallback() {
       this.layout()
+
       this.resizeObserver = new ResizeObserver(() => {
         if (this.resizeTimer) clearTimeout(this.resizeTimer)
         this.resizeTimer = setTimeout(() => this.layout(), 150)
@@ -158,6 +164,11 @@ const builder = createImageUrlBuilder(sanityClient)
       if (width === 0 || height === 0) {
         requestAnimationFrame(() => this.layout())
         return
+      }
+
+      if (this.tl) {
+        this.tl.kill()
+        gsap.set(this.querySelectorAll('img'), { clearProps: 'all' })
       }
 
       const allImgs = shuffle(Array.from(this.querySelectorAll('img')))
@@ -181,32 +192,58 @@ const builder = createImageUrlBuilder(sanityClient)
 
         const layoutData = getScatterLayout(subset, width, height, imageSize)
 
+        this.tl = gsap.timeline({
+          defaults: { duration: 1.8, ease: 'sine.out' },
+          scrollTrigger: {
+            trigger: this,
+            start: 'top bottom',
+            toggleActions: 'play pause resume pause',
+          },
+        })
+
         subset.forEach((img, i) => {
           const pos = layoutData[i]
           if (!pos) return
 
-          const rotate = Math.random() * 10 - 5
-          const z = Math.random() * 10 - 20
+          const rotate = Math.random() * 20 - Math.random() * 20
+          // 1. Find the center of the container and center of the target image
+          const containerCx = width / 2
+          const containerCy = height / 2
+          const targetCx = pos.x + pos.w / 2
+          const targetCy = pos.y + pos.h / 2
 
-          Object.assign(img.style, {
-            display: 'block',
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            width: `${pos.w}px`,
-            height: `${pos.h}px`,
-            objectFit: 'cover',
-            opacity: '1',
-            pointerEvents: 'none',
-            transform: `translate3d(${pos.x}px, ${pos.y}px, ${z}px) rotate(${rotate}deg)`,
-            transformOrigin: 'center center',
-            willChange: 'transform',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
-          })
+          // 2. Calculate the directional vector from center to target
+          const dx = targetCx - containerCx
+          const dy = targetCy - containerCy
+          const distance = Math.hypot(dx, dy) || 1 // Avoid division by zero
+
+          // 3. Normalize the vector
+          const nx = dx / distance
+          const ny = dy / distance
+
+          // 4. Calculate a safe offscreen distance based on container bounds
+          // Pushing it by the diagonal size of the container guarantees it starts completely offscreen
+          const offscreenTravel = Math.hypot(width, height) / 2
+
+          // 5. Invert the vector (-nx, -ny) to move to the opposite side
+          const startX = containerCx - nx * offscreenTravel - pos.w / 2
+          const startY = containerCy - ny * offscreenTravel - pos.h / 2
+
+          // 6. Uniform speed calculation (e.g., 800 pixels per second)
+          const finalTravelDistance = Math.hypot(pos.x - startX, pos.y - startY)
+          const speed = 500
+          const duration = finalTravelDistance / speed
+
+          // 7. Make rotation speed proportional to duration so angular velocity is constant
+          const degreesPerSecond = 120
+          const startRotate = rotate - duration * degreesPerSecond
+          this.tl.set(img, { width: pos.w, height: pos.h, zIndex: i, autoAlpha: 1 })
+          this.tl.fromTo(
+            img,
+            { x: startX, y: startY, rotate: startRotate },
+            { x: pos.x, y: pos.y, rotate, duration },
+          )
         })
-
-        this.style.perspective = '1000px'
-        this.style.transformStyle = 'preserve-3d'
       })
     }
   }

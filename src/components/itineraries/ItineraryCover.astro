@@ -15,7 +15,7 @@ interface Props extends HTMLAttributes<'div'> {
 const { itinerary, flipped, class: cls, ...attrs } = Astro.props
 ---
 
-<div
+<article
   class:list={['grid max-lg:gap-y-[25px] lg:grid-cols-2 lg:aspect-cover max-h-dvh w-full', cls]}
   {...attrs}
 >
@@ -29,20 +29,58 @@ const { itinerary, flipped, class: cls, ...attrs } = Astro.props
   />
   <div
     class:list={[
-      'flex flex-col gap-5 lg:gap-[50px] lg:items-center lg:justify-center lg:place-self-center main-container',
+      'itineraryCoverContent invisible',
+      'flex flex-col lg:gap-[50px] lg:items-center lg:justify-center lg:place-self-center main-container',
       flipped ? 'order-1' : 'order-2',
     ]}
   >
     <div class="flex flex-col lg:items-center gap-2.5">
-      <h3 class="text-h3 max-lg:leading-none lg:text-masthead lg:text-center">{itinerary.title}</h3>
+      <h3 class="text-h3 max-lg:leading-none lg:text-masthead lg:text-center">
+        {itinerary.title}
+      </h3>
       <p class="text-byline lg:text-center">{itinerary.tagline}</p>
     </div>
     <div class="flex flex-col lg:items-center gap-5">
-      <div class="max-lg:hidden flex gap-10">
+      <div class="max-lg:hidden flex gap-10 icons">
         {itinerary.themes.map((th) => <Theme class="size-[55px]" theme={th} />)}
       </div>
-      <p class="text-h3">{itinerary.price}</p>
+      <p class="max-lg:pt-2.5 lg:text-h3 price">{itinerary.price}</p>
     </div>
-    <RollLink href={`/itineraries/${itinerary.slug.current}`}>Explore Details</RollLink>
+    <RollLink class="cta" href={`/itineraries/${itinerary.slug.current}`}>Explore Details</RollLink>
   </div>
-</div>
+</article>
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  import { SplitText } from 'gsap/SplitText'
+
+  gsap.registerPlugin(ScrollTrigger, SplitText)
+
+  gsap.utils.toArray<HTMLElement>('.itineraryCoverContent').forEach((container) => {
+    let h3 = container.querySelector('h3')!,
+      tagline = h3.nextElementSibling,
+      rest = container.querySelectorAll('.icons, .price, .cta')
+
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: container,
+          start: 'top bottom',
+          once: true,
+        },
+        delay: 0.2,
+      })
+      .set(container, { autoAlpha: 1 })
+      .from(SplitText.create(h3, { type: 'lines,chars' }).chars, {
+        autoAlpha: 0,
+        ease: 'power4.out',
+        stagger: { each: 0.03, ease: 'power2.in' },
+      })
+      .from(
+        [tagline, ...rest].filter(Boolean),
+        { yPercent: 20, autoAlpha: 0, stagger: 0.2 },
+        '-=.2',
+      )
+  })
+</script>
