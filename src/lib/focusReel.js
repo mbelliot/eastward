@@ -93,6 +93,7 @@ export function focusReel(container, signal, config = defaultConfig) {
 
     prevClone = prev.cloneNode(true)
     prevClone.style.position = 'absolute'
+    prevClone.style.willChange = 'transform'
     prev.parentNode.appendChild(prevClone)
     Flip.fit(prevClone, prevState)
 

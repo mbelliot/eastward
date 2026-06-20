@@ -29,3 +29,43 @@ const { title, class: cls } = Astro.props
     </main>
   </body>
 </html>
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  import { SplitText } from 'gsap/SplitText'
+  gsap.registerPlugin(ScrollTrigger, SplitText)
+
+  document.fonts.ready.then(() => {
+    document.querySelectorAll('.split-text-container').forEach((container) => {
+      let els: Element[] = []
+      let splits: SplitText[] = []
+
+      Array.from(container.children).forEach((c) => {
+        if (c.hasAttribute('data-lines-container')) {
+          Array.from(c.children).forEach((cc) => {
+            const split = SplitText.create(cc, { type: 'lines' })
+            splits.push(split)
+            els.push(...split.lines)
+          })
+        } else els.push(c)
+      })
+
+      gsap.from(els, {
+        autoAlpha: 0,
+        yPercent: 100,
+        duration: 1,
+        stagger: 0.12,
+        ease: 'power3.out',
+        delay: 0.3,
+        scrollTrigger: {
+          trigger: container,
+          start: 'top bottom',
+          once: true,
+        },
+        onStart: () => gsap.set(container, { autoAlpha: 1 }),
+        onComplete: () => splits.forEach((s) => s.revert()),
+      })
+    })
+  })
+</script>

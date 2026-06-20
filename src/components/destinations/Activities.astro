@@ -13,8 +13,40 @@ const { activities } = Astro.props
 {
   activities.map((att, i) => (
     <Activity
-      class:list={[i % 2 ? 'xl:col-[8/13]' : 'xl:col-[2/7]', 'max-xl:col-[2/18] max-h-[70dvh]']}
+      class:list={[i % 2 ? 'xl:col-[7/13]' : 'xl:col-[2/7]', 'max-xl:col-[2/13] max-h-[70dvh]']}
       activity={att}
     />
   ))
 }
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  gsap.registerPlugin(ScrollTrigger)
+
+  ScrollTrigger.batch('.activity', {
+    once: true,
+    onEnter: (batch) => {
+      gsap.from(batch, {
+        delay: 0.2,
+        autoAlpha: 0,
+        yPercent: 40,
+        duration: 0.6,
+        stagger: 0.2,
+      })
+    },
+  })
+
+  ScrollTrigger.batch('.activity figcaption', {
+    once: true,
+    onEnter: (batch) => {
+      gsap.from(batch, {
+        delay: 0.4,
+        autoAlpha: 0,
+        yPercent: 100,
+        duration: 0.6,
+        stagger: 0.2,
+      })
+    },
+  })
+</script>

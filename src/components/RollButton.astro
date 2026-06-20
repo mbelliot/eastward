@@ -27,9 +27,9 @@ const variants = cva(
 
 type Props = VariantProps<typeof variants> & HTMLAttributes<'button'>
 
-let { variant, size, ...attrs } = Astro.props
+let { variant, size, class: cls, ...attrs } = Astro.props
 ---
 
-<button class={variants({ variant, size })} data-roll-trigger {...attrs}>
+<button class:list={[variants({ variant, size }), cls]} data-roll-trigger {...attrs}>
   <RollText><slot /></RollText>
 </button>

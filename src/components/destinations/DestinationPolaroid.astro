@@ -50,7 +50,7 @@ const builder = createImageUrlBuilder(sanityClient)
     images.map((img) => (
       <img
         class="absolute invisible left-0 top-0 object-cover will-change-transform"
-        src={builder.image(img).width(300).url()}
+        src={builder.image(img).width(imageSize).url()}
         loading="lazy"
         decoding="async"
       />
@@ -140,6 +140,7 @@ const builder = createImageUrlBuilder(sanityClient)
     resizeObserver!: ResizeObserver
     resizeTimer!: ReturnType<typeof setTimeout>
     tl!: gsap.core.Timeline
+    layoutGen = 0
 
     connectedCallback() {
       this.layout()
@@ -157,6 +158,7 @@ const builder = createImageUrlBuilder(sanityClient)
     }
 
     layout() {
+      const myGen = ++this.layoutGen
       const density = parseFloat(this.dataset.density ?? '0.6')
       const imageSize = parseFloat(this.dataset.imageSize ?? '300')
       const { offsetWidth: width, offsetHeight: height } = this
@@ -186,6 +188,8 @@ const builder = createImageUrlBuilder(sanityClient)
       )
 
       Promise.all(waitForLoad).then(() => {
+        if (myGen !== this.layoutGen) return
+
         allImgs.forEach((img) => {
           if (!subset.includes(img)) img.style.display = 'none'
         })
@@ -193,10 +197,10 @@ const builder = createImageUrlBuilder(sanityClient)
         const layoutData = getScatterLayout(subset, width, height, imageSize)
 
         this.tl = gsap.timeline({
-          defaults: { duration: 1.8, ease: 'sine.out' },
+          defaults: { ease: 'sine.out' },
           scrollTrigger: {
             trigger: this,
-            start: 'top bottom',
+            start: 'top 70%',
             toggleActions: 'play pause resume pause',
           },
         })
@@ -241,7 +245,7 @@ const builder = createImageUrlBuilder(sanityClient)
           this.tl.fromTo(
             img,
             { x: startX, y: startY, rotate: startRotate },
-            { x: pos.x, y: pos.y, rotate, duration },
+            { x: pos.x, y: pos.y, rotate, duration: i < (subset.length * 3) / 5 ? 0 : duration },
           )
         })
       })

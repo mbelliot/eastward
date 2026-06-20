@@ -22,6 +22,12 @@
   --font-title: var(--font-tenor);
 }
 
+@layer components {
+  .split-text-container {
+    @apply invisible;
+  }
+}
+
 @utility text-h2 {
   @apply text-[42px] leading-[1.2em] font-body;
 }
