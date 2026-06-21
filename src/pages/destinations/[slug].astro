@@ -131,7 +131,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
         your exploration. We don’t just show you a place; we reveal the themes that define its soul.
       </p>
     </div>
-    <div class="col-span-full lg:col-[7/12] flex flex-col gap-5">
+    <div class="col-span-full lg:col-[7/12] flex flex-col gap-5 split-text-container">
       {
         (dest.themes ?? []).map((theme, i) => (
           <>
@@ -282,7 +282,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     once: true,
     start: 'bottom bottom',
     onEnter: (batch) => {
-      gsap.to(batch, { '--blur': '0px', duration: 0.6, stagger: 0.2, ease: 'sine.out' })
+      gsap.to(batch, { '--blur': '0px', duration: 0.6, stagger: 0.2, delay: 0.2, ease: 'sine.out' })
     },
   })
 </script>

@@ -101,6 +101,9 @@
 }
 
 @layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
   body {
     @apply text-text bg-inverted font-body;
     @apply text-[20px] leading-[1.8] tracking-[0.026em];

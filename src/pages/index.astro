@@ -1,23 +1,80 @@
 ---
-import Hairline from "@/Hairline.astro"
-import Icon from "@/Icon.astro"
-import RollButton from "@/RollButton.astro"
-import RollLink from "@/RollLink.astro"
-import Layout from "~/layouts/Layout.astro"
+import Mandala from '@/Mandala.astro'
+import Layout from '~/layouts/Layout.astro'
 ---
 
 <Layout>
-	<div class="h-25 bg-black flex items-center">
-		<Hairline />
-	</div>
-	<h1 class="text-masthead w-3xl">Welcome to Eastward</h1>
-	<RollButton>Hello</RollButton>
-	<RollButton variant="dimmed" size="sm">Hello</RollButton>
-	<RollButton variant="outline">Hello</RollButton>
-	<RollButton variant="outline" size="sm">Hello</RollButton>
-	<RollButton variant="plain">Hello</RollButton>
-	<RollLink variant="title" class="text-text">Roll</RollLink>
-	<RollLink>Roll</RollLink>
-	<RollLink>Hello you</RollLink>
-	<Icon name="Car" class="stroke-tint" />
+  <div class="relative h-dvh">
+    <section class="size-full relative">
+      <div class="absolute inset-0 -translate-y-px -bottom-px overflow-clip">
+        <video
+          muted
+          loop
+          autoplay
+          playsinline
+          class="absolute left-1/2 top-1/2 -translate-50001/100000 min-w-full min-h-full overflow-clip object-cover pointer-events-none"
+          id="heroVid"
+        >
+          <source src="https://objects.elliotli.dev/0111.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="relative size-full grid place-items-center">
+        <div
+          id="heroText"
+          class="flex flex-col w-[70vw] max-w-350 items-center *:text-inverted *:text-center gap-[15px]"
+        >
+          <h1
+            class="font-title clamp-[text,82px,200px,390px,2000px] uppercase tracking-[-0.06em] leading-[90%] invisible"
+          >
+            Journey to <span class="whitespace-nowrap">the East</span>
+          </h1>
+          <p class="text-byline invisible">
+            Curated experiences across Asia’s most iconic destinations and living traditions.
+          </p>
+        </div>
+      </div>
+    </section>
+    <div id="loading" class="absolute inset-0 bg-brand grid place-items-center text-inverted z-50">
+      <Mandala class="size-[250px]" color="white" />
+    </div>
+  </div>
+  <section class="h-dvh"></section>
 </Layout>
+
+<script>
+  import gsap from 'gsap'
+  import { SplitText } from 'gsap/SplitText'
+  import { videoReady, waitFor } from '~/lib/utils'
+
+  gsap.registerPlugin(SplitText)
+
+  window._lenis?.stop()
+
+  Promise.race([
+    waitFor(6666),
+    Promise.all([videoReady(document.getElementById('heroVid')), document.fonts.ready]),
+  ]).then(() => {
+    let h1 = document.querySelector('#heroText h1')!,
+      byline = document.querySelector('#heroText p')!,
+      h1Split = SplitText.create(h1, { type: 'lines' })
+
+    gsap
+      .timeline({
+        onComplete: () => {
+          window.dispatchEvent(new CustomEvent('heroRevealed', { detail: {} }))
+          h1Split.revert()
+          window._lenis?.start()
+        },
+      })
+      .to('#loading svg', { opacity: 0, duration: 0.5 })
+      .fromTo(
+        '#loading',
+        { clipPath: 'inset(0 0 0% 0)' },
+        { clipPath: 'inset(0 0 100% 0)', duration: 1.2, ease: 'expo.inOut' },
+        '-=.2',
+      )
+      .set(h1, { autoAlpha: 1 })
+      .from(h1Split.lines, { autoAlpha: 0, y: 40, duration: 0.6, stagger: { each: 0.2 } }, '-=.2')
+      .from(byline, { autoAlpha: 0, y: 10, duration: 0.6 }, '-=.2')
+  })
+</script>

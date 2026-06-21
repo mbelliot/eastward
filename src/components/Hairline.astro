@@ -37,7 +37,7 @@ const { id, class: cls, direction = 'x' } = Astro.props
         .fromTo(
           el,
           { autoAlpha: 1, scaleX: isX ? 0 : 1, scaleY: isX ? 1 : 0 },
-          { opacity: 0.2, scaleX: 1, scaleY: 1 },
+          { autoAlpha: 0.2, scaleX: 1, scaleY: 1 },
         )
     }
 

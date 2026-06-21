@@ -1,6 +1,7 @@
 ---
-import { Font } from 'astro:assets'
 import '~/styles/global.css'
+import 'lenis/dist/lenis.css'
+import { Font } from 'astro:assets'
 import Header from '@/Header.astro'
 import Cursor from '@/Cursor.astro'
 import SlideModal from '@/SlideModal.astro'
@@ -34,7 +35,18 @@ const { title, class: cls } = Astro.props
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { SplitText } from 'gsap/SplitText'
+  import Lenis from 'lenis'
+
   gsap.registerPlugin(ScrollTrigger, SplitText)
+
+  const lenis = new Lenis()
+  lenis.on('scroll', ScrollTrigger.update)
+
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000)
+  })
+
+  gsap.ticker.lagSmoothing(0)
 
   document.fonts.ready.then(() => {
     document.querySelectorAll('.split-text-container').forEach((container) => {
@@ -44,6 +56,7 @@ const { title, class: cls } = Astro.props
       Array.from(container.children).forEach((c) => {
         if (c.hasAttribute('data-lines-container')) {
           Array.from(c.children).forEach((cc) => {
+            if (c.classList.contains('split-text-container')) return
             const split = SplitText.create(cc, { type: 'lines' })
             splits.push(split)
             els.push(...split.lines)
@@ -68,4 +81,12 @@ const { title, class: cls } = Astro.props
       })
     })
   })
+
+  declare global {
+    interface Window {
+      _lenis?: Lenis
+    }
+  }
+
+  window._lenis = lenis
 </script>

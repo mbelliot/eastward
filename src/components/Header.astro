@@ -10,23 +10,26 @@ const gap = 'clamp-[gap,15px,25px]',
 const navItems = ['journal', 'destinations', 'itineraries']
 
 const { class: cls } = Astro.props
+const isIndex = Astro.url.pathname === '/' || undefined
 ---
 
 <header
+  id="pageHeader"
+  data-index-page={isIndex}
   class:list={[
-    'fixed top-0 left-0 right-0 clamp-[h,60px,100px] flex justify-between items-center z-30',
+    'fixed top-0 left-0 right-0 clamp-[h,60px,100px] flex justify-between z-30',
     px,
     cls,
   ]}
 >
-  <div>
+  <div id="headerLogo" class="invisible flex items-center">
     <a href="/" aria-label="Home"><Mandala inert color="white" class="clamp-[size,40px,60px]" /></a>
   </div>
-  <nav aria-label="Main navigation" class:list={['flex items-center h-full', gap]}>
-    <ul class:list={['flex', gap]}>
+  <nav id="headerNav" aria-label="Main navigation" class:list={['flex h-full', gap]}>
+    <ul class:list={['flex h-full', gap]}>
       {
         navItems.map((n) => (
-          <li>
+          <li class="invisible h-full flex items-center">
             <RollLink href={`/${n}`} variant="title">
               {n}
             </RollLink>
@@ -35,14 +38,103 @@ const { class: cls } = Astro.props
       }
     </ul>
     <Hairline direction="y" id="header-hairline-cta" />
-    <RollButton>Inquire</RollButton>
+    <div class="flex items-center invisible" id="headerCTA">
+      <RollButton>Inquire</RollButton>
+    </div>
   </nav>
   <Hairline id="header-hairline-bottom" class="absolute left-0 right-0 -bottom-px" />
 </header>
 
 <script>
-  const hlc = document.querySelector('#header-hairline-cta') as any,
-    hlb = document.querySelector('#header-hairline-bottom') as any
-  hlc?.tl?.seek(1)
-  hlb?.tl?.seek(1)
+  import { clamp, lerp } from '~/lib/utils'
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+  gsap.registerPlugin(ScrollTrigger)
+
+  const hlc = document.querySelector<HTMLElementTagNameMap['hair-line']>('#header-hairline-cta')!,
+    hlb = document.querySelector<HTMLElementTagNameMap['hair-line']>('#header-hairline-bottom')!
+
+  function hairlineDuration() {
+    let t = clamp(402, 2560, window?.innerWidth ?? 0)
+    return lerp(0.6, 1.6, t)
+  }
+
+  const duration = hairlineDuration()
+
+  let playedOnce = false
+
+  const navIn = gsap
+    .timeline()
+    .set('#headerNav li', { autoAlpha: 1 })
+    .from('#headerNav li', { yPercent: -100, stagger: 0.16 })
+    .from(
+      '#headerCTA',
+      {
+        id: 'ctaIn',
+        yPercent: () => (playedOnce ? 0 : -100),
+        onStart: () => {
+          playedOnce = true
+          gsap.set('#headerCTA', { autoAlpha: 1 })
+        },
+      },
+      '-=0.16',
+    )
+  const navOut = gsap.to('#headerNav li', { yPercent: -100 })
+
+  const inTl = gsap
+    .timeline({ paused: true, defaults: { ease: 'sine.out' } })
+    .add(hlb.tl.tweenTo(1, { duration, ease: 'power3.out' }), 0)
+    .add(hlc.tl.tweenTo(1, { duration, ease: 'power3.out' }), 0)
+    .from(
+      '#headerLogo',
+      {
+        id: 'logoIn',
+        yPercent: () => (playedOnce ? 0 : -100),
+        onStart: () => {
+          gsap.set('#headerLogo', { autoAlpha: 1 })
+        },
+      },
+      0,
+    )
+    .add(navIn, duration - navIn.duration())
+
+  const outTl = gsap
+    .timeline({ paused: true, defaults: { ease: 'sine.out' } })
+    .add(hlb.tl.tweenTo(0, { duration, ease: 'power3.out' }), 0)
+    .add(hlc.tl.tweenTo(0, { duration, ease: 'power3.out' }), 0)
+    .add(navOut, 0)
+  // .to('#headerLogo', { yPercent: -100 }, duration - 0.6)
+
+  const header = document.getElementById('pageHeader')!
+  const isIndex = header.hasAttribute('data-index-page')
+
+  if (isIndex) {
+    window.addEventListener('heroRevealed', () => {
+      inTl.play()
+    })
+  } else {
+    inTl.progress(1)
+  }
+
+  let isScrolled = false
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      const scrolled = window.scrollY > 10
+      if (scrolled && !isScrolled) {
+        isScrolled = true
+        inTl.pause()
+        outTl.restart()
+      } else if (!scrolled && isScrolled) {
+        isScrolled = false
+        outTl.pause()
+        navIn.getById('ctaIn')?.invalidate()
+        inTl.getById('logoIn')?.invalidate()
+        inTl.restart()
+      }
+    },
+    { passive: true },
+  )
 </script>

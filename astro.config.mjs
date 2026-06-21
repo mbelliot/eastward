@@ -1,16 +1,17 @@
 // @ts-check
-
 import sanity from '@sanity/astro'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, fontProviders } from 'astro/config'
-
 import react from '@astrojs/react'
-
 import icon from 'astro-icon'
 
 const isProd = process.env.NODE_ENV === 'production'
 
 export default defineConfig({
+  site: 'https://eastward.elliotli.dev',
+  trailingSlash: 'never',
+  build: { format: 'file' },
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   fonts: [
     {
       provider: fontProviders.google(),

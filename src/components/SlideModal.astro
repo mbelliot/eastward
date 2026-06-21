@@ -45,7 +45,7 @@ import IconButton from './IconButton.astro'
         tl = gsap.timeline({
           defaults: { duration: 0.6 },
           onComplete: () => {
-            window.dispatchEvent(new CustomEvent('resume-overlay-scroll'))
+            window._lenis?.start()
             gsap.set(this, { clearProps: 'all' })
             gsap.set(modalFlex, { clearProps: 'all' })
 
@@ -82,7 +82,7 @@ import IconButton from './IconButton.astro'
           }).lines,
       )
 
-      window.dispatchEvent(new CustomEvent('pause-overlay-scroll'))
+      window._lenis?.stop()
       gsap
         .timeline({
           defaults: { ease: 'expo.out' },
