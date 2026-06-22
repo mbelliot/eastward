@@ -106,9 +106,9 @@ const { class: cls, waitForReveal } = Astro.props
   // .to('#headerLogo', { yPercent: -100 }, duration - 0.6)
 
   const header = document.getElementById('pageHeader')!
-  const isIndex = header.hasAttribute('data-index-page')
+  const waitForReveal = header.hasAttribute('data-wait-for-reveal')
 
-  if (isIndex) {
+  if (waitForReveal) {
     window.addEventListener('heroRevealed', () => {
       inTl.play()
     })
