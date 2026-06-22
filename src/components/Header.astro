@@ -9,13 +9,12 @@ const gap = 'clamp-[gap,15px,25px]',
 
 const navItems = ['journal', 'destinations', 'itineraries']
 
-const { class: cls } = Astro.props
-const isIndex = Astro.url.pathname === '/' || undefined
+const { class: cls, waitForReveal } = Astro.props
 ---
 
 <header
   id="pageHeader"
-  data-index-page={isIndex}
+  data-wait-for-reveal={waitForReveal || undefined}
   class:list={[
     'fixed top-0 left-0 right-0 clamp-[h,60px,100px] flex justify-between z-30',
     px,
