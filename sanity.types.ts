@@ -187,6 +187,7 @@ export type Itinerary = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'segment'
     _key: string
   }>
@@ -218,6 +219,7 @@ export type Itinerary = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'food'
     _key: string
   }>
@@ -321,6 +323,7 @@ export type Destination = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'attraction'
     _key: string
   }>
@@ -352,6 +355,7 @@ export type Destination = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'activity'
     _key: string
   }>
@@ -383,6 +387,7 @@ export type Destination = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'food'
     _key: string
   }>
@@ -644,6 +649,7 @@ export type DestinationQueryResult = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'attraction'
     _key: string
   }>
@@ -675,6 +681,7 @@ export type DestinationQueryResult = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'activity'
     _key: string
   }>
@@ -706,6 +713,7 @@ export type DestinationQueryResult = {
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'food'
     _key: string
   }>
@@ -828,6 +836,7 @@ export type DestinationsQueryResult = Array<{
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'attraction'
     _key: string
   }>
@@ -859,6 +868,7 @@ export type DestinationsQueryResult = Array<{
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'activity'
     _key: string
   }>
@@ -890,6 +900,7 @@ export type DestinationsQueryResult = Array<{
       alt?: string
       _type: 'image'
     }
+    featured?: boolean
     _type: 'food'
     _key: string
   }>
@@ -919,6 +930,171 @@ export type DestinationsQueryResult = Array<{
   slug: Slug
 }>
 
+// Source: src/pages/index.astro
+// Variable: indexPageQuery
+// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured]  }
+export type IndexPageQueryResult = {
+  featuredDestinations: Array<{
+    cover: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    attractions: Array<{
+      title: string
+      body?: Array<{
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          href?: string
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }>
+      image: {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+      }
+      featured?: boolean
+      _type: 'attraction'
+      _key: string
+      location: string | null
+      country: string | null
+    }> | null
+  }>
+  featuredItineraries: Array<{
+    _id: string
+    _type: 'itinerary'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    title: string
+    tagline: string
+    days?: number
+    price: string
+    featured?: boolean
+    overview?: string
+    schedule?: Array<{
+      title: string
+      body?: Array<{
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          href?: string
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }>
+      image: {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+      }
+      featured?: boolean
+      _type: 'segment'
+      _key: string
+    }>
+    foods?: Array<{
+      title: string
+      body?: Array<{
+        children?: Array<{
+          marks?: Array<string>
+          text?: string
+          _type: 'span'
+          _key: string
+        }>
+        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
+        listItem?: 'bullet' | 'number'
+        markDefs?: Array<{
+          href?: string
+          _type: 'link'
+          _key: string
+        }>
+        level?: number
+        _type: 'block'
+        _key: string
+      }>
+      image: {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+      }
+      featured?: boolean
+      _type: 'food'
+      _key: string
+    }>
+    cover: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    portrait?: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    features: Array<
+      {
+        _key: string
+      } & FeatureReference
+    >
+    destinations?: Array<
+      {
+        _key: string
+      } & DestinationReference
+    >
+    themes: Array<
+      {
+        _key: string
+      } & ThemeReference
+    >
+    curator?: CuratorReference
+    stays?: Array<
+      {
+        _key: string
+      } & StayReference
+    >
+    slug: Slug
+  }>
+}
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
@@ -927,5 +1103,6 @@ declare module '@sanity/client' {
     '*[_type == "destination"]{ slug }': DestinationSlugsQueryResult
     '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      cover {\n        ...,\n        "lqip": asset->metadata.lqip\n      },\n      themes[]->,\n      "testimonials": *[_type == \'testimonial\' && references(^._id)],\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] {\n        slug,\n        title,\n        tagline,\n        cover,\n        price,\n        themes[0..2]->\n      }\n}': DestinationQueryResult
     '*[_type == "destination"]': DestinationsQueryResult
+    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured]\n  }': IndexPageQueryResult
   }
 }

@@ -1,12 +1,35 @@
 ---
+import { defineQuery } from 'groq'
+import { sanityClient } from 'sanity:client'
 import Mandala from '@/Mandala.astro'
 import Layout from '~/layouts/Layout.astro'
+import { Image } from 'astro:assets'
+import FCity from '$/fcity.avif'
+import AttractionsSection from '@/destinations/AttractionsSection.astro'
+import Divider from '@/Divider.astro'
+
+const indexPageQuery = defineQuery(`{
+  "featuredDestinations": *[_type == "destination" && featured] {
+    cover,
+    "attractions": attractions[featured] {
+      ...,
+      "location": ^.name,
+      "country": ^.country
+    }
+  },
+  "featuredItineraries": *[_type == "itinerary" && featured]
+  }`)
+
+const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
+  indexPageQuery,
+  {},
+))!
 ---
 
 <Layout isIndexPage>
   <div class="relative h-dvh">
     <section class="size-full relative">
-      <div class="absolute inset-0 -translate-y-px -bottom-px overflow-clip">
+      <div id="heroVidContainer" class="absolute inset-0 -translate-y-px -bottom-px overflow-clip">
         <video
           muted
           loop
@@ -35,18 +58,94 @@ import Layout from '~/layouts/Layout.astro'
       </div>
     </section>
     <div id="loading" class="absolute inset-0 bg-brand grid place-items-center text-inverted z-50">
-      <Mandala class="size-[250px]" color="white" />
+      <Mandala class="size-50 md:size-[250px]" color="white" />
     </div>
   </div>
-  <section class="h-dvh"></section>
+  <section class="main-grid main-container relative">
+    <div
+      class="max-lg:col-span-full col-[2/5] flex flex-col gap-10 lg:*:max-w-[500px] clamp-[pt,50px,200px] clamp-[pb,25px,100px]"
+    >
+      <h2 class="text-h2">Asia, for those who want to be changed by it</h2>
+      <p>
+        Much of Asia is seen, very little of it is felt. Tailored for those who seek depth over
+        distance, our journeys move between cultures preserved for centuries and cities inventing
+        what comes next. This is Asia as it's rarely encountered, and never forgotten.
+      </p>
+    </div>
+    <div
+      class="h-dvh col-span-full lg:col-[6/13] relative overflow-visible grid grid-cols-subgrid grid-rows-[auto_auto] content-end pb-[50px] gap-y-7.5"
+    >
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 clamp-[mr,-20px,-50px] clamp-[ml,-15px,-20px] pointer-events-none"
+      >
+        <Image
+          class="size-full object-cover"
+          layout="constrained"
+          src={FCity}
+          alt="The Forbidden City"
+        />
+        <div
+          class="absolute inset-0 top-auto h-[60%] bg-linear-to-t from-black via-black/30 to-transparent backdrop-blur-[2px]"
+          style="mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5), black); -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5), black);"
+        >
+        </div>
+        <p class="image-label absolute left-0 top-[8%] lg:top-[28%]">
+          A private gathering in the Forbidden City, where snow-laced roofs awaken at sunrise, and
+          centuries unfold in gold.
+        </p>
+      </div>
+      <div
+        class="col-[2/13] lg:col-[5/8] relative justify-self-end flex flex-col gap-7.5 items-end *:text-inverted *:leading-[1.4]"
+      >
+        <Mandala class="clamp-[size,20,30,1024px,2400px]" color="white" inert />
+        <p class="text-end">
+          For over a decade, Eastward has been creating journeys defined by depth, discretion, and
+          rare access. We believe travel should do more than impress for a moment; it should stay
+          with you for a lifetime.
+        </p>
+      </div>
+      <div class="grid grid-cols-subgrid col-span-full justify-items-end">
+        <div
+          class="relative text-inverted col-[1/7] lg:col-[4/6] max-w-[300px] *:leading-[1.4] *:text-end"
+        >
+          <p class="font-medium uppercase">About</p>
+          <p class="">
+            Learn more about our team and our philosophy <a class="underline" href="/about">here</a
+            >.
+          </p>
+        </div>
+        <div
+          class="relative *:text-inverted col-[7/13] lg:col-[6/8] max-w-[300px] *:leading-[1.4] *:text-end"
+        >
+          <p class="font-medium uppercase">Contact</p>
+          <p>Call or WhatsApp us at <span class="whitespace-nowrap">+852 5555 0123</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div aria-hidden="true" class="clamp-[h,50px,150px]"></div>
+  <Divider />
+  {
+    featuredDestinations?.length && (
+      <AttractionsSection
+        title="Icons of Asia"
+        desc="The landmarks that will stay with you."
+        attractions={featuredDestinations
+          .flatMap((dest) => dest.attractions ?? [])
+          .sort(() => 0.5 - Math.random())}
+      />
+    )
+  }
 </Layout>
 
 <script>
   import gsap from 'gsap'
   import { SplitText } from 'gsap/SplitText'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { videoReady, waitFor } from '~/lib/utils'
 
-  gsap.registerPlugin(SplitText)
+  gsap.registerPlugin(SplitText, ScrollTrigger)
 
   window._lenis?.stop()
 
@@ -76,5 +175,15 @@ import Layout from '~/layouts/Layout.astro'
       .set(h1, { autoAlpha: 1 })
       .from(h1Split.lines, { autoAlpha: 0, y: 40, duration: 0.6, stagger: { each: 0.2 } }, '-=.2')
       .from(byline, { autoAlpha: 0, y: 10, duration: 0.6 }, '-=.2')
+  })
+
+  gsap.to('#heroVid', {
+    yPercent: 5,
+    scrollTrigger: {
+      scrub: true,
+      start: 'top top',
+      end: 'bottom top',
+      trigger: '#heroVidContainer',
+    },
   })
 </script>

@@ -9,7 +9,6 @@ import SectionTitle from '@/SectionTitle.astro'
 import TextBlock from '@/TextBlock.astro'
 import Theme from '@/Theme.astro'
 import Layout from '~/layouts/Layout.astro'
-import Attractions from '@/destinations/Attractions.astro'
 import Picture, { fullscreenSources } from '@/Picture.astro'
 import Activities from '@/destinations/Activities.astro'
 import FlexSlider from '@/FlexSlider.astro'
@@ -20,6 +19,7 @@ import DestinationFAQs from '@/destinations/DestinationFAQs.astro'
 import TestimonialSection from '@/testimonials/TestimonialSection.astro'
 import NewsletterForm from '@/forms/NewsletterForm.astro'
 import DestinationPolaroid from '@/destinations/DestinationPolaroid.astro'
+import AttractionsSection from '@/destinations/AttractionsSection.astro'
 
 export const getStaticPaths = (async () => {
   const destinationSlugsQuery = defineQuery('*[_type == "destination"]{ slug }'),
@@ -149,19 +149,11 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     dest.attractions && (
       <>
         <Divider />
-        <section class="main-grid main-container main-margin" data-focus-reel-root>
-          <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
-            <SectionTitle
-              title="The Sights"
-              desc="The iconic silhouettes that anchor the local horizon."
-            />
-            <div class="flex gap-5">
-              <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
-              <Button name="arrow-right" data-next-slide aria-label="Next slide" />
-            </div>
-          </div>
-          <Attractions class="col-span-full" attractions={dest.attractions} />
-        </section>
+        <AttractionsSection
+          attractions={dest.attractions}
+          title="The Sights"
+          desc="The iconic silhouettes that anchor the local horizon."
+        />
       </>
     )
   }

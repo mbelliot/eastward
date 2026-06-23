@@ -1,0 +1,18 @@
+---
+import Attractions from '@/destinations/Attractions.astro'
+import Button from '@/Button.astro'
+import SectionTitle from '@/SectionTitle.astro'
+
+const { attractions, title, desc } = Astro.props
+---
+
+<section class="main-grid main-container main-margin" data-focus-reel-root>
+  <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
+    <SectionTitle title={title} desc={desc} />
+    <div class="flex gap-5">
+      <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
+      <Button name="arrow-right" data-next-slide aria-label="Next slide" />
+    </div>
+  </div>
+  <Attractions class="col-span-full" attractions={attractions} />
+</section>
