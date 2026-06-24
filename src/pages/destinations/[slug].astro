@@ -14,7 +14,7 @@ import Activities from '@/destinations/Activities.astro'
 import FlexSlider from '@/FlexSlider.astro'
 import OverlayCard from '@/OverlayCard.astro'
 import RichText from '@/RichText.astro'
-import ItineraryCover from '@/itineraries/ItineraryCover.astro'
+import ItineraryCover, { itineraryCoverFragment } from '@/itineraries/ItineraryCover.astro'
 import DestinationFAQs from '@/destinations/DestinationFAQs.astro'
 import TestimonialSection from '@/testimonials/TestimonialSection.astro'
 import NewsletterForm from '@/forms/NewsletterForm.astro'
@@ -39,14 +39,7 @@ const destinationQuery = defineQuery(
       },
       themes[]->,
       "testimonials": *[_type == 'testimonial' && references(^._id)],
-      "itineraries": *[_type == 'itinerary' && references(^._id)] {
-        slug,
-        title,
-        tagline,
-        cover,
-        price,
-        themes[0..2]->
-      }
+      "itineraries": *[_type == 'itinerary' && references(^._id)] ${itineraryCoverFragment}
 }`,
 )
 const dest = (await sanityClient.fetch(destinationQuery, params))!
@@ -83,7 +76,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
       <h1 class="text-masthead clamp-[text,60px,240px,375px,2400px] text-inverted">
         {dest.name}
       </h1>
-      <ul class="flex items-center gap-2.5 text-label text-inverted leading-none pt-8">
+      <ul class="flex items-center gap-2.5 text-label text-inverted uppercase leading-none pt-8">
         <li>{dest.country}</li>
         <li aria-hidden="true" class="size-1.5 rounded-full bg-inverted"></li>
         <li>
@@ -122,7 +115,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     </div>
   </section>
   <Divider />
-  <section class="max-md:gap-y-10 main-grid main-container main-margin split-text-container">
+  <section class="max-md:gap-y-10 main-grid main-container main-spacing split-text-container">
     <h2 class="text-h2 col-span-full lg:col-[2/6] mb-5">Curated Perspectives</h2>
     <div class="col-span-full lg:col-[2/6]" data-lines-container="">
       <p class="text-balance">
@@ -161,7 +154,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     dest.activities && (
       <>
         <Divider />
-        <section class="main-grid main-container main-margin">
+        <section class="main-grid main-container main-spacing">
           <div class="col-[2/6]">
             <SectionTitle
               title="The Moments"
@@ -179,7 +172,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
     dest.foods && (
       <>
         <Divider />
-        <section class="main-grid main-container main-margin" data-flex-slider-root>
+        <section class="main-grid main-container main-spacing" data-flex-slider-root>
           <div class="flex gap-5 col-[2/8] items-end">
             <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
             <Button name="arrow-right" data-next-slide aria-label="Next slide" />
@@ -229,7 +222,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
       <DestinationPolaroid slug={dest.slug.current} />
     </div>
   </section>
-  <section class="main-container main-margin">
+  <section class="main-container main-spacing">
     <DestinationFAQs />
   </section>
 </Layout>

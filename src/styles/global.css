@@ -20,6 +20,9 @@
 
   --font-body: var(--font-jost);
   --font-title: var(--font-tenor);
+
+  --clamp-main-top-space: 100px, 200px;
+  --clamp-main-bottom-space: 50px, 150px;
 }
 
 @layer components {
@@ -61,7 +64,7 @@
 }
 
 @utility text-label {
-  @apply text-[16px] leading-[1.4em] tracking-[0.03em] font-body uppercase;
+  @apply text-[16px] leading-[1.4em] tracking-[0.03em] font-body;
 }
 
 @utility text-journal-body {
@@ -76,8 +79,8 @@
   @apply clamp-[px,20px,50px] overflow-x-clip;
 }
 
-@utility main-margin {
-  @apply clamp-[mt,100px,200px] clamp-[mb,50px,150px];
+@utility main-spacing {
+  @apply mt-(--clamp-main-top-space) mb-(--clamp-main-bottom-space);
 }
 
 @utility main-grid {

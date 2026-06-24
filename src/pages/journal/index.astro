@@ -1,0 +1,34 @@
+---
+import { defineQuery } from 'groq'
+import { sanityClient } from 'sanity:client'
+import Divider from '@/Divider.astro'
+import Layout from '~/layouts/Layout.astro'
+import JournalCard, { journalCardFragment } from '@/journal/JournalCard.astro'
+
+const journalIndexQuery = defineQuery(`*[_type == 'journal'] ${journalCardFragment}`)
+
+const journals = await sanityClient.fetch(journalIndexQuery, {})!
+---
+
+<Layout variant="mono">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="clamp-[h,350px,450px,390px,1280px] flex flex-col justify-end pb-[30px]">
+      <h1 class="font-title leading-[.9] tracking-[-.04em] clamp-[text,90px,200px,390px,1280px]">
+        Journal
+      </h1>
+      <p class="text-byline mb-[10px]">Stories and reflections from our curated travels</p>
+      <Divider />
+    </div>
+    <div class="grid grid-cols-3 clamp-[gap,15px,20px]">
+      {
+        journals.map((j, i) => (
+          <JournalCard
+            journal={j}
+            variant={i === 0 ? 'featured' : 'default'}
+            class={i === 0 ? 'col-span-2 row-span-2' : ''}
+          />
+        ))
+      }
+    </div>
+  </div>
+</Layout>

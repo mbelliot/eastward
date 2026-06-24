@@ -5,12 +5,23 @@ import Theme from '@/Theme.astro'
 import type { HTMLAttributes } from 'astro/types'
 import type { Itinerary, Theme as ThemeType } from 'sanity.types'
 
-interface Props extends HTMLAttributes<'div'> {
+interface Props extends HTMLAttributes<'article'> {
   itinerary: NonNullable<Pick<Itinerary, 'slug' | 'cover' | 'title' | 'tagline' | 'price'>> & {
     themes: ThemeType[]
   }
   flipped?: boolean
 }
+
+export const itineraryCoverFragment = `
+  {
+    slug,
+    title,
+    tagline,
+    cover,
+    price,
+    themes[0..2]->
+  }
+  `
 
 const { itinerary, flipped, class: cls, ...attrs } = Astro.props
 ---
@@ -20,8 +31,8 @@ const { itinerary, flipped, class: cls, ...attrs } = Astro.props
   {...attrs}
 >
   <Picture
-    class:list={['object-cover h-full w-full', flipped ? 'order-2' : 'order-1']}
-    pictureClass="min-h-0 block"
+    class:list={['object-cover h-full w-full']}
+    pictureClass={`min-h-0 block ${flipped ? 'order-2' : 'order-1'}`}
     src={itinerary.cover}
     sources={[
       { media: '(min-width:0px)', sizes: '50vw', widths: [300, 600, 1200], aspect: 17 / 22 },

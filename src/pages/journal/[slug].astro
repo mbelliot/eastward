@@ -1,0 +1,86 @@
+---
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import type { GetStaticPaths } from 'astro'
+import Layout from '~/layouts/Layout.astro'
+import Picture, { fullscreenSources } from '@/Picture.astro'
+import Content from '@/journal/Content.astro'
+
+export const getStaticPaths = (async () => {
+  const journalSlugsQuery = defineQuery('*[_type == "journal"]{ slug }'),
+    journals = await sanityClient.fetch(journalSlugsQuery)
+
+  return journals.map(({ slug }) => ({ params: { slug: slug.current } }))
+}) satisfies GetStaticPaths
+
+const journalQuery = defineQuery(`*[_type == 'journal' && slug.current == $slug][0] {
+  ...,
+ itinerary-> {
+  slug,
+  title,
+  curator-> {
+    slug,
+    name,
+    portrait
+   }
+ }
+  }`)
+
+const journal = (await sanityClient.fetch(journalQuery, Astro.params))!
+---
+
+<Layout title={journal.title} class="bg-black **:text-inverted">
+  <Picture
+    pictureClass="block absolute inset-0 bottom-auto h-dvh overflow-clip"
+    class="size-full object-cover"
+    sources={fullscreenSources}
+    src={journal.cover}
+    alt={journal.cover.alt ?? ''}
+  />
+  <div class="relative mt-[40dvh]">
+    <article>
+      <header class="bg-linear-to-t from-black to-black/0">
+        <div class="max-w-[1280px] mx-auto">
+          <h1
+            class="font-title clamp-[text,44px,80px] tracking-[-.04em] leading-[1.18] text-balance"
+          >
+            {journal.title}
+          </h1>
+          <p class="text-byline mt-[10px] max-w-[600px]">{journal.excerpt}</p>
+        </div>
+      </header>
+      <div class="bg-black pt-[35px]">
+        <div class="max-w-[1280px] mx-auto flex justify-between">
+          <div class="journalContent max-w-180">
+            <Content content={journal.content} />
+          </div>
+          {
+            journal.itinerary && (
+              <aside>
+                <Picture
+                  pictureClass="block max-w-40 aspect-page-fixed"
+                  class="object-cover size-full"
+                  alt={journal.itinerary?.curator?.name}
+                  src={journal.itinerary?.curator?.portrait}
+                />
+                <p class="mt-2">{journal.itinerary.curator?.name}</p>
+                <p class="mt-3">{journal.itinerary.title}</p>
+              </aside>
+            )
+          }
+        </div>
+      </div>
+    </article>
+  </div>
+</Layout>
+
+<style is:global>
+  .journalContent p {
+    line-height: 1.8;
+    font-size: 22px;
+  }
+
+  .journalContent p + p {
+    margin-top: 0.8lh;
+  }
+</style>

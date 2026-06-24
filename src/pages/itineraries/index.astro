@@ -1,0 +1,13 @@
+---
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import ItineraryCover, { itineraryCoverFragment } from '@/itineraries/ItineraryCover.astro'
+import Layout from '~/layouts/Layout.astro'
+
+const itinerariesIndexQuery = defineQuery(` *[_type == 'itinerary'] ${itineraryCoverFragment}`)
+const itineraries = (await sanityClient.fetch(itinerariesIndexQuery, {}))!
+---
+
+<Layout>
+  {itineraries.map((itn, i) => <ItineraryCover itinerary={itn} flipped={Boolean(i % 2)} />)}
+</Layout>

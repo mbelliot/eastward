@@ -9,7 +9,13 @@ const gap = 'clamp-[gap,15px,25px]',
 
 const navItems = ['journal', 'destinations', 'itineraries']
 
-const { class: cls, waitForReveal } = Astro.props
+interface Props {
+  class?: string
+  waitForReveal?: boolean
+  variant: 'default' | 'mono'
+}
+
+const { class: cls, waitForReveal, variant = 'default' } = Astro.props
 ---
 
 <header
@@ -22,26 +28,36 @@ const { class: cls, waitForReveal } = Astro.props
   ]}
 >
   <div id="headerLogo" class="invisible flex items-center">
-    <a href="/" aria-label="Home"><Mandala inert color="white" class="clamp-[size,40px,60px]" /></a>
+    <a href="/" aria-label="Home"
+      ><Mandala
+        inert
+        color={variant === 'default' ? 'var(--color-inverted)' : 'var(--color-text)'}
+        class="clamp-[size,40px,60px]"
+      /></a
+    >
   </div>
   <nav id="headerNav" aria-label="Main navigation" class:list={['flex h-full', gap]}>
     <ul class:list={['flex h-full', gap]}>
       {
         navItems.map((n) => (
           <li class="invisible h-full flex items-center">
-            <RollLink href={`/${n}`} variant="title">
+            <RollLink href={`/${n}`} variant={variant === 'default' ? 'title' : 'mono'}>
               {n}
             </RollLink>
           </li>
         ))
       }
     </ul>
-    <Hairline direction="y" id="header-hairline-cta" />
+    <Hairline direction="y" id="header-hairline-cta" variant={variant} />
     <div class="flex items-center invisible" id="headerCTA">
-      <RollButton>Inquire</RollButton>
+      <RollButton {...variant === 'mono' ? { variant: 'mono' } : {}}>Inquire</RollButton>
     </div>
   </nav>
-  <Hairline id="header-hairline-bottom" class="absolute left-0 right-0 -bottom-px" />
+  <Hairline
+    id="header-hairline-bottom"
+    class="absolute left-0 right-0 -bottom-px"
+    variant={variant}
+  />
 </header>
 
 <script>

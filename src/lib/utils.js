@@ -22,3 +22,13 @@ export function clamp(edge0, edge1, x) {
 export function lerp(edge0, edge1, t) {
   return edge0 + (edge1 - edge0) * t
 }
+
+export function formatDate(date) {
+  const dateObj = new Date(date)
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(dateObj)
+}

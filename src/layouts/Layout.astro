@@ -6,7 +6,7 @@ import Header from '@/Header.astro'
 import Cursor from '@/Cursor.astro'
 import SlideModal from '@/SlideModal.astro'
 
-const { title, class: cls, isIndexPage } = Astro.props
+const { variant, title, class: cls, isIndexPage } = Astro.props
 ---
 
 <!doctype html>
@@ -24,7 +24,7 @@ const { title, class: cls, isIndexPage } = Astro.props
   <body class={cls}>
     <Cursor />
     <SlideModal />
-    <Header waitForReveal={isIndexPage} />
+    <Header waitForReveal={isIndexPage} variant={variant} />
     <main>
       <slot />
     </main>
@@ -61,6 +61,10 @@ const { title, class: cls, isIndexPage } = Astro.props
             splits.push(split)
             els.push(...split.lines)
           })
+        } else if (c.matches('h1, h2, h3, h4, h5, h6, p')) {
+          const split = SplitText.create(c, { type: 'lines' })
+          splits.push(split)
+          els.push(...split.lines)
         } else els.push(c)
       })
 

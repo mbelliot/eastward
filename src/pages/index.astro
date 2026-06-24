@@ -4,9 +4,11 @@ import { sanityClient } from 'sanity:client'
 import Mandala from '@/Mandala.astro'
 import Layout from '~/layouts/Layout.astro'
 import { Image } from 'astro:assets'
-import FCity from '$/fcity.avif'
 import AttractionsSection from '@/destinations/AttractionsSection.astro'
+import FCity from '$/fcity.avif'
 import Divider from '@/Divider.astro'
+import Laurels from '@/Laurels.astro'
+import ItineraryPoster, { itineraryPosterFragment } from '@/itineraries/ItineraryPoster.astro'
 
 const indexPageQuery = defineQuery(`{
   "featuredDestinations": *[_type == "destination" && featured] {
@@ -17,7 +19,7 @@ const indexPageQuery = defineQuery(`{
       "country": ^.country
     }
   },
-  "featuredItineraries": *[_type == "itinerary" && featured]
+  "featuredItineraries": *[_type == "itinerary" && featured] ${itineraryPosterFragment}
   }`)
 
 const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
@@ -27,21 +29,21 @@ const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
 ---
 
 <Layout isIndexPage>
-  <div class="relative h-dvh">
-    <section class="size-full relative">
-      <div id="heroVidContainer" class="absolute inset-0 -translate-y-px -bottom-px overflow-clip">
+  <div class="relative h-dvh overflow-clip">
+    <section class="size-full relative h-[200dvh]">
+      <div id="heroVidContainer" class="h-dvh sticky top-0 overflow-clip">
         <video
           muted
           loop
           autoplay
           playsinline
-          class="absolute left-1/2 top-1/2 -translate-50001/100000 min-w-full min-h-full overflow-clip object-cover pointer-events-none"
+          class="absolute inset-0 size-full overflow-clip object-cover pointer-events-none"
           id="heroVid"
         >
           <source src="https://objects.elliotli.dev/0111.mp4" type="video/mp4" />
         </video>
       </div>
-      <div class="relative size-full grid place-items-center">
+      <div class="absolute inset-0 bottom-auto h-dvh grid place-items-center">
         <div
           id="heroText"
           class="flex flex-col w-[70vw] max-w-350 items-center *:text-inverted *:text-center gap-[15px]"
@@ -63,7 +65,7 @@ const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
   </div>
   <section class="main-grid main-container relative">
     <div
-      class="max-lg:col-span-full col-[2/5] flex flex-col gap-10 lg:*:max-w-[500px] clamp-[pt,50px,200px] clamp-[pb,25px,100px]"
+      class="max-lg:col-span-full col-[2/5] flex flex-col gap-10 lg:*:max-w-[500px] clamp-[pt,50px,200px] clamp-[pb,25px,100px] split-text-container"
     >
       <h2 class="text-h2">Asia, for those who want to be changed by it</h2>
       <p>
@@ -96,9 +98,9 @@ const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
         </p>
       </div>
       <div
-        class="col-[2/13] lg:col-[5/8] relative justify-self-end flex flex-col gap-7.5 items-end *:text-inverted *:leading-[1.4]"
+        class="col-[2/13] lg:col-[5/8] max-w-[600px] relative justify-self-end flex flex-col gap-7.5 items-end *:text-inverted *:leading-[1.4]"
       >
-        <Mandala class="clamp-[size,20,30,1024px,2400px]" color="white" inert />
+        <Laurels class="gap-5" />
         <p class="text-end">
           For over a decade, Eastward has been creating journeys defined by depth, discretion, and
           rare access. We believe travel should do more than impress for a moment; it should stay
@@ -125,17 +127,25 @@ const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
     </div>
   </section>
   <div aria-hidden="true" class="clamp-[h,50px,150px]"></div>
-  <Divider />
   {
     featuredDestinations?.length && (
-      <AttractionsSection
-        title="Icons of Asia"
-        desc="The landmarks that will stay with you."
-        attractions={featuredDestinations
-          .flatMap((dest) => dest.attractions ?? [])
-          .sort(() => 0.5 - Math.random())}
-      />
+      <>
+        <Divider />
+        <AttractionsSection
+          title="Icons of Asia"
+          desc="The landmarks that will stay with you."
+          attractions={featuredDestinations
+            .flatMap((dest) => dest.attractions ?? [])
+            .sort(() => 0.5 - Math.random())}
+        />
+      </>
     )
+  }
+  {
+    featuredItineraries?.length &&
+      featuredItineraries.map((itn, i) => (
+        <ItineraryPoster itinerary={itn} variant={i % 2 > 0 ? 'flipped' : 'default'} />
+      ))
   }
 </Layout>
 
@@ -175,15 +185,5 @@ const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
       .set(h1, { autoAlpha: 1 })
       .from(h1Split.lines, { autoAlpha: 0, y: 40, duration: 0.6, stagger: { each: 0.2 } }, '-=.2')
       .from(byline, { autoAlpha: 0, y: 10, duration: 0.6 }, '-=.2')
-  })
-
-  gsap.to('#heroVid', {
-    yPercent: 5,
-    scrollTrigger: {
-      scrub: true,
-      start: 'top top',
-      end: 'bottom top',
-      trigger: '#heroVidContainer',
-    },
   })
 </script>

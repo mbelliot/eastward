@@ -15,6 +15,43 @@
 export declare const internalGroqTypeReferenceTo: unique symbol
 
 // Source: schema.json
+export type SanityImageAssetReference = {
+  _ref: string
+  _type: 'reference'
+  _weak?: boolean
+  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
+}
+
+export type BlockContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>
+        text?: string
+        _type: 'span'
+        _key: string
+      }>
+      style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'blockquote'
+      listItem?: 'bullet'
+      markDefs?: Array<{
+        href?: string
+        _type: 'link'
+        _key: string
+      }>
+      level?: number
+      _type: 'block'
+      _key: string
+    }
+  | {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+      _key: string
+    }
+>
+
 export type Info = {
   _id: string
   _type: 'info'
@@ -43,13 +80,6 @@ export type ItineraryReference = {
   _type: 'reference'
   _weak?: boolean
   [internalGroqTypeReferenceTo]?: 'itinerary'
-}
-
-export type SanityImageAssetReference = {
-  _ref: string
-  _type: 'reference'
-  _weak?: boolean
-  [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
 }
 
 export type Testimonial = {
@@ -103,11 +133,11 @@ export type Journal = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  title?: string
-  excerpt?: string
-  date?: string
-  content?: string
-  cover?: {
+  title: string
+  excerpt: string
+  content?: BlockContent
+  publishedAt: string
+  cover: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -558,10 +588,11 @@ export type Geopoint = {
 }
 
 export type AllSanitySchemaTypes =
+  | SanityImageAssetReference
+  | BlockContent
   | Info
   | DestinationReference
   | ItineraryReference
-  | SanityImageAssetReference
   | Testimonial
   | Slug
   | SanityImageCrop
@@ -610,7 +641,7 @@ export type DestinationSlugsQueryResult = Array<{
 
 // Source: src/pages/destinations/[slug].astro
 // Variable: destinationQuery
-// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      cover {        ...,        "lqip": asset->metadata.lqip      },      themes[]->,      "testimonials": *[_type == 'testimonial' && references(^._id)],      "itineraries": *[_type == 'itinerary' && references(^._id)] {        slug,        title,        tagline,        cover,        price,        themes[0..2]->      }}
+// Query: *[_type=="destination" && slug.current == $slug][0] {      ...,      cover {        ...,        "lqip": asset->metadata.lqip      },      themes[]->,      "testimonials": *[_type == 'testimonial' && references(^._id)],      "itineraries": *[_type == 'itinerary' && references(^._id)]   {    slug,    title,    tagline,    cover,    price,    themes[0..2]->  }  }
 export type DestinationQueryResult = {
   _id: string
   _type: 'destination'
@@ -932,7 +963,7 @@ export type DestinationsQueryResult = Array<{
 
 // Source: src/pages/index.astro
 // Variable: indexPageQuery
-// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured]  }
+// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured] {  slug,  cover,  ...select(defined(portrait) => { portrait }),  title,  tagline,  "overview": coalesce(overview, ""),  "destinations": coalesce(count(destinations), 0),  "days": coalesce(count(schedule), 0)}  }
 export type IndexPageQueryResult = {
   featuredDestinations: Array<{
     cover: {
@@ -979,81 +1010,7 @@ export type IndexPageQueryResult = {
     }> | null
   }>
   featuredItineraries: Array<{
-    _id: string
-    _type: 'itinerary'
-    _createdAt: string
-    _updatedAt: string
-    _rev: string
-    title: string
-    tagline: string
-    days?: number
-    price: string
-    featured?: boolean
-    overview?: string
-    schedule?: Array<{
-      title: string
-      body?: Array<{
-        children?: Array<{
-          marks?: Array<string>
-          text?: string
-          _type: 'span'
-          _key: string
-        }>
-        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
-        listItem?: 'bullet' | 'number'
-        markDefs?: Array<{
-          href?: string
-          _type: 'link'
-          _key: string
-        }>
-        level?: number
-        _type: 'block'
-        _key: string
-      }>
-      image: {
-        asset?: SanityImageAssetReference
-        media?: unknown
-        hotspot?: SanityImageHotspot
-        crop?: SanityImageCrop
-        alt?: string
-        _type: 'image'
-      }
-      featured?: boolean
-      _type: 'segment'
-      _key: string
-    }>
-    foods?: Array<{
-      title: string
-      body?: Array<{
-        children?: Array<{
-          marks?: Array<string>
-          text?: string
-          _type: 'span'
-          _key: string
-        }>
-        style?: 'blockquote' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'normal'
-        listItem?: 'bullet' | 'number'
-        markDefs?: Array<{
-          href?: string
-          _type: 'link'
-          _key: string
-        }>
-        level?: number
-        _type: 'block'
-        _key: string
-      }>
-      image: {
-        asset?: SanityImageAssetReference
-        media?: unknown
-        hotspot?: SanityImageHotspot
-        crop?: SanityImageCrop
-        alt?: string
-        _type: 'image'
-      }
-      featured?: boolean
-      _type: 'food'
-      _key: string
-    }>
+    slug: Slug
     cover: {
       asset?: SanityImageAssetReference
       media?: unknown
@@ -1062,7 +1019,7 @@ export type IndexPageQueryResult = {
       alt?: string
       _type: 'image'
     }
-    portrait?: {
+    portrait: {
       asset?: SanityImageAssetReference
       media?: unknown
       hotspot?: SanityImageHotspot
@@ -1070,30 +1027,105 @@ export type IndexPageQueryResult = {
       alt?: string
       _type: 'image'
     }
-    features: Array<
-      {
-        _key: string
-      } & FeatureReference
-    >
-    destinations?: Array<
-      {
-        _key: string
-      } & DestinationReference
-    >
-    themes: Array<
-      {
-        _key: string
-      } & ThemeReference
-    >
-    curator?: CuratorReference
-    stays?: Array<
-      {
-        _key: string
-      } & StayReference
-    >
-    slug: Slug
+    title: string
+    tagline: string
+    overview: string | ''
+    destinations: number | 0
+    days: number | 0
   }>
 }
+
+// Source: src/pages/itineraries/index.astro
+// Variable: itinerariesIndexQuery
+// Query: *[_type == 'itinerary']   {    slug,    title,    tagline,    cover,    price,    themes[0..2]->  }
+export type ItinerariesIndexQueryResult = Array<{
+  slug: Slug
+  title: string
+  tagline: string
+  cover: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  price: string
+  themes: Array<{
+    _id: string
+    _type: 'theme'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name: string
+    description: string
+    slug: Slug
+  }>
+}>
+
+// Source: src/pages/journal/[slug].astro
+// Variable: journalSlugsQuery
+// Query: *[_type == "journal"]{ slug }
+export type JournalSlugsQueryResult = Array<{
+  slug: Slug
+}>
+
+// Source: src/pages/journal/[slug].astro
+// Variable: journalQuery
+// Query: *[_type == 'journal' && slug.current == $slug][0] {  ..., itinerary-> {  slug,  title,  curator-> {    slug,    name,    portrait   } }  }
+export type JournalQueryResult = {
+  _id: string
+  _type: 'journal'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  excerpt: string
+  content?: BlockContent
+  publishedAt: string
+  cover: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  itinerary: {
+    slug: Slug
+    title: string
+    curator: {
+      slug: Slug
+      name: string | null
+      portrait: {
+        asset?: SanityImageAssetReference
+        media?: unknown
+        hotspot?: SanityImageHotspot
+        crop?: SanityImageCrop
+        alt?: string
+        _type: 'image'
+      } | null
+    } | null
+  } | null
+  slug: Slug
+} | null
+
+// Source: src/pages/journal/index.astro
+// Variable: journalIndexQuery
+// Query: *[_type == 'journal'] {  slug,  cover,  title,  publishedAt  }
+export type JournalIndexQueryResult = Array<{
+  slug: Slug
+  cover: {
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt?: string
+    _type: 'image'
+  }
+  title: string
+  publishedAt: string
+}>
 
 // Query TypeMap
 import '@sanity/client'
@@ -1101,8 +1133,12 @@ declare module '@sanity/client' {
   interface SanityQueries {
     '\n  *[_type == "destination" && slug.current == $slug][0] {\n    "images": (\n      attractions[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n      + activities[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n      + foods[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n    )\n  }\n': QueryResult
     '*[_type == "destination"]{ slug }': DestinationSlugsQueryResult
-    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      cover {\n        ...,\n        "lqip": asset->metadata.lqip\n      },\n      themes[]->,\n      "testimonials": *[_type == \'testimonial\' && references(^._id)],\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] {\n        slug,\n        title,\n        tagline,\n        cover,\n        price,\n        themes[0..2]->\n      }\n}': DestinationQueryResult
+    '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      cover {\n        ...,\n        "lqip": asset->metadata.lqip\n      },\n      themes[]->,\n      "testimonials": *[_type == \'testimonial\' && references(^._id)],\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  \n}': DestinationQueryResult
     '*[_type == "destination"]': DestinationsQueryResult
-    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured]\n  }': IndexPageQueryResult
+    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured] \n{\n  slug,\n  cover,\n  ...select(defined(portrait) => { portrait }),\n  title,\n  tagline,\n  "overview": coalesce(overview, ""),\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n\n  }': IndexPageQueryResult
+    " *[_type == 'itinerary'] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  ": ItinerariesIndexQueryResult
+    '*[_type == "journal"]{ slug }': JournalSlugsQueryResult
+    "*[_type == 'journal' && slug.current == $slug][0] {\n  ...,\n itinerary-> {\n  slug,\n  title,\n  curator-> {\n    slug,\n    name,\n    portrait\n   }\n }\n  }": JournalQueryResult
+    "*[_type == 'journal'] {\n  slug,\n  cover,\n  title,\n  publishedAt\n  }": JournalIndexQueryResult
   }
 }

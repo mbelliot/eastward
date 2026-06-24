@@ -1,0 +1,37 @@
+---
+import Divider from '@/Divider.astro'
+import Picture from '@/Picture.astro'
+import type { HTMLAttributes } from 'astro/types'
+import type { Journal } from 'sanity.types'
+import { formatDate } from '~/lib/utils'
+
+interface Props extends HTMLAttributes<'article'> {
+  journal: NonNullable<Pick<Journal, 'slug' | 'cover' | 'title' | 'publishedAt'>>
+  variant?: 'default' | 'featured'
+}
+
+export const journalCardFragment = `{
+  slug,
+  cover,
+  title,
+  publishedAt
+  }`
+
+const { journal, class: cls, variant = 'default', ...attrs } = Astro.props
+---
+
+<a href={`/journal/${journal.slug.current}`} class="contents">
+  <article class:list={['flex flex-col gap-[10px]', cls]} {...attrs}>
+    <Picture
+      src={journal.cover}
+      pictureClass="block flex-1 mb-[5px]"
+      class="size-full object-cover"
+      sources={[{ widths: [400, 800], aspect: 16 / 9, media: '(min-width:0px)' }]}
+    />
+    <h3 class:list={[variant === 'default' ? 'text-h4' : 'text-h3']}>{journal.title}</h3>
+    <time datetime={journal.publishedAt} class="text-label text-mono"
+      >{formatDate(journal.publishedAt)}</time
+    >
+    <Divider />
+  </article>
+</a>

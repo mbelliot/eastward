@@ -3,18 +3,20 @@ interface Props {
   id?: string
   class?: string
   direction?: 'x' | 'y'
+  variant: 'default' | 'mono'
 }
 
-const { id, class: cls, direction = 'x' } = Astro.props
+const { id, class: cls, variant = 'default', direction = 'x' } = Astro.props
 ---
 
 <hair-line data-direction={direction} class="contents" id={id}>
   <div
     aria-hidden="true"
     class:list={[
-      'bg-white self-stretch invisible',
+      'self-stretch invisible',
       direction === 'x' ? 'w-full h-px origin-left' : 'h-full w-px origin-top',
       'hairline',
+      variant === 'default' ? 'bg-white' : 'bg-text',
       cls,
     ]}
   >

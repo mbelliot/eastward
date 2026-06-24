@@ -1,0 +1,6 @@
+---
+import Picture from '@/Picture.astro'
+const { node, ...attrs } = Astro.props
+---
+
+<Picture src={node} {...attrs} />
