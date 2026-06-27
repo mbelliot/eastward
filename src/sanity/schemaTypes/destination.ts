@@ -9,11 +9,13 @@ export const destinationType = defineType({
       name: 'name',
       type: 'string',
       title: 'Name',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'country',
       type: 'string',
       title: 'Country',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'tagline',

@@ -1,0 +1,50 @@
+---
+import Picture from '@/Picture.astro'
+import Theme from '@/Theme.astro'
+import { type HTMLAttributes } from 'astro/types'
+import type { Destination, Theme as ThemeType } from 'sanity.types'
+
+interface Props extends HTMLAttributes<'figure'> {
+  destination: NonNullable<Pick<Destination, 'slug' | 'name' | 'country' | 'cover'>> & {
+    themes: Pick<ThemeType, 'name'>[]
+  }
+}
+
+const { destination, class: cls, ...attrs } = Astro.props
+---
+
+<figure
+  class:list={['group relative overflow-clip @container list-view:flex list-view:rounded-sm', cls]}
+  {...attrs}
+>
+  <Picture
+    pictureClass="block"
+    class="size-full object-cover list-view:size-50 list-view:aspect-square list-view:rounded-sm"
+    sources={[{ widths: [400, 800], aspect: 3 / 4, media: '(min-width:0px)' }]}
+    src={destination.cover}
+    alt={destination.cover.alt ?? ''}
+  />
+  <a
+    href={`/destinations/${destination.slug.current}`}
+    class="after:absolute after:inset-0 after:z-10 list-view:hover:after:bg-mono-a"
+    aria-label={`Go to ${destination.name}`}></a>
+  <div
+    aria-hidden="true"
+    class="list-view:hidden absolute inset-0 top-auto translate-y-full h-[50%] bg-linear-to-t from-black to-black/0 mask-t-from-0% backdrop-blur-md transition-transform duration-500 group-hover:translate-0"
+  >
+  </div>
+  <figcaption
+    class="list-view:hidden absolute inset-0 top-auto translate-y-[.35lh] opacity-0 group-hover:translate-0 group-hover:opacity-100 transition-all duration-500 p-5 font-title text-inverted uppercase leading-none text-[12cqi]"
+  >
+    <p>{destination.name}</p>
+  </figcaption>
+  <div class="hidden list-view:flex flex-col flex-1 px-5 py-2 justify-between">
+    <p class="text-h2 font-title tracking-[-.04em] uppercase">{destination.name}</p>
+    <div>
+      <div class="flex gap-2">
+        {destination.themes.map((th) => <Theme class="size-10" theme={th} />)}
+      </div>
+      <p class="text-label uppercase mt-2.5">{destination.country}</p>
+    </div>
+  </div>
+</figure>

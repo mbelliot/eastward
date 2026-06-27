@@ -1,0 +1,254 @@
+---
+import type { Theme as ThemeType } from 'sanity.types'
+import type { ComponentProps, HTMLAttributes } from 'astro/types'
+import Button from '@/Button.astro'
+import Drawer from '@/Drawer.astro'
+import Theme from '@/Theme.astro'
+import RollButton from '@/RollButton.astro'
+import DestinationCard from './DestinationCard.astro'
+
+interface Props extends HTMLAttributes<'div'> {
+  destinations: (ComponentProps<typeof DestinationCard>['destination'] & {
+    themes: { _id: string }[]
+  })[]
+  themes: ThemeType[]
+  drawerId?: string
+}
+
+const { destinations, themes, class: cls, drawerId = 'destFilter' } = Astro.props
+---
+
+<destination-grid data-view="grid" class:list={['block relative', cls]}>
+  <div
+    role="toolbar"
+    aria-label="View options"
+    class="sticky top-0 z-20 bg-inverted flex justify-between clamp-[pt,100px,150px] clamp-[mb,15px,40px]"
+  >
+    <div role="group" aria-label="Layout" class="flex gap-5">
+      <Button
+        data-view-target="grid"
+        outline={false}
+        name="grid"
+        aria-pressed="true"
+        aria-label="Grid view"
+      />
+      <Button
+        data-view-target="list"
+        outline={false}
+        name="list"
+        aria-pressed="false"
+        aria-label="Dense grid view"
+      />
+    </div>
+    <div class="flex items-center gap-[5px]">
+      <div
+        data-filter-count
+        class="invisible bg-tint text-inverted text-medium size-6 rounded-full grid place-items-center"
+      >
+      </div>
+      <Button
+        outline={false}
+        name="filter"
+        aria-expanded="false"
+        aria-label="Filter"
+        aria-controls={drawerId}
+      />
+    </div>
+  </div>
+  <div
+    class:list={[
+      'grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] 2xl:grid-cols-5',
+      'list-view:grid-cols-1 list-view:lg:grid-cols-2 list-view:2xl:grid-cols-3',
+      'clamp-[gap,5px,50px] transition-all duration-300',
+    ]}
+  >
+    {
+      destinations.map((dest) => (
+        <DestinationCard
+          destination={dest}
+          data-theme-ids={dest.themes.map((t) => t._id).join(',')}
+        />
+      ))
+    }
+  </div>
+  <Drawer id={drawerId} class="flex flex-col h-full w-fit">
+    <div class="flex justify-end"><Button data-close-drawer name="x" outline={false} /></div>
+    <div class="px-25 h-full flex flex-col pb-[50px]">
+      <h3
+        class="font-title tracking-[-.03em] text-[60px] uppercase mt-25 mb-12.5 leading-[1.1] text-center"
+      >
+        Choose<br /> experiences
+      </h3>
+      <ul class="flex flex-col gap-5">
+        {
+          themes.map((theme) => (
+            <li>
+              <button
+                class="flex gap-8 items-center w-full cursor-pointer text-left group"
+                type="button"
+                data-theme-id={theme._id}
+                aria-pressed="false"
+              >
+                <Theme class="size-16" theme={theme} />
+                <p class="flex-1 text-[28px] text-nowrap">{theme.name}</p>
+                <div class="size-16 grid place-items-center">
+                  <div class="size-1 rounded-full bg-text opacity-0 group-aria-pressed:opacity-100 transition-all duration-120" />
+                </div>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="flex-1 flex items-end">
+        <button
+          type="button"
+          data-clear-filters
+          class="cursor-pointer uppercase font-medium py-1.5 px-6 bg-text text-inverted"
+          >Clear all</button
+        >
+      </div>
+    </div>
+  </Drawer>
+  <div data-grid-empty class="hidden my-25">
+    <div class="grid place-items-center *:text-center">
+      <p class="text-h2 mb-15">No matching destinations found</p>
+      <RollButton variant="plain" data-clear-filters>Clear filters</RollButton>
+    </div>
+  </div>
+</destination-grid>
+
+<script>
+  class DestinationGrid extends HTMLElement {
+    #abc!: AbortController
+    selectedThemeIds: string[] = []
+
+    connectedCallback() {
+      this.#abc = new AbortController()
+      const { signal } = this.#abc
+
+      this.addEventListener(
+        'click',
+        (e) => {
+          const target = e.target as HTMLElement
+
+          // 1. Handle Grid/List View Toggles
+          const viewTrigger = target.closest('[data-view-target]')
+          if (viewTrigger) {
+            const view = viewTrigger.getAttribute('data-view-target')!
+            this.setView(view)
+            return
+          }
+
+          // 2. Handle Theme Filter Clicks
+          const themeTrigger = target.closest('[data-theme-id]')
+          if (themeTrigger) {
+            const themeId = themeTrigger.getAttribute('data-theme-id')!
+            this.toggleTheme(themeTrigger, themeId)
+            return
+          }
+
+          // 3. Clear Filters Action
+          if (target.closest('[data-clear-filters]')) {
+            this.clearAllFilters()
+            return
+          }
+        },
+        { signal },
+      )
+    }
+
+    disconnectedCallback() {
+      this.#abc?.abort()
+    }
+
+    setView(view: string) {
+      this.dataset.view = view
+
+      this.querySelector('[data-view-target="grid"]')?.setAttribute(
+        'aria-pressed',
+        String(view === 'grid'),
+      )
+      this.querySelector('[data-view-target="list"]')?.setAttribute(
+        'aria-pressed',
+        String(view === 'list'),
+      )
+    }
+
+    toggleTheme(button: Element, themeId: string) {
+      const isPressed = button.getAttribute('aria-pressed') === 'true'
+      const nextState = !isPressed
+
+      button.setAttribute('aria-pressed', String(nextState))
+
+      if (nextState) {
+        this.selectedThemeIds.push(themeId)
+      } else {
+        this.selectedThemeIds = this.selectedThemeIds.filter((id) => id !== themeId)
+      }
+
+      this.updateFilterCount()
+      this.filterDestinations()
+    }
+
+    updateFilterCount() {
+      let el = this.querySelector('[data-filter-count]')
+      if (el) {
+        const { length } = this.selectedThemeIds
+        if (length) {
+          el.textContent = '' + length
+          el.classList.remove('invisible')
+        } else {
+          el.classList.add('invisible')
+        }
+      }
+    }
+
+    filterDestinations() {
+      // 1. Grab all the destination cards inside this grid component
+      const cards = this.querySelectorAll('[data-theme-ids]') as NodeListOf<HTMLElement>
+
+      // 2. Cache the length for slightly cleaner reading
+      const hasActiveFilters = this.selectedThemeIds.length > 0
+
+      let matches = 0
+      cards.forEach((card) => {
+        // 3. Extract the card's themes into an array
+        const cardThemesString = card.getAttribute('data-theme-ids') || ''
+        const cardThemeIds = cardThemesString ? cardThemesString.split(',') : []
+
+        // 4. Check if the card matches the active filters
+        // (Using .every() means all selected filters must match. Change to .some() if you want an "OR" match instead of "AND")
+        const matchesFilters =
+          !hasActiveFilters || this.selectedThemeIds.every((id) => cardThemeIds.includes(id))
+
+        if (matchesFilters) {
+          card.classList.remove('hidden!')
+          matches++
+        } else {
+          card.classList.add('hidden!')
+        }
+      })
+
+      let emptyDisplay = this.querySelector('[data-grid-empty]')
+      if (matches) {
+        emptyDisplay?.classList.add('hidden')
+      } else {
+        emptyDisplay?.classList.remove('hidden')
+      }
+    }
+
+    clearAllFilters() {
+      this.selectedThemeIds = []
+
+      // Reset all button states visually
+      this.querySelectorAll('[data-theme-id][aria-pressed="true"]').forEach((btn) => {
+        btn.setAttribute('aria-pressed', 'false')
+      })
+
+      this.updateFilterCount()
+      this.filterDestinations()
+    }
+  }
+
+  customElements.define('destination-grid', DestinationGrid)
+</script>

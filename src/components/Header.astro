@@ -126,7 +126,12 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
 
   if (waitForReveal) {
     window.addEventListener('heroRevealed', () => {
-      inTl.play()
+      if (isScrolled) {
+        inTl.progress(1)
+        outTl.restart()
+      } else {
+        inTl.play()
+      }
     })
   } else {
     inTl.progress(1)

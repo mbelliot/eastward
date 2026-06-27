@@ -28,6 +28,7 @@ import IconButton from './IconButton.astro'
 <script>
   import gsap from 'gsap'
   import { SplitText } from 'gsap/SplitText'
+  import { lockScroll, releaseScroll } from '~/lib/utils'
   gsap.registerPlugin(SplitText)
 
   class SlideModal extends HTMLElement {
@@ -45,7 +46,7 @@ import IconButton from './IconButton.astro'
         tl = gsap.timeline({
           defaults: { duration: 0.6 },
           onComplete: () => {
-            window._lenis?.start()
+            releaseScroll()
             gsap.set(this, { clearProps: 'all' })
             gsap.set(modalFlex, { clearProps: 'all' })
 
@@ -82,7 +83,7 @@ import IconButton from './IconButton.astro'
           }).lines,
       )
 
-      window._lenis?.stop()
+      lockScroll()
       gsap
         .timeline({
           defaults: { ease: 'expo.out' },

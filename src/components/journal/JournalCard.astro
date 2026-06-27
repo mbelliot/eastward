@@ -6,8 +6,9 @@ import type { Journal } from 'sanity.types'
 import { formatDate } from '~/lib/utils'
 
 interface Props extends HTMLAttributes<'article'> {
-  journal: NonNullable<Pick<Journal, 'slug' | 'cover' | 'title' | 'publishedAt'>>
-  variant?: 'default' | 'featured'
+  journal: NonNullable<Pick<Journal, 'slug' | 'cover' | 'title'>> &
+    Partial<Pick<Journal, 'publishedAt'>>
+  variant?: 'default' | 'featured' | 'inverted'
 }
 
 export const journalCardFragment = `{
@@ -21,17 +22,31 @@ const { journal, class: cls, variant = 'default', ...attrs } = Astro.props
 ---
 
 <a href={`/journal/${journal.slug.current}`} class="contents">
-  <article class:list={['flex flex-col gap-[10px]', cls]} {...attrs}>
+  <article class:list={['group flex flex-col gap-[10px]', cls]} {...attrs}>
     <Picture
       src={journal.cover}
-      pictureClass="block flex-1 mb-[5px]"
-      class="size-full object-cover"
-      sources={[{ widths: [400, 800], aspect: 16 / 9, media: '(min-width:0px)' }]}
+      pictureClass="block flex-1 mb-[5px] overflow-clip"
+      class="size-full object-cover group-hover:scale-[1.1] transition-all duration-700"
+      sources={[{ widths: [400, 800], aspect: 16 / 7, media: '(min-width:0px)' }]}
     />
-    <h3 class:list={[variant === 'default' ? 'text-h4' : 'text-h3']}>{journal.title}</h3>
-    <time datetime={journal.publishedAt} class="text-label text-mono"
-      >{formatDate(journal.publishedAt)}</time
+    <h3
+      class:list={[
+        ['default', 'inverted'].includes(variant) ? 'text-h4' : 'text-h3',
+        variant === 'inverted' ? 'tex-inverted' : '',
+      ]}
     >
-    <Divider />
+      {journal.title}
+    </h3>
+    {
+      journal.publishedAt && (
+        <time
+          datetime={journal.publishedAt}
+          class:list={['text-label', variant === 'inverted' ? 'text-inverted' : 'text-mono']}
+        >
+          {formatDate(journal.publishedAt)}
+        </time>
+      )
+    }
+    {variant !== 'inverted' && <Divider />}
   </article>
 </a>

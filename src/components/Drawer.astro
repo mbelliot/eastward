@@ -1,0 +1,127 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+
+interface Props extends HTMLAttributes<'dialog'> {
+  position?: 'left' | 'right' | 'bottom'
+}
+const { position = 'right', class: cls, ...rest } = Astro.props
+
+const positionClasses = {
+  left: {
+    box: 'inset-y-0 left-0 right-auto h-full w-[min(90vw,420px)]',
+    translate: '-translate-x-full open:translate-x-0 open:starting:-translate-x-full',
+  },
+  right: {
+    box: 'inset-y-0 right-0 left-auto h-full w-[min(90vw,420px)]',
+    translate: 'translate-x-full open:translate-x-0 open:starting:translate-x-full',
+  },
+  bottom: {
+    box: 'inset-x-0 bottom-0 top-auto w-full',
+    translate: 'translate-y-full open:translate-y-0 open:starting:translate-y-full',
+  },
+} as const
+---
+
+<el-drawer>
+  <dialog
+    class:list={[
+      'fixed m-0 max-w-none max-h-none bg-inverted py-4',
+      'transition-all duration-350 ease-out transition-discrete',
+      'backdrop:transition-all backdrop:duration-350 backdrop:ease-out backdrop:transition-discrete',
+      'backdrop:bg-black/0 open:backdrop:bg-black/40 open:backdrop:starting:bg-black/0',
+      positionClasses[position].box,
+      positionClasses[position].translate,
+      cls,
+    ]}
+    {...rest}
+  >
+    <slot />
+  </dialog>
+</el-drawer>
+
+<script>
+  import { lockScroll, releaseScroll } from '~/lib/utils'
+
+  class Drawer extends HTMLElement {
+    #dialog!: HTMLDialogElement
+    #abc!: AbortController
+
+    connectedCallback() {
+      this.#dialog = this.querySelector('dialog')!
+      this.#abc = new AbortController()
+      const { signal } = this.#abc
+
+      document.addEventListener(
+        'click',
+        (e) => {
+          const trigger = (e.target as HTMLElement).closest('[aria-controls]')
+          if (trigger?.getAttribute('aria-controls') === this.#dialog.id) this.open()
+        },
+        { signal },
+      )
+
+      this.#dialog.addEventListener(
+        'click',
+        (e) => {
+          if (!(e.target instanceof Element)) return
+
+          // 1. Check for the data attribute close trigger
+          if (e.target.closest('[data-close-drawer]')) {
+            this.close()
+            return
+          }
+
+          // 2. Check for the backdrop click
+          if (e.target === this.#dialog) {
+            const rect = this.#dialog.getBoundingClientRect()
+            const isOutside =
+              e.clientX < rect.left ||
+              e.clientX > rect.right ||
+              e.clientY < rect.top ||
+              e.clientY > rect.bottom
+
+            if (isOutside) {
+              this.close()
+            }
+          }
+        },
+        { signal },
+      )
+
+      this.#dialog.addEventListener(
+        'cancel',
+        (e) => {
+          e.preventDefault()
+          this.close()
+        },
+        { signal },
+      )
+    }
+
+    disconnectedCallback() {
+      this.#abc?.abort()
+    }
+
+    open() {
+      lockScroll()
+      this.#dialog.showModal()
+      this.dispatchEvent(new CustomEvent('drawer:open', { bubbles: true }))
+      this.syncTriggers(true)
+    }
+
+    close() {
+      releaseScroll()
+      this.#dialog.close()
+      this.dispatchEvent(new CustomEvent('drawer:close', { bubbles: true }))
+      this.syncTriggers(false)
+    }
+
+    syncTriggers(state: boolean) {
+      document
+        .querySelectorAll(`[aria-controls="${this.#dialog.id}"]`)
+        .forEach((el) => el.setAttribute('aria-expanded', String(state)))
+    }
+  }
+
+  customElements.define('el-drawer', Drawer)
+</script>

@@ -4,14 +4,14 @@ import Laurel2 from '$/laurel2.avif'
 import Laurel3 from '$/laurel3.avif'
 import { Image } from 'astro:assets'
 
-const { class: cls } = Astro.props
+const { class: cls, ...attrs } = Astro.props
 ---
 
-<div class:list={['flex', cls]}>
+<div class:list={['flex', cls]} {...attrs}>
   {
     [Laurel1, Laurel2, Laurel3].map((l) => (
       <div>
-        <Image class="w-full" src={l} alt="award" />
+        <Image class="w-full invisible" src={l} alt="award" />
       </div>
     ))
   }

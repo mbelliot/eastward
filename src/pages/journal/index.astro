@@ -5,7 +5,9 @@ import Divider from '@/Divider.astro'
 import Layout from '~/layouts/Layout.astro'
 import JournalCard, { journalCardFragment } from '@/journal/JournalCard.astro'
 
-const journalIndexQuery = defineQuery(`*[_type == 'journal'] ${journalCardFragment}`)
+const journalIndexQuery = defineQuery(
+  `*[_type == 'journal'] | order(publishedAt desc) ${journalCardFragment}`,
+)
 
 const journals = await sanityClient.fetch(journalIndexQuery, {})!
 ---
@@ -19,7 +21,7 @@ const journals = await sanityClient.fetch(journalIndexQuery, {})!
       <p class="text-byline mb-[10px]">Stories and reflections from our curated travels</p>
       <Divider />
     </div>
-    <div class="grid grid-cols-3 clamp-[gap,15px,20px]">
+    <div class="grid grid-cols-3 clamp-[gap,15px,20px] mb-(--clamp-main-bottom-space)">
       {
         journals.map((j, i) => (
           <JournalCard

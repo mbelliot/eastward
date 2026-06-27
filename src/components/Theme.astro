@@ -4,7 +4,7 @@ import type { Theme } from 'sanity.types'
 import Icon, { type IconName } from './Icon.astro'
 
 interface Props extends Omit<HTMLAttributes<'svg'>, 'name'> {
-  theme: Theme
+  theme: Pick<Theme, 'name'>
 }
 
 const { theme, ...attrs } = Astro.props

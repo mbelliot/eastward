@@ -4,10 +4,23 @@ import { defineQuery } from 'groq'
 import Layout from '~/layouts/Layout.astro'
 import Newari from '$/newari.jpg'
 import { Image } from 'astro:assets'
-import SeasonPicks from '@/destinations/SeasonPicks.astro'
+import SeasonPicks, { seasonPicksFragment } from '@/destinations/SeasonPicks.astro'
+import DestinationGrid from '@/destinations/DestinationGrid.astro'
+import Divider from '@/Divider.astro'
 
-const destinationsQuery = defineQuery('*[_type == "destination"]')
-const destinations = await sanityClient.fetch(destinationsQuery)
+const destinationsIndexQuery = defineQuery(`{
+  "destinations": *[_type == "destination"] {
+    cover,
+    name,
+    slug,
+    country,
+    "themes": coalesce(themes[]-> {_id,name}, [])
+  },
+  "featuredDests": *[_type == "destination" && featured]  ${seasonPicksFragment},
+  "themes": *[_type == "theme"]
+  }`)
+
+const { featuredDests, destinations, themes } = await sanityClient.fetch(destinationsIndexQuery)
 ---
 
 <Layout>
@@ -38,5 +51,9 @@ const destinations = await sanityClient.fetch(destinationsQuery)
       </div>
     </div>
   </section>
-  <SeasonPicks destinations={destinations} />
+  <section class="main-spacing main-container">
+    <DestinationGrid destinations={destinations} themes={themes} />
+  </section>
+  <Divider />
+  <SeasonPicks destinations={featuredDests} />
 </Layout>

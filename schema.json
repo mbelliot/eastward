@@ -1978,14 +1978,14 @@
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "country": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "tagline": {
         "type": "objectAttribute",

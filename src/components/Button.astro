@@ -14,23 +14,32 @@ const variants = cva('disabled:opacity-50 disabled:pointer-events-none', {
   defaultVariants: { variant: 'mono' },
 })
 
-type Name = 'arrow-left' | 'arrow-right'
-
-type Props = VariantProps<typeof variants> & HTMLAttributes<'button'> & { name: Name }
-
 const iconNames = {
     'arrow-right': 'ph:arrow-right-light',
     'arrow-left': 'ph:arrow-left-light',
+    grid: 'ph:squares-four-light',
+    list: 'ph:list-light',
+    filter: 'ph:funnel-simple-light',
+    x: 'ph:x-light',
   } as const,
-  directions = { 'arrow-right': 'right', 'arrow-left': 'left' } as const
+  directions = { 'arrow-right': 'right', 'arrow-left': 'left' }
 
-const { class: cls, variant, name, ...attrs } = Astro.props
+type Name = keyof typeof iconNames
+
+type Props = VariantProps<typeof variants> &
+  HTMLAttributes<'button'> & { name: Name; outline?: boolean }
+
+const { class: cls, variant, name, outline = true, ...attrs } = Astro.props
 ---
 
 <IconButton
-  class:list={['size-[45px]', variants({ variant }), cls]}
+  class:list={['size-[45px] relative', variants({ variant }), cls]}
   {...attrs}
-  direction={directions[name]}
+  direction={(directions as any)[name]}
+  variant={outline ? 'outline' : 'ghost'}
 >
-  <Icon class:list={['size-[28px]', variants({ variant })]} name={iconNames[name]} />
+  <Icon
+    class:list={['size-[28px] group-aria-pressed:text-text', variants({ variant })]}
+    name={iconNames[name]}
+  />
 </IconButton>

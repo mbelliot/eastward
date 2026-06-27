@@ -119,3 +119,15 @@
     outline: none;
   }
 }
+
+@custom-variant list-view {
+  &:where([data-view='list'] *) {
+    @slot;
+  }
+}
+
+@custom-variant grid-view {
+  &:where([data-view='grid'] *) {
+    @slot;
+  }
+}

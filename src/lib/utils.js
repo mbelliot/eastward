@@ -14,13 +14,13 @@ export function waitFor(ms) {
   })
 }
 
-export function clamp(edge0, edge1, x) {
-  let t = (x - edge0) / (edge1 - edge0)
+export function clamp(a, b, x) {
+  let t = (x - a) / (b - a)
   return Math.max(0, Math.min(1, t))
 }
 
-export function lerp(edge0, edge1, t) {
-  return edge0 + (edge1 - edge0) * t
+export function lerp(a, b, t) {
+  return a + (b - a) * t
 }
 
 export function formatDate(date) {
@@ -31,4 +31,33 @@ export function formatDate(date) {
     day: 'numeric',
     year: 'numeric',
   }).format(dateObj)
+}
+
+function lenis() {
+  return window._lenis
+}
+
+export function lockScroll() {
+  let _lenis = lenis()
+  if (_lenis) {
+    _lenis.stop()
+    return
+  }
+
+  let scrollbarWidth = window.innerWidth - document.documentElement.clientWidth,
+    props = { overflow: 'hidden', paddingRight: `${scrollbarWidth}px` }
+  for (let [k, v] of Object.entries(props)) {
+    document.body.style.setProperty(k, v)
+  }
+}
+
+export function releaseScroll() {
+  let _lenis = lenis()
+  if (_lenis) {
+    _lenis.start()
+    return
+  }
+
+  document.body.style.removeProperty('overflow')
+  document.body.style.removeProperty('paddingRight')
 }

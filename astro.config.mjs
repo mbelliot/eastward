@@ -12,6 +12,9 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
+  experimental: {
+    clientPrerender: true,
+  },
   fonts: [
     {
       provider: fontProviders.google(),
