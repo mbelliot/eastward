@@ -1,15 +1,59 @@
 ---
+import { cva, type VariantProps } from 'class-variance-authority'
 import Picture from '@/Picture.astro'
 import RollLink from '@/RollLink.astro'
 import Theme from '@/Theme.astro'
 import type { HTMLAttributes } from 'astro/types'
 import type { Itinerary, Theme as ThemeType } from 'sanity.types'
 
-interface Props extends HTMLAttributes<'article'> {
+const articleStyles =
+  'max-lg:gap-y-[25px] max-lg:pb-[50px] lg:grid-cols-2 lg:aspect-cover max-h-dvh w-full'
+const variants = cva('', {
+  variants: {
+    variant: {
+      default: articleStyles,
+      flipped: articleStyles,
+      sm: '',
+    },
+  },
+  defaultVariants: { variant: 'default' },
+})
+const pictureVariants = cva('min-h-0 block', {
+  variants: {
+    variant: {
+      default: 'lg:order-1',
+      flipped: 'lg:order-2',
+      sm: '',
+    },
+  },
+})
+
+const contentStyles =
+  'lg:gap-[50px] lg:items-center lg:justify-center lg:place-self-center main-container'
+const contentVariants = cva('flex flex-col', {
+  variants: {
+    variant: {
+      default: ['lg:order-2', contentStyles],
+      flipped: ['lg:order-1', contentStyles],
+      sm: '',
+    },
+  },
+})
+
+const titleVariants = cva('text-h3 max-lg:leading-none', {
+  variants: {
+    variant: {
+      default: 'lg:text-masthead lg:text-center',
+      flipped: 'lg:text-masthead lg:text-center',
+      sm: '',
+    },
+  },
+})
+
+interface Props extends VariantProps<typeof variants>, HTMLAttributes<'article'> {
   itinerary: NonNullable<Pick<Itinerary, 'slug' | 'cover' | 'title' | 'tagline' | 'price'>> & {
     themes: ThemeType[]
   }
-  flipped?: boolean
 }
 
 export const itineraryCoverFragment = `
@@ -23,39 +67,39 @@ export const itineraryCoverFragment = `
   }
   `
 
-const { itinerary, flipped, class: cls, ...attrs } = Astro.props
+const { itinerary, class: cls, variant = 'default', ...attrs } = Astro.props
 ---
 
-<article
-  class:list={['grid max-lg:gap-y-[25px] lg:grid-cols-2 lg:aspect-cover max-h-dvh w-full', cls]}
-  {...attrs}
->
+<article class:list={['grid', variants({ variant }), cls]} {...attrs}>
   <Picture
     class:list={['object-cover h-full w-full']}
-    pictureClass={`min-h-0 block ${flipped ? 'order-2' : 'order-1'}`}
+    pictureClass={pictureVariants({ variant })}
     src={itinerary.cover}
+    alt={itinerary.cover.alt || itinerary.title}
     sources={[
       { media: '(min-width:0px)', sizes: '50vw', widths: [300, 600, 1200], aspect: 17 / 22 },
     ]}
   />
-  <div
-    class:list={[
-      'itineraryCoverContent invisible',
-      'flex flex-col lg:gap-[50px] lg:items-center lg:justify-center lg:place-self-center main-container',
-      flipped ? 'order-1' : 'order-2',
-    ]}
-  >
-    <div class="flex flex-col lg:items-center gap-2.5">
-      <h3 class="text-h3 max-lg:leading-none lg:text-masthead lg:text-center">
+  <div class:list={['itineraryCoverContent invisible', contentVariants({ variant })]}>
+    <div class:list={['flex flex-col gap-2.5', variant === 'sm' ? undefined : 'lg:items-center']}>
+      <h3 class={titleVariants({ variant })}>
         {itinerary.title}
       </h3>
-      <p class="text-byline lg:text-center">{itinerary.tagline}</p>
+      <p class:list={['text-byline', variant === 'sm' ? undefined : 'lg:text-center']}>
+        {itinerary.tagline}
+      </p>
     </div>
-    <div class="flex flex-col lg:items-center gap-5">
-      <div class="max-lg:hidden flex gap-10 icons">
-        {itinerary.themes.map((th) => <Theme class="size-[55px]" theme={th} />)}
-      </div>
-      <p class="max-lg:pt-2.5 lg:text-h3 price">{itinerary.price}</p>
+    <div class:list={[variant !== 'sm' && 'lg:items-center', 'flex flex-col gap-5']}>
+      {
+        variant !== 'sm' && (
+          <div class="max-lg:hidden flex gap-10 icons">
+            {itinerary.themes.map((th) => (
+              <Theme class="size-[55px]" theme={th} />
+            ))}
+          </div>
+        )
+      }
+      <p class:list={[variant !== 'sm' && 'lg:text-h3 ', 'max-lg:pt-5 price']}>{itinerary.price}</p>
     </div>
     <RollLink class="cta" href={`/itineraries/${itinerary.slug.current}`}>Explore Details</RollLink>
   </div>

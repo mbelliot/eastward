@@ -14,7 +14,7 @@ interface Props {
   imageSize?: number
 }
 
-const { slug, density = 0.6, imageSize = 300 } = Astro.props
+const { slug, density = 0.56, imageSize = 300 } = Astro.props
 
 const query = defineQuery(`
   *[_type == "destination" && slug.current == $slug][0] {

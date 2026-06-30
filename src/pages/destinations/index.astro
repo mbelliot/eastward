@@ -23,8 +23,8 @@ const destinationsIndexQuery = defineQuery(`{
 const { featuredDests, destinations, themes } = await sanityClient.fetch(destinationsIndexQuery)
 ---
 
-<Layout>
-  <section class="w-full aspect-anamorphic relative flex items-end">
+<Layout title="Destinations">
+  <section class="relative flex items-end h-[70dvh]">
     <div aria-hidden="true" class="absolute inset-0">
       <Image
         src={Newari}
@@ -40,18 +40,26 @@ const { featuredDests, destinations, themes } = await sanityClient.fetch(destina
     >
     </div>
     <div class="main-grid main-container pb-12.5 relative">
-      <div
-        class="col-[2/8] flex flex-col gap-5 *:text-inverted bg-linear-[white] bg-left bg-size-[8px_100%] bg-no-repeat pl-[2em]"
-      >
-        <h1 class="text-masthead ml-[-.1em]">Destinations</h1>
-        <p class="text-byline w-[50ch]">
-          From the slow, mist-shrouded rhythms of the interior to the sharp energy of the coast, we
-          map the continent through its living heritage and silent spaces.
-        </p>
+      <div class="col-[2/13] flex flex-col gap-5 *:text-inverted">
+        <h1 class="text-billboard ml-[-.1em]">Destinations</h1>
+        <div class="flex items-center gap-2.5">
+          <div class="text-nowrap text-label uppercase">{destinations.length} locations</div>
+          <div aria-hidden="true" class="size-1.5 rounded-full bg-inverted"></div>
+          <div class="text-nowrap text-label uppercase">
+            {new Set(destinations.map((dest) => dest.country)).size} countries
+          </div>
+        </div>
       </div>
     </div>
   </section>
+
   <section class="main-spacing main-container">
+    <div class="split-text-container">
+      <p class="text-h3 text-center max-w-[50ch] mx-auto">
+        From the slow, mist-shrouded rhythms of the interior to the sharp energy of the coast, we
+        map the continent through its living heritage and silent spaces.
+      </p>
+    </div>
     <DestinationGrid destinations={destinations} themes={themes} />
   </section>
   <Divider />

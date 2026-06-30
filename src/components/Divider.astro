@@ -1,1 +1,9 @@
-<div aria-hidden="true" class="h-px bg-mono/20" />
+---
+const { variant = 'mono', class: cls } = Astro.props
+---
+
+<div
+  aria-hidden="true"
+  class:list={['h-px', variant === 'mono' ? 'bg-mono/20' : 'bg-inverted/20', cls]}
+>
+</div>

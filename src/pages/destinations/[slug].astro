@@ -81,7 +81,7 @@ const dest = (await sanityClient.fetch(destinationQuery, params))!
         <li aria-hidden="true" class="size-1.5 rounded-full bg-inverted"></li>
         <li>
           {dest.itineraries.length}
-          {dest.itineraries.length === 1 ? 'itinerary' : 'itineraries'}
+          {dest.itineraries.length === 1 ? ' itinerary' : ' itineraries'}
         </li>
       </ul>
     </div>

@@ -1,0 +1,18 @@
+---
+import { sanityClient } from 'sanity:client'
+import type { GetStaticPaths } from 'astro'
+import { defineQuery } from 'groq'
+
+export const getStaticPaths = (async () => {
+  const itinerarySlugsQuery = defineQuery('*[_type == "itinerary"]{ slug }'),
+    itns = await sanityClient.fetch(itinerarySlugsQuery)
+
+  return itns.map(({ slug }) => ({ params: { slug: slug.current } }))
+}) satisfies GetStaticPaths
+
+const itineraryPageQuery = defineQuery(`
+  *[_type == 'itinerary' && slug.current == $slug][0]
+  `)
+
+const itinerary = (await sanityClient.fetch(itineraryPageQuery, Astro.params))!
+---

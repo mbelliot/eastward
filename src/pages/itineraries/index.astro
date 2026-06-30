@@ -3,11 +3,37 @@ import { sanityClient } from 'sanity:client'
 import { defineQuery } from 'groq'
 import ItineraryCover, { itineraryCoverFragment } from '@/itineraries/ItineraryCover.astro'
 import Layout from '~/layouts/Layout.astro'
+import Feature from '@/itineraries/Feature.astro'
 
-const itinerariesIndexQuery = defineQuery(` *[_type == 'itinerary'] ${itineraryCoverFragment}`)
-const itineraries = (await sanityClient.fetch(itinerariesIndexQuery, {}))!
+const itinerariesIndexQuery = defineQuery(`{
+  "features": *[_type == 'feature'],
+ "itineraries": *[_type == 'itinerary'] ${itineraryCoverFragment}
+  } `)
+const { features, itineraries } = (await sanityClient.fetch(itinerariesIndexQuery, {}))!
 ---
 
-<Layout>
-  {itineraries.map((itn, i) => <ItineraryCover itinerary={itn} flipped={Boolean(i % 2)} />)}
+<Layout variant="mono">
+  <header class="flex flex-col gap-10 items-center clamp-[pt,100px,200px] clamp-[pb,50px,150px]">
+    <h1 class="text-billboard">Itineraries</h1>
+    <div class="mt-12.5 main-container">
+      <ul class="list-none flex gap-x-10 gap-y-15 flex-wrap justify-center max-w-[1100px]">
+        {
+          features.map((feature) => (
+            <li class="flex flex-col items-center gap-4">
+              <Feature feature={feature} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </header>
+  {
+    itineraries.map((itn, i) => (
+      <ItineraryCover itinerary={itn} variant={Boolean(i % 2) ? 'flipped' : 'default'} />
+    ))
+  }
 </Layout>
+
+<script>
+  import gsap from 'gsap'
+</script>

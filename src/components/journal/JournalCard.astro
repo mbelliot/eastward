@@ -25,7 +25,7 @@ const { journal, class: cls, variant = 'default', ...attrs } = Astro.props
   <article class:list={['group flex flex-col gap-[10px]', cls]} {...attrs}>
     <Picture
       src={journal.cover}
-      pictureClass="block flex-1 mb-[5px] overflow-clip"
+      pictureClass="block flex-1 mb-[5px] overflow-clip aspect-[16/7]"
       class="size-full object-cover group-hover:scale-[1.1] transition-all duration-700"
       sources={[{ widths: [400, 800], aspect: 16 / 7, media: '(min-width:0px)' }]}
     />

@@ -1,0 +1,27 @@
+---
+import Icon, { type IconName } from '@/Icon.astro'
+import type { HTMLAttributes } from 'astro/types'
+import type { Feature } from 'sanity.types'
+
+const featureIconNames: Record<Feature['name'], IconName> = {
+  'Exclusive Access': 'VIP',
+  'Private Driver': 'Car',
+  'All Meals Included': 'Culinary',
+  '5-Star Accommodation': 'Hotel',
+  'Expert Guide': 'Compass',
+}
+
+interface Props extends HTMLAttributes<'article'> {
+  feature: Feature
+}
+
+const { feature, class: cls, ...attrs } = Astro.props
+---
+
+<article class:list={['flex gap-4 items-start max-w-[330px]', cls]} {...attrs}>
+  <Icon name={featureIconNames[feature.name]} class="size-10 shrink-0" />
+  <div class="flex flex-col gap-1 items-start">
+    <span class="text-nowrap leading-loose">{feature.name}</span>
+    <p class="text-medium">{feature.blurb}</p>
+  </div>
+</article>

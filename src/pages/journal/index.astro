@@ -12,12 +12,10 @@ const journalIndexQuery = defineQuery(
 const journals = await sanityClient.fetch(journalIndexQuery, {})!
 ---
 
-<Layout variant="mono">
-  <div class="max-w-[1400px] mx-auto">
+<Layout variant="mono" title="Journal">
+  <div class="max-w-[1400px] main-container mx-auto">
     <div class="clamp-[h,350px,450px,390px,1280px] flex flex-col justify-end pb-[30px]">
-      <h1 class="font-title leading-[.9] tracking-[-.04em] clamp-[text,90px,200px,390px,1280px]">
-        Journal
-      </h1>
+      <h1 class="text-billboard">Journal</h1>
       <p class="text-byline mb-[10px]">Stories and reflections from our curated travels</p>
       <Divider />
     </div>

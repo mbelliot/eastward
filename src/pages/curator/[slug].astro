@@ -1,0 +1,69 @@
+---
+import { sanityClient } from 'sanity:client'
+import type { GetStaticPaths } from 'astro'
+import { defineQuery } from 'groq'
+import Picture from '@/Picture.astro'
+import Layout from '~/layouts/Layout.astro'
+import Divider from '@/Divider.astro'
+import ItineraryCover, { itineraryCoverFragment } from '@/itineraries/ItineraryCover.astro'
+
+export const getStaticPaths = (async () => {
+  const curatorSlugsQuery = defineQuery('*[_type == "curator"]{ slug }'),
+    itns = await sanityClient.fetch(curatorSlugsQuery)
+
+  return itns.map(({ slug }) => ({ params: { slug: slug.current } }))
+}) satisfies GetStaticPaths
+
+const curatorPageQuery = defineQuery(`
+  *[_type == 'curator' && slug.current == $slug][0] {
+    ...,
+    "curations": *[_type == 'itinerary' && curator._ref == ^._id] ${itineraryCoverFragment}
+  }
+  `)
+
+const curator = (await sanityClient.fetch(curatorPageQuery, Astro.params))!
+---
+
+<Layout variant="mono">
+  <header class="h-dvh flex flex-col items-center pt-(--clamp-main-top-space)">
+    <Picture
+      pictureClass="flex-1 min-h-0 aspect-page"
+      class="h-full object-cover"
+      sources={[{ widths: [400, 800], media: '(min-width: 0px)', aspect: 17 / 22 }]}
+      src={curator.portrait}
+      alt={curator.name}
+      loading="eager"
+      decoding="sync"
+      fetchpriority="high"
+    />
+    <div class="flex flex-col align-center text-center clamp-[py,20px,70px] clamp-[gap,5px,15px]">
+      <div>
+        <p class="text-masthead uppercase">Meet</p>
+        <h1 class="text-masthead uppercase">{curator.name}</h1>
+      </div>
+      <p class="text-byline">{curator.title}</p>
+    </div>
+  </header>
+  <Divider />
+  <section class="main-container main-grid clamp-[my,20px,50px]">
+    <div class="col-[2/9]"><p class="text-quote">{curator.bio}</p></div>
+    {
+      curator.curations.length > 0 && (
+        <>
+          <div class="col-span-full clamp-[pt,50px,100px] clamp-[pb,15px,30px] text-center">
+            <p class="text-label uppercase">Curations</p>
+          </div>
+          <div class="col-[2/12] grid grid-cols-subgrid">
+            {curator.curations.map((x, i) => (
+              <ItineraryCover
+                class:list={['col-[1/6]', Boolean((i % 2) - 1) ? 'col-[1/6]' : 'col-[6/11]']}
+                itinerary={x}
+                variant="sm"
+              />
+            ))}
+          </div>
+        </>
+      )
+    }
+  </section>
+</Layout>

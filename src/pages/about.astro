@@ -1,0 +1,71 @@
+---
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import Layout from '~/layouts/Layout.astro'
+import Tibet from '$/tibet.jpg'
+import { Image } from 'astro:assets'
+import SectionTitle from '@/SectionTitle.astro'
+import Picture from '@/Picture.astro'
+
+const aboutPageQuery = defineQuery(`
+  *[_type == 'curator']`)
+
+const curators = (await sanityClient.fetch(aboutPageQuery))!
+---
+
+<Layout variant="mono" title="About Us">
+  <section class="h-dvh pt-(--clamp-main-top-space) clamp-[pb,20px,50px] main-container main-grid">
+    <div class="col-[1/7] relative">
+      <Image
+        src={Tibet}
+        alt="Tibet"
+        layout="constrained"
+        class="size-full object-cover"
+        fetchpriority="high"
+        loading="eager"
+      />
+    </div>
+    <div class="col-[8/12] self-end">
+      <h1 class="text-label uppercase">Our Philosophy</h1>
+      <h2 class="text-h2 mt-2 mb-12.5">Arrive to belong</h2>
+      <p class="my-5">
+        Eastward is a private travel atelier, built for those who have seen enough of the world to
+        know that the ultimate luxury is not comfort—it is frictionless entry into the unavailable.
+      </p>
+      <p class="mt-5">
+        We operate on a standard of absolute precision, removing the commercial filter of the
+        tourism industry so you can experience a place through a native, highly sophisticated lens.
+        We do not design itineraries to be consumed. We compose journeys that transition from
+        initial attraction into deep intimacy.
+      </p>
+    </div>
+  </section>
+  <section class="main-grid main-container main-spacing">
+    <SectionTitle class="col-[2/5]" title="The In‑group" />
+    <div class="col-[2/6] pt-5">
+      <p>
+        We are a tight collective of field anthropologists, architectural historians, and expedition
+        leads who grew tired of the over-rehearsed, insulated nature of luxury tourism. We don't
+        operate from corporate headquarters; we operate directly from the terrain.
+      </p>
+    </div>
+    <div class="col-[8/13] pt-7.5">
+      <ul class="list-none flex flex-col gap-7.5">
+        {
+          curators.map((curator) => (
+            <li>
+              <a class="flex gap-5" href={`/curator/${curator.slug.current}`}>
+                <Picture
+                  pictureClass="size-25 block"
+                  class="size-full object-cover"
+                  src={curator.portrait}
+                />
+                <p class="text-h4 grid items-center">{curator.name}</p>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Layout>

@@ -64,7 +64,7 @@
 }
 
 @utility text-label {
-  @apply text-[16px] leading-[1.4em] tracking-[0.03em] font-body;
+  @apply text-[16px] leading-[1.4em] tracking-[0.06em] font-body;
 }
 
 @utility text-journal-body {
@@ -73,6 +73,10 @@
 
 @utility text-masthead {
   @apply font-title clamp-[text,40px,130px,390px,2560px] leading-none tracking-[-.04em] uppercase;
+}
+
+@utility text-billboard {
+  @apply font-title leading-[.9] tracking-[-.04em] clamp-[text,90px,200px,390px,1280px];
 }
 
 @utility main-container {
