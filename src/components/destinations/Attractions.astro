@@ -60,10 +60,9 @@ const { attractions, class: cls, ...attrs } = Astro.props
           <figcaption class="invisible">
             <p class="text-left">{attraction.title}</p>
             {attraction.location && (
-                <!-- prettier-ignore -->
-                <p class="ml-px text-left text-label uppercase">
-                  {attraction.location}{attraction.country ? `, ${attraction.country}` : ''}
-                </p>
+              <p class="ml-px text-left text-label uppercase">
+                {`${attraction.location}${attraction.country ? `, ${attraction.country}` : ''}`}
+              </p>
             )}
           </figcaption>
         </figure>
