@@ -2,6 +2,22 @@
 import { sanityClient } from 'sanity:client'
 import type { GetStaticPaths } from 'astro'
 import { defineQuery } from 'groq'
+import Layout from '~/layouts/Layout.astro'
+import ItineraryBanner, { itineraryBannerFragment } from '@/itineraries/ItineraryBanner.astro'
+import ImageAside from '@/ImageAside.astro'
+import Picture from '@/Picture.astro'
+import TextBlock from '@/TextBlock.astro'
+import Divider from '@/Divider.astro'
+import FeatureSection from '@/FeatureSection.astro'
+import Theme from '@/Theme.astro'
+import Schedule from '@/itineraries/Schedule.astro'
+import Feature from '@/itineraries/Feature.astro'
+import SectionTitle from '@/SectionTitle.astro'
+import CulinarySection from '@/destinations/CulinarySection.astro'
+import DestinationLabel from '@/destinations/DestinationLabel.astro'
+import TestimonialSection from '@/testimonials/TestimonialSection.astro'
+import Input from '@/forms/Input.astro'
+import ItineraryFAQs from '@/itineraries/ItineraryFAQs.astro'
 
 export const getStaticPaths = (async () => {
   const itinerarySlugsQuery = defineQuery('*[_type == "itinerary"]{ slug }'),
@@ -11,8 +27,170 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths
 
 const itineraryPageQuery = defineQuery(`
-  *[_type == 'itinerary' && slug.current == $slug][0]
+  *[_type == 'itinerary' && slug.current == $slug][0] {
+    ...,
+    features[]->,
+    themes[]->,
+    stays[]->{
+      ...,
+      destination-> {
+        name,
+        country
+      }
+    },
+    "reviews": *[_type == 'testimonial' && itinerary._ref == ^._id],
+    ...${itineraryBannerFragment}
+  }
   `)
 
 const itinerary = (await sanityClient.fetch(itineraryPageQuery, Astro.params))!
 ---
+
+<Layout title={itinerary.title}>
+  <section>
+    <ItineraryBanner itinerary={itinerary} />
+    <ImageAside>
+      <Fragment slot="image">
+        {
+          itinerary.portrait && (
+            <Picture
+              pictureClass="block min-h-0 max-h-full w-full aspect-page max-lg:mt-12.5"
+              class="size-full object-cover"
+              src={itinerary.portrait}
+              alt={itinerary.portrait?.alt ?? ''}
+              sources={[
+                { media: '(min-width: 0px)', widths: [400, 800], aspect: 9 / 16, sizes: '100vw' },
+              ]}
+            />
+          )
+        }</Fragment
+      >
+      <>
+        <h2 class="text-h2">Overview</h2>
+        <div data-lines-container class="flex flex-col gap-[1em]">
+          <TextBlock class="lg:text-balance" text={itinerary.overview ?? ''} />
+        </div>
+      </>
+    </ImageAside>
+  </section>
+  <Divider />
+  {
+    itinerary.themes.length > 0 && (
+      <>
+        <FeatureSection title="Thematic Journeys">
+          <p class="text-balance max-w-125" slot="desc">
+            True travel requires time, context, and a willingness to engage. Our Thematic Journeys
+            are built around specific cultural, historical, or environmental narratives that connect
+            you deeply with each place. By moving past standard tourist circuits, we focus on manual
+            curation and structural depth, allowing you to understand the actual rhythm and heritage
+            of a region.
+          </p>
+          {itinerary.themes.map((theme, i) => (
+            <>
+              {i > 0 && <Divider />}
+              <div class="flex gap-[30px] items-center">
+                <Theme class="size-[50px]" theme={theme} />
+                <p>{theme.name}</p>
+              </div>
+            </>
+          ))}
+        </FeatureSection>
+        <Divider />
+      </>
+    )
+  }
+  {
+    itinerary.schedule && (
+      <>
+        <Schedule schedule={itinerary.schedule} />
+        <Divider />
+      </>
+    )
+  }
+  {
+    itinerary.features?.length > 0 && (
+      <>
+        <FeatureSection title="What's included" sectionTitle>
+          <p slot="desc" class="max-w-125">
+            Every trip includes a range of thoughtful amenities — carefully chosen so you can focus
+            on the moments that matter, not the logistics.
+          </p>
+          {itinerary.features.map((feat, i) => (
+            <>
+              {i > 0 && <Divider />}
+              <Feature feature={feat} />
+            </>
+          ))}
+        </FeatureSection>
+        <Divider />
+      </>
+    )
+  }
+  {
+    itinerary.foods?.length && (
+      <>
+        <CulinarySection foods={itinerary.foods} />
+        <Divider />
+      </>
+    )
+  }
+  {
+    itinerary.stays?.length && (
+      <section class="main-grid main-container main-spacing">
+        <SectionTitle
+          class="col-span-full lg:col-[2/5] max-lg:text-center"
+          title="The Stays"
+          desc="Stay where stories live."
+        />
+        <ul class="grid col-span-full grid-cols-subgrid">
+          {itinerary.stays.map((stay, i) => (
+            <li
+              class:list={[
+                i % 2 ? 'xl:col-[7/12]' : 'xl:col-[2/7]',
+                'max-xl:col-[2/12] max-h-[70dvh] block mt-12.5',
+              ]}
+            >
+              <figure class="flex flex-col gap-2.5">
+                <div class="relative flex-1">
+                  <Picture
+                    src={stay.cover}
+                    alt={stay.cover.alt ?? ''}
+                    pictureClass="block"
+                    class="size-full object-cover"
+                  />
+                  {stay.destination && (
+                    <DestinationLabel
+                      class="absolute bottom-5 right-7"
+                      name={stay.destination.name}
+                      country={stay.destination.country}
+                    />
+                  )}
+                </div>
+                <figcaption>
+                  <p class="text-h4">{stay.name}</p>
+                  <p>{stay.description}</p>
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    itinerary.reviews?.length && (
+      <TestimonialSection bgSrc={itinerary.cover} testimonials={itinerary.reviews} />
+    )
+  }
+  <section class="main-grid main-container main-spacing">
+    <div class="col-[2/7]">
+      <form class="flex flex-col gap-8.5">
+        <Input name="name" id="name" placeholder="Name" />
+        <Input name="email" id="email" placeholder="Email" />
+      </form>
+    </div>
+  </section>
+  <section class="main-spacing main-container">
+    <ItineraryFAQs />
+  </section>
+</Layout>

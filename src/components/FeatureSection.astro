@@ -1,0 +1,22 @@
+---
+import SectionTitle from '@/SectionTitle.astro'
+
+const { title, sectionTitle } = Astro.props
+const titleClass = 'col-span-full lg:col-[2/6] mb-5'
+---
+
+<section class="max-md:gap-y-10 main-grid main-container main-spacing split-text-container">
+  {
+    sectionTitle ? (
+      <SectionTitle class={titleClass} title={title} />
+    ) : (
+      <h2 class:list={[titleClass, 'text-h2']}>{title}</h2>
+    )
+  }
+  <div class="col-span-full lg:col-[2/6]" data-lines-container="">
+    <slot name="desc" />
+  </div>
+  <div class="col-span-full lg:col-[7/12] flex flex-col gap-5 split-text-container">
+    <slot />
+  </div>
+</section>

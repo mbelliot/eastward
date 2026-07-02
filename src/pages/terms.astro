@@ -1,0 +1,21 @@
+---
+import Layout from '~/layouts/Layout.astro'
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import TextBlock from '@/TextBlock.astro'
+
+const termsPageQuery = defineQuery(`
+  *[_type == 'info'][0]{ terms }
+  `)
+
+const info = (await sanityClient.fetch(termsPageQuery))!
+---
+
+<Layout variant="mono">
+  <header class="flex justify-center pt-[180px] pb-[30px]">
+    <h1 class="text-[6vw]">terms and conditions</h1>
+  </header>
+  <div class="mx-auto max-w-200 mb-30">
+    <TextBlock text={info.terms} />
+  </div>
+</Layout>

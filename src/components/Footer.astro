@@ -1,0 +1,67 @@
+---
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import { Icon } from 'astro-icon/components'
+import Mandala from '@/Mandala.astro'
+import RollLink from '@/RollLink.astro'
+
+const footerQuery = defineQuery(`
+  *[_type == 'info'][0]
+  `)
+
+const info = (await sanityClient.fetch(footerQuery))!
+const { class: cls } = Astro.props
+const navItems = ['journal', 'destinations', 'itineraries', ['About Us', '/about']]
+---
+
+<footer
+  class:list={[
+    '*:main-container flex flex-col **:text-inverted',
+    '*:not-last:bg-linear-to-r *:not-last:from-white/20 *:not-last:to-white/20 *:not-last:bg-size-[100%_1px] *:not-last:bg-bottom-left *:not-last:bg-no-repeat',
+    cls,
+  ]}
+>
+  <div class="flex max-sm:flex-col items-center justify-between">
+    <div class="max-sm:pt-[60px] max-sm:pb-[30px]"><Mandala color="white" class="size-25" /></div>
+    <nav class="max-sm:pt-5 max-sm:pb-[50px] py-[50px]">
+      <ul class="flex max-sm:flex-col items-center gap-[30px]">
+        {
+          navItems.map((n) => {
+            let href = Array.isArray(n) ? n[1] : `/${n}`,
+              txt = Array.isArray(n) ? n[0] : n
+            return (
+              <li class="sm:h-[95px] flex items-center">
+                <RollLink variant="title" href={href}>
+                  {txt}
+                </RollLink>
+              </li>
+            )
+          })
+        }
+      </ul>
+    </nav>
+  </div>
+  <address
+    class="flex flex-col items-center sm:items-end gap-[20px] py-[50px] px-[25px] **:not-italic **:text-center sm:**:text-end"
+  >
+    <div class="flex flex-col gap-[15px] max-w-100">
+      <p>{info.address}</p>
+      <div class="*:block">
+        <a href={`tel:${info.phone}`}>{info.phone}</a>
+        <a href={`mailto:${info.email}`}>{info.email}</a>
+      </div>
+    </div>
+    <div class="flex justify-center gap-5">
+      <Icon size={30} name="ph:instagram-logo-light" />
+      <Icon size={30} name="ph:whatsapp-logo-light" />
+    </div>
+  </address>
+  <small
+    class="flex max-sm:flex-col justify-center **:text-label **:text-center *:block p-[25px] gap-[15px]"
+  >
+    <span>© 2026 Eastward</span>
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="https://elliotli.dev">Design & Development by Elliot Li</a>
+  </small>
+</footer>

@@ -18,8 +18,8 @@ interface Props extends HTMLAttributes<'article'> {
 const { feature, class: cls, ...attrs } = Astro.props
 ---
 
-<article class:list={['flex gap-4 items-start max-w-[330px]', cls]} {...attrs}>
-  <Icon name={featureIconNames[feature.name]} class="size-10 shrink-0" />
+<article class:list={['flex gap-7 items-center max-w-125', cls]} {...attrs}>
+  <Icon name={featureIconNames[feature.name]} class="size-15 shrink-0" />
   <div class="flex flex-col gap-1 items-start">
     <span class="text-nowrap leading-loose">{feature.name}</span>
     <p class="text-medium">{feature.blurb}</p>

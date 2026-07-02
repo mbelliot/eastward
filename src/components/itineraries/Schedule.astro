@@ -1,0 +1,47 @@
+---
+import Picture from '@/Picture.astro'
+import SectionTitle from '@/SectionTitle.astro'
+import type { HTMLAttributes } from 'astro/types'
+import type { Itinerary } from 'sanity.types'
+import RichText from '@/RichText.astro'
+
+interface Props extends HTMLAttributes<'section'> {
+  schedule: NonNullable<Itinerary['schedule']>
+}
+
+const { schedule } = Astro.props
+---
+
+<section class="main-grid main-container main-spacing">
+  <SectionTitle
+    class="col-span-full justify-self-center max-lg:**:text-center lg:col-[9/12]"
+    title="Day by day"
+    desc="A journey through tradition, flavor, and time."
+  />
+  <div class="lg:hidden grid grid-cols-subgrid col-span-full">
+    {
+      schedule.map((segment) => (
+        <article class="grid grid-cols-subgrid col-span-full gap-y-5 mt-10">
+          <Picture
+            pictureClass="block col-span-full"
+            class="size-full object-cover"
+            src={segment.image}
+            alt={segment.image.alt ?? ''}
+          />
+          <div class="col-span-full flex flex-col gap-2">
+            <p class="text-h3">{segment.title}</p>
+            <RichText text={segment.body} />
+          </div>
+        </article>
+      ))
+    }
+  </div>
+  <schedule-reel class="max-lg:hidden grid grid-cols-subgrid col-span-full"></schedule-reel>
+</section>
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+  
+</script>

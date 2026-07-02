@@ -1,0 +1,60 @@
+---
+import Button from '@/Button.astro'
+import FlexSlider from '@/FlexSlider.astro'
+import OverlayCard from '@/OverlayCard.astro'
+import RichText from '@/RichText.astro'
+import SectionTitle from '@/SectionTitle.astro'
+import Picture from '@/Picture.astro'
+import type { Destination } from 'sanity.types'
+
+type Props = { foods: NonNullable<Destination['foods']> }
+
+const { foods } = Astro.props
+---
+
+<section class="main-grid main-container main-spacing" data-flex-slider-root>
+  <div class="flex gap-5 col-[2/8] items-end">
+    <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
+    <Button name="arrow-right" data-next-slide aria-label="Next slide" />
+  </div>
+  <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
+    <SectionTitle
+      title="The Flavors"
+      desc="An aromatic heritage told through ancestral culinary craft."
+    />
+  </div>
+  <FlexSlider class="col-[2/13] pt-7.5 [--blur:12px]" trackClass="clamp-[gap-x,20px,25px]">
+    {
+      foods.map((food) => (
+        <OverlayCard class="aspect-3/4 clamp-[w,300px,512px,390px,2000px] foodCard [--blur:40px]">
+          <h4 class="text-h4 blur-(--blur)" slot="title">
+            {food.title}
+          </h4>
+          <Picture
+            sources={[{ media: '(min-width:0px)', widths: [512], aspect: 3 / 4 }]}
+            src={food.image}
+            slot="image"
+          />
+          <div class="blur-(--blur)">
+            <RichText class="blur-(--blur)" text={food.body} />
+          </div>
+        </OverlayCard>
+      ))
+    }
+  </FlexSlider>
+</section>
+
+<script>
+  import gsap from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+  gsap.registerPlugin(ScrollTrigger)
+
+  ScrollTrigger.batch('.foodCard', {
+    once: true,
+    start: 'bottom bottom',
+    onEnter: (batch) => {
+      gsap.to(batch, { '--blur': '0px', duration: 0.6, stagger: 0.2, delay: 0.2, ease: 'sine.out' })
+    },
+  })
+</script>

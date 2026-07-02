@@ -1817,14 +1817,14 @@
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "description": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
-        "optional": true
+        "optional": false
       },
       "type": {
         "type": "objectAttribute",
@@ -1926,7 +1926,7 @@
             }
           }
         },
-        "optional": true
+        "optional": false
       },
       "slug": {
         "type": "objectAttribute",

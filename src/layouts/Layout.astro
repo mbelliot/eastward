@@ -5,8 +5,9 @@ import { Font } from 'astro:assets'
 import Header from '@/Header.astro'
 import Cursor from '@/Cursor.astro'
 import SlideModal from '@/SlideModal.astro'
+import Footer from '@/Footer.astro'
 
-const { variant, title, class: cls, isIndexPage } = Astro.props
+const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
 ---
 
 <!doctype html>
@@ -28,6 +29,7 @@ const { variant, title, class: cls, isIndexPage } = Astro.props
     <main>
       <slot />
     </main>
+    <Footer class={footerClass ?? 'bg-brand'} />
   </body>
 </html>
 
@@ -53,20 +55,22 @@ const { variant, title, class: cls, isIndexPage } = Astro.props
       let els: Element[] = []
       let splits: SplitText[] = []
 
-      Array.from(container.children).forEach((c) => {
-        if (c.hasAttribute('data-lines-container')) {
-          Array.from(c.children).forEach((cc) => {
-            if (c.classList.contains('split-text-container')) return
-            const split = SplitText.create(cc, { type: 'lines' })
+      Array.from(container.children)
+        .filter((c) => !c.hasAttribute('data-inhibit-motion'))
+        .forEach((c) => {
+          if (c.hasAttribute('data-lines-container')) {
+            Array.from(c.children).forEach((cc) => {
+              if (c.classList.contains('split-text-container')) return
+              const split = SplitText.create(cc, { type: 'lines' })
+              splits.push(split)
+              els.push(...split.lines)
+            })
+          } else if (c.matches('h1, h2, h3, h4, h5, h6, p')) {
+            const split = SplitText.create(c, { type: 'lines' })
             splits.push(split)
             els.push(...split.lines)
-          })
-        } else if (c.matches('h1, h2, h3, h4, h5, h6, p')) {
-          const split = SplitText.create(c, { type: 'lines' })
-          splits.push(split)
-          els.push(...split.lines)
-        } else els.push(c)
-      })
+          } else els.push(c)
+        })
 
       gsap.from(els, {
         autoAlpha: 0,

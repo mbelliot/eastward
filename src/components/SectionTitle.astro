@@ -2,11 +2,11 @@
 let { title, desc, class: cls } = Astro.props
 ---
 
-<div class={cls}>
+<div data-inhibit-motion class={cls}>
   <h2
     class="font-title text-balance uppercase leading-none tracking-[-.04em] clamp-[text,40px,120px,390px,2560px]"
   >
     {title}
   </h2>
-  <p class="italic leading-[1.2] tracking-normal">{desc}</p>
+  {desc && <p class="mt-2 italic leading-[1.2] tracking-normal">{desc}</p>}
 </div>

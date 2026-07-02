@@ -1,0 +1,21 @@
+---
+import Layout from '~/layouts/Layout.astro'
+import { sanityClient } from 'sanity:client'
+import { defineQuery } from 'groq'
+import TextBlock from '@/TextBlock.astro'
+
+const privacyPageQuery = defineQuery(`
+  *[_type == 'info'][0]{ privacy }
+  `)
+
+const info = (await sanityClient.fetch(privacyPageQuery))!
+---
+
+<Layout variant="mono">
+  <header class="flex justify-center pt-[180px] pb-[30px]">
+    <h1 class="text-[6vw]">privacy policy</h1>
+  </header>
+  <div class="mx-auto max-w-200 mb-30">
+    <TextBlock text={info.privacy} />
+  </div>
+</Layout>

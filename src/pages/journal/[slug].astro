@@ -37,7 +37,11 @@ const journalQuery = defineQuery(`*[_type == 'journal' && slug.current == $slug]
 const journal = (await sanityClient.fetch(journalQuery, Astro.params))!
 ---
 
-<Layout title={journal.title} class="bg-black **:text-inverted">
+<Layout
+  title={journal.title}
+  class="bg-black **:text-inverted"
+  footerClass="bg-black border-t border-white/20"
+>
   <Picture
     pictureClass="block absolute inset-0 bottom-auto h-dvh overflow-clip"
     class="size-full object-cover"

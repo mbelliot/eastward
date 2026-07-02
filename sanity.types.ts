@@ -299,12 +299,12 @@ export type Stay = {
   _createdAt: string
   _updatedAt: string
   _rev: string
-  name?: string
-  description?: string
+  name: string
+  description: string
   type?: 'Resort' | 'Boutique' | 'Glamping' | 'Villa' | 'Palace' | 'Lodge'
   destination?: DestinationReference
   website?: string
-  cover?: {
+  cover: {
     asset?: SanityImageAssetReference
     media?: unknown
     hotspot?: SanityImageHotspot
@@ -616,6 +616,25 @@ export type AllSanitySchemaTypes =
   | SanityAssetSourceData
   | SanityImageAsset
   | Geopoint
+
+// Source: src/components/Footer.astro
+// Variable: footerQuery
+// Query: *[_type == 'info'][0]
+export type FooterQueryResult = {
+  _id: string
+  _type: 'info'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  brandName?: string
+  address?: string
+  phone?: string
+  email?: string
+  whatsapp?: string
+  instagram?: string
+  terms?: string
+  privacy?: string
+} | null
 
 // Source: src/components/destinations/DestinationPolaroid.astro
 // Variable: query
@@ -964,7 +983,7 @@ export type DestinationsIndexQueryResult = {
 
 // Source: src/pages/index.astro
 // Variable: indexPageQuery
-// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured] {  slug,  cover,  ...select(defined(portrait) => { portrait }),  title,  tagline,  "overview": coalesce(overview, ""),  "destinations": coalesce(count(destinations), 0),  "days": coalesce(count(schedule), 0)},  }
+// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured] {  ...{  cover,  title,  tagline,  "destinations": coalesce(count(destinations), 0),  "days": coalesce(count(schedule), 0)},  slug,  ...select(defined(portrait) => { portrait }),  "overview": coalesce(overview, ""),},  }
 export type IndexPageQueryResult = {
   featuredDestinations: Array<{
     cover: {
@@ -1011,16 +1030,7 @@ export type IndexPageQueryResult = {
     }> | null
   }>
   featuredItineraries: Array<{
-    slug: Slug
     cover: {
-      asset?: SanityImageAssetReference
-      media?: unknown
-      hotspot?: SanityImageHotspot
-      crop?: SanityImageCrop
-      alt?: string
-      _type: 'image'
-    }
-    portrait: {
       asset?: SanityImageAssetReference
       media?: unknown
       hotspot?: SanityImageHotspot
@@ -1030,9 +1040,18 @@ export type IndexPageQueryResult = {
     }
     title: string
     tagline: string
-    overview: string | ''
     destinations: number | 0
     days: number | 0
+    slug: Slug
+    portrait: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    overview: string | ''
   }>
 }
 
@@ -1045,7 +1064,7 @@ export type ItinerarySlugsQueryResult = Array<{
 
 // Source: src/pages/itineraries/[slug].astro
 // Variable: itineraryPageQuery
-// Query: *[_type == 'itinerary' && slug.current == $slug][0]
+// Query: *[_type == 'itinerary' && slug.current == $slug][0] {    ...,    features[]->,    themes[]->,    stays[]->{      ...,      destination-> {        name,        country      }    },    "reviews": *[_type == 'testimonial' && itinerary._ref == ^._id],    ...{  cover,  title,  tagline,  "destinations": coalesce(count(destinations), 0),  "days": coalesce(count(schedule), 0)}  }
 export type ItineraryPageQueryResult = {
   _id: string
   _type: 'itinerary'
@@ -1054,7 +1073,7 @@ export type ItineraryPageQueryResult = {
   _rev: string
   title: string
   tagline: string
-  days?: number
+  days: number | 0
   price: string
   featured?: boolean
   overview?: string
@@ -1138,28 +1157,75 @@ export type ItineraryPageQueryResult = {
     alt?: string
     _type: 'image'
   }
-  features: Array<
-    {
-      _key: string
-    } & FeatureReference
-  >
-  destinations?: Array<
-    {
-      _key: string
-    } & DestinationReference
-  >
-  themes: Array<
-    {
-      _key: string
-    } & ThemeReference
-  >
+  features: Array<{
+    _id: string
+    _type: 'feature'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name: string
+    blurb: string
+    slug: Slug
+  }>
+  destinations: number | 0
+  themes: Array<{
+    _id: string
+    _type: 'theme'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name: string
+    description: string
+    slug: Slug
+  }>
   curator?: CuratorReference
-  stays?: Array<
-    {
-      _key: string
-    } & StayReference
-  >
+  stays: Array<{
+    _id: string
+    _type: 'stay'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name: string
+    description: string
+    type?: 'Boutique' | 'Glamping' | 'Lodge' | 'Palace' | 'Resort' | 'Villa'
+    destination: {
+      name: string
+      country: string
+    } | null
+    website?: string
+    cover: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    slug: Slug
+  }> | null
   slug: Slug
+  reviews: Array<{
+    _id: string
+    _type: 'testimonial'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name?: string
+    title?: string
+    quote?: string
+    featured?: boolean
+    destination?: DestinationReference
+    itinerary?: ItineraryReference
+    headshot?: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    slug: Slug
+  }>
 } | null
 
 // Source: src/pages/itineraries/index.astro
@@ -1279,10 +1345,25 @@ export type JournalIndexQueryResult = Array<{
   publishedAt: string
 }>
 
+// Source: src/pages/privacy.astro
+// Variable: privacyPageQuery
+// Query: *[_type == 'info'][0]{ privacy }
+export type PrivacyPageQueryResult = {
+  privacy: string | null
+} | null
+
+// Source: src/pages/terms.astro
+// Variable: termsPageQuery
+// Query: *[_type == 'info'][0]{ terms }
+export type TermsPageQueryResult = {
+  terms: string | null
+} | null
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
   interface SanityQueries {
+    "\n  *[_type == 'info'][0]\n  ": FooterQueryResult
     '\n  *[_type == "destination" && slug.current == $slug][0] {\n    "images": (\n      attractions[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n      + activities[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n      + foods[].image {\n        ...,\n        "dimensions": asset->metadata.dimensions\n      }\n    )\n  }\n': QueryResult
     "\n  *[_type == 'curator']": AboutPageQueryResult
     '*[_type == "curator"]{ slug }': CuratorSlugsQueryResult
@@ -1290,12 +1371,14 @@ declare module '@sanity/client' {
     '*[_type == "destination"]{ slug }': DestinationSlugsQueryResult
     '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      cover {\n        ...,\n        "lqip": asset->metadata.lqip\n      },\n      themes[]->,\n      "testimonials": *[_type == \'testimonial\' && references(^._id)],\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  \n}': DestinationQueryResult
     '{\n  "destinations": *[_type == "destination"] {\n    cover,\n    name,\n    slug,\n    country,\n    "themes": coalesce(themes[]-> {_id,name}, [])\n  },\n  "featuredDests": *[_type == "destination" && featured]  {\n  cover,\n  portrait,\n  name,\n  country,\n  commentary,\n  slug\n  },\n  "themes": *[_type == "theme"]\n  }': DestinationsIndexQueryResult
-    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured] \n{\n  slug,\n  cover,\n  ...select(defined(portrait) => { portrait }),\n  title,\n  tagline,\n  "overview": coalesce(overview, ""),\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n,\n  }': IndexPageQueryResult
+    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured] \n{\n  ...\n{\n  cover,\n  title,\n  tagline,\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n,\n  slug,\n  ...select(defined(portrait) => { portrait }),\n  "overview": coalesce(overview, ""),\n}\n,\n  }': IndexPageQueryResult
     '*[_type == "itinerary"]{ slug }': ItinerarySlugsQueryResult
-    "\n  *[_type == 'itinerary' && slug.current == $slug][0]\n  ": ItineraryPageQueryResult
+    '\n  *[_type == \'itinerary\' && slug.current == $slug][0] {\n    ...,\n    features[]->,\n    themes[]->,\n    stays[]->{\n      ...,\n      destination-> {\n        name,\n        country\n      }\n    },\n    "reviews": *[_type == \'testimonial\' && itinerary._ref == ^._id],\n    ...\n{\n  cover,\n  title,\n  tagline,\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n\n  }\n  ': ItineraryPageQueryResult
     '{\n  "features": *[_type == \'feature\'],\n "itineraries": *[_type == \'itinerary\'] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  \n  } ': ItinerariesIndexQueryResult
     '*[_type == "journal"]{ slug }': JournalSlugsQueryResult
     "*[_type == 'journal' && slug.current == $slug][0] {\n  ...,\n itinerary-> {\n  slug,\n  title,\n  curator-> {\n    slug,\n    name,\n    portrait\n   }\n },\n \"related\": *[_type == 'journal'&&_id != ^._id] | order(\n   select(\n     publishedAt > ^.publishedAt => publishedAt - ^.publishedAt,\n     ^.publishedAt - publishedAt\n   )\n )[0...2] {\n  slug,\n  cover,\n  title,\n  publishedAt\n  }\n  }": JournalQueryResult
     "*[_type == 'journal'] | order(publishedAt desc) {\n  slug,\n  cover,\n  title,\n  publishedAt\n  }": JournalIndexQueryResult
+    "\n  *[_type == 'info'][0]{ privacy }\n  ": PrivacyPageQueryResult
+    "\n  *[_type == 'info'][0]{ terms }\n  ": TermsPageQueryResult
   }
 }
