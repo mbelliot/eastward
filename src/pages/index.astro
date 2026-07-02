@@ -5,10 +5,18 @@ import Mandala from '@/Mandala.astro'
 import Layout from '~/layouts/Layout.astro'
 import { Image } from 'astro:assets'
 import AttractionsSection from '@/destinations/AttractionsSection.astro'
-import FCity from '$/fcity.avif'
 import Divider from '@/Divider.astro'
 import Laurels from '@/Laurels.astro'
 import ItineraryPoster, { itineraryPosterFragment } from '@/itineraries/ItineraryPoster.astro'
+import FeatureSection from '@/FeatureSection.astro'
+import Theme from '@/Theme.astro'
+import JournalGrid from '@/journal/JournalGrid.astro'
+import SectionTitle from '@/SectionTitle.astro'
+import Feature from '@/itineraries/Feature.astro'
+import NewsletterForm from '@/forms/NewsletterForm.astro'
+import Details from '@/Details.astro'
+import FCity from '$/fcity.avif'
+import Thres from '$/threshold.avif'
 
 const indexPageQuery = defineQuery(`{
   "featuredDestinations": *[_type == "destination" && featured] {
@@ -20,12 +28,13 @@ const indexPageQuery = defineQuery(`{
     }
   },
   "featuredItineraries": *[_type == "itinerary" && featured] ${itineraryPosterFragment},
+  "themes": *[_type == 'theme'],
+  "journals": *[_type == 'journal'] | order(publishedAt desc)[0..2],
+  "features": *[_type == 'feature']
   }`)
 
-const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
-  indexPageQuery,
-  {},
-))!
+const { features, journals, themes, featuredDestinations, featuredItineraries } =
+  (await sanityClient.fetch(indexPageQuery, {}))!
 ---
 
 <Layout isIndexPage>
@@ -148,6 +157,110 @@ const { featuredDestinations, featuredItineraries } = (await sanityClient.fetch(
         <ItineraryPoster itinerary={itn} variant={i % 2 > 0 ? 'flipped' : 'default'} />
       ))
   }
+  <Divider />
+  <FeatureSection title="Experiences">
+    <p slot="desc">
+      Explore our curated collection of immersive activities, tailored to reflect the way you choose
+      to see the world.
+    </p>
+    <>
+      {
+        (themes ?? []).map((theme, i) => (
+          <>
+            {i > 0 && <Divider />}
+            <div class="flex gap-[30px] items-center">
+              <Theme class="size-[50px]" theme={theme} />
+              <p>{theme.name}</p>
+            </div>
+          </>
+        ))
+      }
+    </>
+  </FeatureSection>
+  <Divider />
+  <section class="main-grid main-container main-spacing">
+    <SectionTitle
+      class="col-span-full lg:col-[9/13]"
+      title="From the Field"
+      desc="Latest reports from our curators"
+    />
+    <div class="col-span-full pt-[50px]">
+      <JournalGrid journals={journals} />
+    </div>
+  </section>
+  <Divider />
+  <FeatureSection title="Amenities">
+    <p slot="desc">
+      Travel with us and everything you need is already taken care of — thoughtful amenities
+      included, so you can focus on the destination, not the details.
+    </p>
+    <>
+      {
+        features.map((feat, i) => (
+          <>
+            {i > 0 && <Divider />}
+            <Feature feature={feat} />
+          </>
+        ))
+      }
+    </>
+  </FeatureSection>
+  <section class="main-container main-grid h-dvh place-items-center">
+    <div class="col-[2/12] lg:col-[2/6]">
+      <NewsletterForm />
+    </div>
+    <div class="max-lg:hidden col-[7/13] place-self-stretch mr-[-10vw] my-[5dvh] relative">
+      <Image
+        src={Thres}
+        layout="constrained"
+        alt="Lantern-lit temple"
+        class="size-full object-cover"
+      />
+      <p class="image-label absolute left-0 bottom-[8%] lg:bottom-[13%]">
+        A lantern-lit threshold at the edge of the sacred, where red lacquer holds centuries of
+        whispered prayers.
+      </p>
+    </div>
+  </section>
+  <Divider />
+  <section class="main-container main-spacing">
+    <div class="flex flex-col mx-auto gap-12.5 w-[70ch]">
+      <h3 class="text-h2">Frequently Asked Questions</h3>
+      <div class="flex flex-col">
+        <Details summary="What kind of journeys do you design?">
+          <p>
+            We create privately guided journeys across Asia for travelers who care about cultural
+            depth, thoughtful pacing, and a stronger sense of place. The emphasis is on fewer,
+            better-chosen experiences rather than trying to see everything at once.
+          </p>
+        </Details>
+
+        <Details summary="Are these trips private or group based?">
+          <p>
+            These journeys are designed as private experiences, which allows the routing, rhythm,
+            and level of support to feel more personal. That makes it easier to shape the trip
+            around your interests instead of asking you to fit a fixed group schedule.
+          </p>
+        </Details>
+
+        <Details summary="Can you tailor the itinerary to our interests?">
+          <p>
+            Yes. Each journey can be adjusted around what matters most to you, whether that is
+            history, architecture, food, quieter stays, family pacing, or a better balance between
+            iconic stops and less expected moments.
+          </p>
+        </Details>
+
+        <Details summary="How do we start planning?">
+          <p>
+            The process usually starts with a conversation about where you want to go, how you like
+            to travel, and what kind of experience you want the journey to leave you with. From
+            there, the itinerary is shaped around fit, pace, and priorities.
+          </p>
+        </Details>
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <script>

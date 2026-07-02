@@ -1,0 +1,167 @@
+---
+interface Props {
+  ariaControls?: string
+  openLabel?: string
+  closeLabel?: string
+  class?: string
+  variant?: 'mono' | 'inverted'
+}
+
+const {
+  ariaControls = 'mobileSiteNav',
+  openLabel = 'Open menu',
+  closeLabel = 'Close menu',
+  variant = 'inverted',
+  class: cls,
+} = Astro.props
+---
+
+<menu-toggle class={cls} data-open-label={openLabel} data-close-label={closeLabel}>
+  <button
+    type="button"
+    class="cursor-pointer inline-flex h-10 w-10 items-center justify-center"
+    aria-expanded="false"
+    aria-controls={ariaControls}
+    aria-label={openLabel}
+  >
+    <svg viewBox="0 0 24 24" width="25" height="25" aria-hidden="true">
+      <line
+        class="bar bar-top"
+        x1="4"
+        y1="6"
+        x2="20"
+        y2="6"
+        stroke={variant === 'inverted' ? 'var(--color-inverted)' : 'var(--color-text)'}
+        stroke-width="2"
+        stroke-linecap="round"></line>
+
+      <line
+        class="bar bar-mid"
+        x1="4"
+        y1="12"
+        x2="20"
+        y2="12"
+        stroke={variant === 'inverted' ? 'var(--color-inverted)' : 'var(--color-text)'}
+        stroke-width="2"
+        stroke-linecap="round"></line>
+
+      <line
+        class="bar bar-bottom"
+        x1="4"
+        y1="18"
+        x2="20"
+        y2="18"
+        stroke={variant === 'inverted' ? 'var(--color-inverted)' : 'var(--color-text)'}
+        stroke-width="2"
+        stroke-linecap="round"></line>
+    </svg>
+  </button>
+</menu-toggle>
+
+<script>
+  import gsap from 'gsap'
+
+  class MenuToggle extends HTMLElement {
+    #button!: HTMLButtonElement
+    #top!: SVGLineElement
+    #mid!: SVGLineElement
+    #bottom!: SVGLineElement
+    #nav!: HTMLElement
+    #iconTl!: gsap.core.Timeline
+    #navTl!: gsap.core.Tween
+    #open = false
+    #openLabel = 'Open menu'
+    #closeLabel = 'Close menu'
+
+    connectedCallback() {
+      this.#button = this.querySelector('button')!
+      this.#top = this.querySelector('.bar-top')!
+      this.#mid = this.querySelector('.bar-mid')!
+      this.#bottom = this.querySelector('.bar-bottom')!
+
+      const controls = this.#button.getAttribute('aria-controls')
+
+      if (!controls) {
+        throw new Error('Missing aria-controls')
+      }
+
+      this.#nav = document.getElementById(controls)!
+
+      this.#openLabel = this.dataset.openLabel ?? this.#openLabel
+      this.#closeLabel = this.dataset.closeLabel ?? this.#closeLabel
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+      const duration = reduced ? 0 : 0.4
+      const ease = 'power2.inOut'
+
+      this.#iconTl = gsap
+        .timeline({ paused: true })
+        .to(
+          this.#top,
+          {
+            y: 6,
+            rotation: 45,
+            transformOrigin: '50% 50%',
+            duration,
+            ease,
+          },
+          0,
+        )
+        .to(
+          this.#bottom,
+          {
+            y: -6,
+            rotation: -45,
+            transformOrigin: '50% 50%',
+            duration,
+            ease,
+          },
+          0,
+        )
+        .to(
+          this.#mid,
+          {
+            opacity: 0,
+            scaleX: 0,
+            transformOrigin: '50% 50%',
+            duration: duration * 0.6,
+            ease,
+          },
+          0,
+        )
+
+      this.#button.addEventListener('click', this.#toggle)
+    }
+
+    #toggle = () => {
+      this.#open = !this.#open
+
+      this.#button.setAttribute('aria-expanded', String(this.#open))
+
+      this.#button.setAttribute('aria-label', this.#open ? this.#closeLabel : this.#openLabel)
+
+      this.#open ? this.#iconTl.play() : this.#iconTl.reverse()
+
+      gsap.killTweensOf(this.#nav)
+
+      gsap.set(this.#nav, { autoAlpha: 1 })
+      this.#navTl = gsap.to(this.#nav, {
+        xPercent: this.#open ? -100 : 0,
+        duration: 0.5,
+        ease: 'power3.inOut',
+      })
+
+      document.documentElement.classList.toggle('overflow-hidden', this.#open)
+    }
+
+    disconnectedCallback() {
+      this.#button.removeEventListener('click', this.#toggle)
+
+      this.#iconTl.kill()
+      this.#navTl?.kill()
+    }
+  }
+
+  customElements.define('menu-toggle', MenuToggle)
+</script>

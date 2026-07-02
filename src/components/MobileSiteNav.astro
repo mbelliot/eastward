@@ -1,0 +1,25 @@
+---
+import RollLink from '@/RollLink.astro'
+
+const navItems = ['journal', 'destinations', 'itineraries', ['About Us', '/about']]
+---
+
+<div
+  id="mobileSiteNav"
+  class="md:hidden fixed z-20 inset-0 bg-brand translate-x-full grid place-items-center content-center gap-6 invisible"
+>
+  {
+    navItems.map((n) => {
+      let href = Array.isArray(n) ? n[1] : `/${n}`,
+        txt = Array.isArray(n) ? n[0] : n
+      return (
+        <li class="sm:h-[95px] flex flex-col items-center">
+          <RollLink variant="title" href={href} class="text-[36px]">
+            {txt}
+          </RollLink>
+        </li>
+      )
+    })
+  }
+  <ul></ul>
+</div>

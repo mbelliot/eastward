@@ -983,7 +983,7 @@ export type DestinationsIndexQueryResult = {
 
 // Source: src/pages/index.astro
 // Variable: indexPageQuery
-// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured] {  ...{  cover,  title,  tagline,  "destinations": coalesce(count(destinations), 0),  "days": coalesce(count(schedule), 0)},  slug,  ...select(defined(portrait) => { portrait }),  "overview": coalesce(overview, ""),},  }
+// Query: {  "featuredDestinations": *[_type == "destination" && featured] {    cover,    "attractions": attractions[featured] {      ...,      "location": ^.name,      "country": ^.country    }  },  "featuredItineraries": *[_type == "itinerary" && featured] {  ...{  cover,  title,  tagline,  "destinations": coalesce(count(destinations), 0),  "days": coalesce(count(schedule), 0)},  slug,  ...select(defined(portrait) => { portrait }),  "overview": coalesce(overview, ""),},  "themes": *[_type == 'theme'],  "journals": *[_type == 'journal'] | order(publishedAt desc)[0..2],  "features": *[_type == 'feature']  }
 export type IndexPageQueryResult = {
   featuredDestinations: Array<{
     cover: {
@@ -1052,6 +1052,47 @@ export type IndexPageQueryResult = {
       _type: 'image'
     }
     overview: string | ''
+  }>
+  themes: Array<{
+    _id: string
+    _type: 'theme'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name: string
+    description: string
+    slug: Slug
+  }>
+  journals: Array<{
+    _id: string
+    _type: 'journal'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    title: string
+    excerpt: string
+    content?: BlockContent
+    publishedAt: string
+    cover: {
+      asset?: SanityImageAssetReference
+      media?: unknown
+      hotspot?: SanityImageHotspot
+      crop?: SanityImageCrop
+      alt?: string
+      _type: 'image'
+    }
+    itinerary?: ItineraryReference
+    slug: Slug
+  }>
+  features: Array<{
+    _id: string
+    _type: 'feature'
+    _createdAt: string
+    _updatedAt: string
+    _rev: string
+    name: string
+    blurb: string
+    slug: Slug
   }>
 }
 
@@ -1230,16 +1271,16 @@ export type ItineraryPageQueryResult = {
 
 // Source: src/pages/itineraries/index.astro
 // Variable: itinerariesIndexQuery
-// Query: {  "features": *[_type == 'feature'], "itineraries": *[_type == 'itinerary']   {    slug,    title,    tagline,    cover,    price,    themes[0..2]->  }    }
+// Query: {  "themes": *[_type == 'theme'],  "itineraries": *[_type == 'itinerary']   {    slug,    title,    tagline,    cover,    price,    themes[0..2]->  }    }
 export type ItinerariesIndexQueryResult = {
-  features: Array<{
+  themes: Array<{
     _id: string
-    _type: 'feature'
+    _type: 'theme'
     _createdAt: string
     _updatedAt: string
     _rev: string
     name: string
-    blurb: string
+    description: string
     slug: Slug
   }>
   itineraries: Array<{
@@ -1371,10 +1412,10 @@ declare module '@sanity/client' {
     '*[_type == "destination"]{ slug }': DestinationSlugsQueryResult
     '*[_type=="destination" && slug.current == $slug][0] {\n      ...,\n      cover {\n        ...,\n        "lqip": asset->metadata.lqip\n      },\n      themes[]->,\n      "testimonials": *[_type == \'testimonial\' && references(^._id)],\n      "itineraries": *[_type == \'itinerary\' && references(^._id)] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  \n}': DestinationQueryResult
     '{\n  "destinations": *[_type == "destination"] {\n    cover,\n    name,\n    slug,\n    country,\n    "themes": coalesce(themes[]-> {_id,name}, [])\n  },\n  "featuredDests": *[_type == "destination" && featured]  {\n  cover,\n  portrait,\n  name,\n  country,\n  commentary,\n  slug\n  },\n  "themes": *[_type == "theme"]\n  }': DestinationsIndexQueryResult
-    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured] \n{\n  ...\n{\n  cover,\n  title,\n  tagline,\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n,\n  slug,\n  ...select(defined(portrait) => { portrait }),\n  "overview": coalesce(overview, ""),\n}\n,\n  }': IndexPageQueryResult
+    '{\n  "featuredDestinations": *[_type == "destination" && featured] {\n    cover,\n    "attractions": attractions[featured] {\n      ...,\n      "location": ^.name,\n      "country": ^.country\n    }\n  },\n  "featuredItineraries": *[_type == "itinerary" && featured] \n{\n  ...\n{\n  cover,\n  title,\n  tagline,\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n,\n  slug,\n  ...select(defined(portrait) => { portrait }),\n  "overview": coalesce(overview, ""),\n}\n,\n  "themes": *[_type == \'theme\'],\n  "journals": *[_type == \'journal\'] | order(publishedAt desc)[0..2],\n  "features": *[_type == \'feature\']\n  }': IndexPageQueryResult
     '*[_type == "itinerary"]{ slug }': ItinerarySlugsQueryResult
     '\n  *[_type == \'itinerary\' && slug.current == $slug][0] {\n    ...,\n    features[]->,\n    themes[]->,\n    stays[]->{\n      ...,\n      destination-> {\n        name,\n        country\n      }\n    },\n    "reviews": *[_type == \'testimonial\' && itinerary._ref == ^._id],\n    ...\n{\n  cover,\n  title,\n  tagline,\n  "destinations": coalesce(count(destinations), 0),\n  "days": coalesce(count(schedule), 0)\n}\n\n  }\n  ': ItineraryPageQueryResult
-    '{\n  "features": *[_type == \'feature\'],\n "itineraries": *[_type == \'itinerary\'] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  \n  } ': ItinerariesIndexQueryResult
+    '{\n  "themes": *[_type == \'theme\'],\n  "itineraries": *[_type == \'itinerary\'] \n  {\n    slug,\n    title,\n    tagline,\n    cover,\n    price,\n    themes[0..2]->\n  }\n  \n  } ': ItinerariesIndexQueryResult
     '*[_type == "journal"]{ slug }': JournalSlugsQueryResult
     "*[_type == 'journal' && slug.current == $slug][0] {\n  ...,\n itinerary-> {\n  slug,\n  title,\n  curator-> {\n    slug,\n    name,\n    portrait\n   }\n },\n \"related\": *[_type == 'journal'&&_id != ^._id] | order(\n   select(\n     publishedAt > ^.publishedAt => publishedAt - ^.publishedAt,\n     ^.publishedAt - publishedAt\n   )\n )[0...2] {\n  slug,\n  cover,\n  title,\n  publishedAt\n  }\n  }": JournalQueryResult
     "*[_type == 'journal'] | order(publishedAt desc) {\n  slug,\n  cover,\n  title,\n  publishedAt\n  }": JournalIndexQueryResult

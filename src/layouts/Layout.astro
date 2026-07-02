@@ -6,6 +6,7 @@ import Header from '@/Header.astro'
 import Cursor from '@/Cursor.astro'
 import SlideModal from '@/SlideModal.astro'
 import Footer from '@/Footer.astro'
+import MobileSiteNav from '@/MobileSiteNav.astro'
 
 const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
 ---
@@ -26,6 +27,7 @@ const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
     <Cursor />
     <SlideModal />
     <Header waitForReveal={isIndexPage} variant={variant} />
+    <MobileSiteNav />
     <main>
       <slot />
     </main>

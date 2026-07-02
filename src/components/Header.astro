@@ -3,6 +3,7 @@ import Hairline from '@/Hairline.astro'
 import Mandala from '@/Mandala.astro'
 import RollButton from '@/RollButton.astro'
 import RollLink from '@/RollLink.astro'
+import MenuToggle from '@/MenuToggle.astro'
 
 const gap = 'clamp-[gap,15px,25px]',
   px = 'clamp-[px,15px,25px]'
@@ -22,7 +23,7 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
   id="pageHeader"
   data-wait-for-reveal={waitForReveal || undefined}
   class:list={[
-    'fixed top-0 left-0 right-0 clamp-[h,60px,100px] flex justify-between z-30',
+    'fixed top-0 left-0 right-0 clamp-[h,70px,100px] flex justify-between z-30',
     px,
     cls,
   ]}
@@ -37,7 +38,7 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
     >
   </div>
   <nav id="headerNav" aria-label="Main navigation" class:list={['flex h-full', gap]}>
-    <ul class:list={['flex h-full', gap]}>
+    <ul class:list={['flex h-full max-md:hidden', gap]}>
       {
         navItems.map((n) => (
           <li class="invisible h-full flex items-center">
@@ -49,8 +50,16 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
       }
     </ul>
     <Hairline direction="y" id="header-hairline-cta" variant={variant} />
+    <div id="kebab" class="flex items-center md:hidden invisible">
+      <MenuToggle variant={variant === 'default' ? 'inverted' : 'mono'} />
+    </div>
     <div class="flex items-center invisible" id="headerCTA">
-      <RollButton {...variant === 'mono' ? { variant: 'mono' } : {}}>Inquire</RollButton>
+      <RollButton class="max-md:hidden" {...variant === 'mono' ? { variant: 'mono' } : {}}
+        >Inquire</RollButton
+      >
+      <RollButton class="md:hidden" size="sm" {...variant === 'mono' ? { variant: 'mono' } : {}}
+        >Inquire</RollButton
+      >
     </div>
   </nav>
   <Hairline
@@ -83,6 +92,8 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
     .timeline()
     .set('#headerNav li', { autoAlpha: 1 })
     .from('#headerNav li', { yPercent: -100, stagger: 0.16 })
+    .set('#kebab', { autoAlpha: 1 })
+    .from('#kebab', { yPercent: -100 }, '-=0.16')
     .from(
       '#headerCTA',
       {
@@ -95,7 +106,7 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
       },
       '-=0.16',
     )
-  const navOut = gsap.to('#headerNav li', { yPercent: -100 })
+  const navOut = gsap.to('#headerNav li, #kebab', { yPercent: -100 })
 
   const inTl = gsap
     .timeline({ paused: true, defaults: { ease: 'sine.out' } })

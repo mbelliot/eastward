@@ -1,8 +1,8 @@
 ---
-import Picture from '@/Picture.astro'
-import SectionTitle from '@/SectionTitle.astro'
 import type { HTMLAttributes } from 'astro/types'
 import type { Itinerary } from 'sanity.types'
+import Picture from '@/Picture.astro'
+import SectionTitle from '@/SectionTitle.astro'
 import RichText from '@/RichText.astro'
 
 interface Props extends HTMLAttributes<'section'> {
@@ -12,36 +12,107 @@ interface Props extends HTMLAttributes<'section'> {
 const { schedule } = Astro.props
 ---
 
-<section class="main-grid main-container main-spacing">
-  <SectionTitle
-    class="col-span-full justify-self-center max-lg:**:text-center lg:col-[9/12]"
-    title="Day by day"
-    desc="A journey through tradition, flavor, and time."
-  />
-  <div class="lg:hidden grid grid-cols-subgrid col-span-full">
-    {
-      schedule.map((segment) => (
-        <article class="grid grid-cols-subgrid col-span-full gap-y-5 mt-10">
-          <Picture
-            pictureClass="block col-span-full"
-            class="size-full object-cover"
-            src={segment.image}
-            alt={segment.image.alt ?? ''}
-          />
-          <div class="col-span-full flex flex-col gap-2">
-            <p class="text-h3">{segment.title}</p>
-            <RichText text={segment.body} />
-          </div>
-        </article>
-      ))
-    }
-  </div>
-  <schedule-reel class="max-lg:hidden grid grid-cols-subgrid col-span-full"></schedule-reel>
-</section>
+<schedule-reel
+  class="relative block lg:h-[calc(var(--segments)*56dvh)]"
+  style={`--segments: ${schedule.length || 1}`}
+>
+  <section
+    class:list={[
+      'main-grid main-container main-spacing mt-0! pt-(--clamp-main-top-space)',
+      'lg:h-dvh lg:sticky lg:top-0 lg:grid-rows-[auto_1fr]',
+    ]}
+  >
+    <SectionTitle
+      class="col-span-full justify-self-center max-lg:**:text-center lg:col-[9/12]"
+      title="Day by day"
+      desc="A journey through tradition, flavor, and time."
+    />
+    <div class:list={['relative max-lg:grid max-lg:grid-cols-subgrid col-span-full max-lg:mt-10']}>
+      {
+        schedule.map((segment) => (
+          <article class="max-lg:grid max-lg:grid-cols-subgrid max-lg:col-span-full absolute bottom-0 gap-y-5">
+            <Picture
+              pictureClass="block col-span-full"
+              class="size-full object-cover"
+              src={segment.image}
+              alt={segment.image.alt ?? ''}
+            />
+            <div class="col-span-full flex flex-col gap-2">
+              <p class="text-h3">{segment.title}</p>
+              <RichText text={segment.body} />
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</schedule-reel>
 
 <script>
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-  
+  gsap.registerPlugin(ScrollTrigger)
+
+  class Schedule extends HTMLElement {
+    #tl!: gsap.core.Timeline
+
+    connectedCallback() {
+      const segments = gsap.utils.toArray<HTMLElement>(this.querySelectorAll('article'))
+      let currDay = 1
+
+      this.#tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: this,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true,
+          // onUpdate: (self) => {
+          //   const y = self.progress
+          //   let nextDay = Math.round(y * (segments.length - 1))
+          //   if (nextDay == currDay) return
+          //   currDay = nextDay
+          //   this.#tl.tweenTo(`day-${nextDay}`, {
+          //     duration: 0.8,
+          //     ease: 'power1.inOut',
+          //     overwrite: 'auto',
+          //   })
+          // },
+        },
+        defaults: { ease: 'none' },
+      })
+
+      const focusedWidth = Math.max(window.innerWidth / 2, 800),
+        width = focusedWidth * 0.6,
+        gap = 25,
+        step = focusedWidth + gap,
+        duration = step * segments.length
+
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i],
+          pic = segment.querySelector('picture'),
+          rest = segment.querySelectorAll(':scope > :not(picture)')
+        gsap.set(segment, { width: focusedWidth })
+        gsap.set(pic, { width })
+        gsap.set(rest, { autoAlpha: 0 })
+        gsap.set(segment, { left: focusedWidth + gap + (width + gap) * i })
+
+        this.#tl
+          .add(`segment-${i}`, step * (i + 1))
+          .to(segment, { x: -step * i, width: focusedWidth, duration: step }, step * i)
+          .to(pic, { width: '100%', duration: step })
+          .to(
+            [...segments.slice(0, i), ...segments.slice(i + 1)],
+            { x: -gap - width, duration: step },
+            '<',
+          )
+      }
+    }
+
+    disconnectedCallback() {
+      this.#tl?.kill()
+    }
+  }
+
+  customElements.define('schedule-reel', Schedule)
 </script>

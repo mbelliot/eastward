@@ -2,7 +2,7 @@
 let { title, desc, class: cls } = Astro.props
 ---
 
-<div data-inhibit-motion class={cls}>
+<div data-inhibit-motion class:list={['max-lg:**:text-center', cls]}>
   <h2
     class="font-title text-balance uppercase leading-none tracking-[-.04em] clamp-[text,40px,120px,390px,2560px]"
   >

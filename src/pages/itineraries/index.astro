@@ -3,28 +3,27 @@ import { sanityClient } from 'sanity:client'
 import { defineQuery } from 'groq'
 import ItineraryCover, { itineraryCoverFragment } from '@/itineraries/ItineraryCover.astro'
 import Layout from '~/layouts/Layout.astro'
-import Feature from '@/itineraries/Feature.astro'
+import Theme from '@/Theme.astro'
 
 const itinerariesIndexQuery = defineQuery(`{
-  "features": *[_type == 'feature'],
- "itineraries": *[_type == 'itinerary'] ${itineraryCoverFragment}
+  "themes": *[_type == 'theme'],
+  "itineraries": *[_type == 'itinerary'] ${itineraryCoverFragment}
   } `)
-const { features, itineraries } = (await sanityClient.fetch(itinerariesIndexQuery, {}))!
+const { themes, itineraries } = (await sanityClient.fetch(itinerariesIndexQuery, {}))!
 ---
 
 <Layout variant="mono">
-  <header class="flex flex-col gap-10 items-center clamp-[pt,100px,200px] clamp-[pb,50px,150px]">
+  <header class="flex flex-col gap-15 items-center pt-[32dvh] clamp-[pb,50px,150px]">
     <h1 class="text-billboard">Itineraries</h1>
-    <div class="mt-12.5 main-container">
-      <ul class="list-none flex gap-x-10 gap-y-15 flex-wrap justify-center max-w-[1100px]">
-        {
-          features.map((feature) => (
-            <li class="flex flex-col items-center gap-4">
-              <Feature feature={feature} />
-            </li>
-          ))
-        }
-      </ul>
+    <div role="toolbar" class="flex gap-x-10 gap-y-6 max-w-300 flex-wrap justify-center">
+      {
+        themes.map((theme) => (
+          <button class="flex gap-2 border rounded-full border-mono-a px-8 py-2 items-center">
+            <Theme class="fill-text size-10" theme={theme} />
+            <span>{theme.name}</span>
+          </button>
+        ))
+      }
     </div>
   </header>
   {
@@ -33,7 +32,3 @@ const { features, itineraries } = (await sanityClient.fetch(itinerariesIndexQuer
     ))
   }
 </Layout>
-
-<script>
-  import gsap from 'gsap'
-</script>

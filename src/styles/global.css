@@ -51,7 +51,7 @@
 }
 
 @utility text-byline {
-  @apply text-[24px] leading-[1.6em] font-body italic font-light;
+  @apply clamp-[text,20px,24px] leading-[1.6em] font-body italic font-light;
 }
 
 @utility text-medium {
@@ -112,7 +112,7 @@
   }
   body {
     @apply text-text bg-inverted font-body;
-    @apply text-[20px] leading-[1.8] tracking-[0.026em];
+    @apply clamp-[text,16px,20px] leading-[1.8] tracking-[0.026em];
   }
   button:focus-visible {
     outline: none;

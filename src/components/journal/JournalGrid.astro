@@ -1,0 +1,17 @@
+---
+import JournalCard from '@/journal/JournalCard.astro'
+
+const { journals, cls } = Astro.props
+---
+
+<div class:list={['grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 clamp-[gap,15px,20px]', cls]}>
+  {
+    journals.map((j, i) => (
+      <JournalCard
+        journal={j}
+        variant={i === 0 ? 'featured' : 'default'}
+        class={i === 0 ? 'md:col-span-2 lg:row-span-2' : ''}
+      />
+    ))
+  }
+</div>

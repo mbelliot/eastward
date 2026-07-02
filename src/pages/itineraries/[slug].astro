@@ -18,6 +18,7 @@ import DestinationLabel from '@/destinations/DestinationLabel.astro'
 import TestimonialSection from '@/testimonials/TestimonialSection.astro'
 import Input from '@/forms/Input.astro'
 import ItineraryFAQs from '@/itineraries/ItineraryFAQs.astro'
+import RollButton from '@/RollButton.astro'
 
 export const getStaticPaths = (async () => {
   const itinerarySlugsQuery = defineQuery('*[_type == "itinerary"]{ slug }'),
@@ -100,7 +101,7 @@ const itinerary = (await sanityClient.fetch(itineraryPageQuery, Astro.params))!
     )
   }
   {
-    itinerary.schedule && (
+    false && itinerary.schedule && (
       <>
         <Schedule schedule={itinerary.schedule} />
         <Divider />
@@ -186,7 +187,8 @@ const itinerary = (await sanityClient.fetch(itineraryPageQuery, Astro.params))!
     <div class="col-[2/7]">
       <form class="flex flex-col gap-8.5">
         <Input name="name" id="name" placeholder="Name" />
-        <Input name="email" id="email" placeholder="Email" />
+        <Input type="email" name="email" id="email" placeholder="Email" />
+        <RollButton variant="mono">Plan Journey</RollButton>
       </form>
     </div>
   </section>
