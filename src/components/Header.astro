@@ -88,24 +88,34 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
 
   let playedOnce = false
 
-  const navIn = gsap
-    .timeline()
-    .set('#headerNav li', { autoAlpha: 1 })
-    .from('#headerNav li', { yPercent: -100, stagger: 0.16 })
-    .set('#kebab', { autoAlpha: 1 })
-    .from('#kebab', { yPercent: -100 }, '-=0.16')
-    .from(
-      '#headerCTA',
-      {
-        id: 'ctaIn',
-        yPercent: () => (playedOnce ? 0 : -100),
-        onStart: () => {
-          playedOnce = true
-          gsap.set('#headerCTA', { autoAlpha: 1 })
-        },
+  const navListVisible =
+    getComputedStyle(document.querySelector('#headerNav ul')!).display !== 'none'
+  const kebabVisible = getComputedStyle(document.getElementById('kebab')!).display !== 'none'
+
+  const navIn = gsap.timeline()
+
+  if (navListVisible) {
+    navIn
+      .set('#headerNav li', { autoAlpha: 1 })
+      .from('#headerNav li', { yPercent: -100, stagger: 0.16 })
+  }
+
+  if (kebabVisible) {
+    navIn.set('#kebab', { autoAlpha: 1 }).from('#kebab', { yPercent: -100 }, '-=0.16')
+  }
+
+  navIn.from(
+    '#headerCTA',
+    {
+      id: 'ctaIn',
+      yPercent: () => (playedOnce ? 0 : -100),
+      onStart: () => {
+        playedOnce = true
+        gsap.set('#headerCTA', { autoAlpha: 1 })
       },
-      '-=0.16',
-    )
+    },
+    '-=0.16',
+  )
   const navOut = gsap.to('#headerNav li, #kebab', { yPercent: -100 })
 
   const inTl = gsap
