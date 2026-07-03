@@ -14,12 +14,12 @@ const { destination, class: cls, ...attrs } = Astro.props
 ---
 
 <figure
-  class:list={['group relative overflow-clip @container list-view:flex list-view:rounded-sm', cls]}
+  class:list={['group relative overflow-clip @container list-view:flex list-view:rounded-xs', cls]}
   {...attrs}
 >
   <Picture
     pictureClass="block"
-    class="size-full object-cover list-view:size-50 list-view:aspect-square list-view:rounded-sm"
+    class="size-full object-cover list-view:size-50 list-view:aspect-square list-view:rounded-xs"
     sources={[{ widths: [400, 800], aspect: 3 / 4, media: '(min-width:0px)' }]}
     src={destination.cover}
     alt={destination.cover.alt ?? ''}
@@ -34,7 +34,7 @@ const { destination, class: cls, ...attrs } = Astro.props
   >
   </div>
   <figcaption
-    class="list-view:hidden absolute inset-0 top-auto translate-y-[.35lh] opacity-0 group-hover:translate-0 group-hover:opacity-100 transition-all duration-500 p-5 font-title text-inverted uppercase leading-none text-[12cqi]"
+    class="list-view:hidden absolute inset-0 top-auto translate-y-[.35lh] opacity-0 group-hover:translate-0 group-hover:opacity-100 transition-all duration-500 p-5 font-title text-inverted uppercase leading-none text-[12cqi] list-view:text-[8cqi]"
   >
     <p>{destination.name}</p>
   </figcaption>

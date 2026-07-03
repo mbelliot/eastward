@@ -1,3 +1,5 @@
+import Lenis from 'lenis'
+
 export function videoReady(el, readyState = 3) {
   return new Promise((resolve) => {
     if (!el || el.readyState >= readyState) {
@@ -33,8 +35,10 @@ export function formatDate(date) {
   }).format(dateObj)
 }
 
-function lenis() {
-  return window._lenis
+let _lenis
+export function lenis() {
+  if (!_lenis) _lenis = new Lenis()
+  return _lenis
 }
 
 export function lockScroll() {

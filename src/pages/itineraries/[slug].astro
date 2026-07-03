@@ -101,7 +101,7 @@ const itinerary = (await sanityClient.fetch(itineraryPageQuery, Astro.params))!
     )
   }
   {
-    false && itinerary.schedule && (
+    itinerary.schedule && (
       <>
         <Schedule schedule={itinerary.schedule} />
         <Divider />

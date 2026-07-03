@@ -30,14 +30,14 @@ const { schedule } = Astro.props
     <div class:list={['relative max-lg:grid max-lg:grid-cols-subgrid col-span-full max-lg:mt-10']}>
       {
         schedule.map((segment) => (
-          <article class="max-lg:grid max-lg:grid-cols-subgrid max-lg:col-span-full absolute bottom-0 gap-y-5">
+          <article class="grid lg:grid-rows-[1fr_auto] max-lg:grid-cols-subgrid max-lg:col-span-full absolute bottom-5 gap-y-5">
             <Picture
               pictureClass="block col-span-full"
               class="size-full object-cover"
               src={segment.image}
               alt={segment.image.alt ?? ''}
             />
-            <div class="col-span-full flex flex-col gap-2">
+            <div class="col-span-full flex flex-col gap-2 pr-2">
               <p class="text-h3">{segment.title}</p>
               <RichText text={segment.body} />
             </div>
@@ -51,15 +51,17 @@ const { schedule } = Astro.props
 <script>
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  import { lenis } from '~/lib/utils'
+  import Snap from 'lenis/snap'
 
   gsap.registerPlugin(ScrollTrigger)
 
   class Schedule extends HTMLElement {
     #tl!: gsap.core.Timeline
+    #snap!: Snap
 
     connectedCallback() {
       const segments = gsap.utils.toArray<HTMLElement>(this.querySelectorAll('article'))
-      let currDay = 1
 
       this.#tl = gsap.timeline({
         scrollTrigger: {
@@ -67,45 +69,65 @@ const { schedule } = Astro.props
           start: 'top top',
           end: 'bottom bottom',
           scrub: true,
-          // onUpdate: (self) => {
-          //   const y = self.progress
-          //   let nextDay = Math.round(y * (segments.length - 1))
-          //   if (nextDay == currDay) return
-          //   currDay = nextDay
-          //   this.#tl.tweenTo(`day-${nextDay}`, {
-          //     duration: 0.8,
-          //     ease: 'power1.inOut',
-          //     overwrite: 'auto',
-          //   })
-          // },
+          onToggle: (self) => {
+            if (self.isActive) {
+              let _lenis = lenis()
+              if (_lenis) {
+                this.#snap = new Snap(_lenis, { type: 'proximity' })
+                let { start, end } = self,
+                  step = (end - start) / segments.length
+                for (let i = 0; i < segments.length; i++) {
+                  this.#snap.add(start + i * step)
+                }
+                this.#snap.add(end)
+              }
+            } else {
+              this.#snap?.stop()
+              this.#snap?.destroy()
+            }
+          },
         },
         defaults: { ease: 'none' },
       })
 
-      const focusedWidth = Math.max(window.innerWidth / 2, 800),
-        width = focusedWidth * 0.6,
+      let focusedWidth = Math.max(window.innerWidth * 0.54, 800),
+        width = focusedWidth * 0.42,
         gap = 25,
         step = focusedWidth + gap,
-        duration = step * segments.length
+        height,
+        focusedHeight
 
       for (let i = 0; i < segments.length; i++) {
         const segment = segments[i],
           pic = segment.querySelector('picture'),
           rest = segment.querySelectorAll(':scope > :not(picture)')
-        gsap.set(segment, { width: focusedWidth })
-        gsap.set(pic, { width })
-        gsap.set(rest, { autoAlpha: 0 })
-        gsap.set(segment, { left: focusedWidth + gap + (width + gap) * i })
 
-        this.#tl
-          .add(`segment-${i}`, step * (i + 1))
-          .to(segment, { x: -step * i, width: focusedWidth, duration: step }, step * i)
-          .to(pic, { width: '100%', duration: step })
-          .to(
-            [...segments.slice(0, i), ...segments.slice(i + 1)],
-            { x: -gap - width, duration: step },
-            '<',
-          )
+        gsap.set(segment, { width: focusedWidth })
+
+        if (i === 0) {
+          focusedHeight = Number(gsap.getProperty(segment, 'width')) * 0.92
+          height = focusedHeight * 0.72
+          gsap.set(segment, { left: 0, height: focusedHeight })
+          gsap.set(pic, { width: '100%' })
+          this.#tl.add('segment-0', 0)
+        } else {
+          gsap.set(pic, { width })
+          gsap.set(rest, { autoAlpha: 0 })
+          gsap.set(segment, { left: focusedWidth + gap + (width + gap) * (i - 1), height })
+
+          this.#tl
+            .add(`segment-${i}`, step * (i + 1))
+            .to(
+              segment,
+              { x: '-=' + step, width: focusedWidth, height: focusedHeight, duration: step },
+              step * i,
+            )
+            .to(pic, { width: '100%', duration: step }, '<')
+            .to(segments.slice(i + 1), { x: '-=' + (gap + width), duration: step }, '<')
+            .to(segments[i - 1], { x: '-=' + step, duration: step }, '<')
+            .to(rest, { autoAlpha: 1, duration: step / 3 }, '-=' + step / 3)
+            .set(segments[i - 1], { autoAlpha: 0 })
+        }
       }
     }
 

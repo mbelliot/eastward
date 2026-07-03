@@ -39,15 +39,14 @@ const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
   import gsap from 'gsap'
   import { ScrollTrigger } from 'gsap/ScrollTrigger'
   import { SplitText } from 'gsap/SplitText'
-  import Lenis from 'lenis'
+  import { lenis } from '~/lib/utils'
 
   gsap.registerPlugin(ScrollTrigger, SplitText)
-
-  const lenis = new Lenis()
-  lenis.on('scroll', ScrollTrigger.update)
+  let _lenis = lenis()
+  _lenis.on('scroll', ScrollTrigger.update)
 
   gsap.ticker.add((time) => {
-    lenis.raf(time * 1000)
+    _lenis.raf(time * 1000)
   })
 
   gsap.ticker.lagSmoothing(0)
@@ -91,12 +90,4 @@ const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
       })
     })
   })
-
-  declare global {
-    interface Window {
-      _lenis?: Lenis
-    }
-  }
-
-  window._lenis = lenis
 </script>
