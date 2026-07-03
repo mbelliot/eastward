@@ -72,97 +72,102 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
 <script>
   import { clamp, lerp } from '~/lib/utils'
   import gsap from 'gsap'
-  import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-  gsap.registerPlugin(ScrollTrigger)
 
   const hlc = document.querySelector<HTMLElementTagNameMap['hair-line']>('#header-hairline-cta')!,
     hlb = document.querySelector<HTMLElementTagNameMap['hair-line']>('#header-hairline-bottom')!
-
-  function hairlineDuration() {
-    let t = clamp(402, 2560, window?.innerWidth ?? 0)
-    return lerp(0.6, 1.6, t)
-  }
-
-  const duration = hairlineDuration()
-
-  let playedOnce = false
-
-  const navListVisible =
-    getComputedStyle(document.querySelector('#headerNav ul')!).display !== 'none'
-  const kebabVisible = getComputedStyle(document.getElementById('kebab')!).display !== 'none'
-
-  const navIn = gsap.timeline()
-
-  if (navListVisible) {
-    navIn
-      .set('#headerNav li', { autoAlpha: 1 })
-      .from('#headerNav li', { yPercent: -100, stagger: 0.16 })
-  }
-
-  if (kebabVisible) {
-    navIn.set('#kebab', { autoAlpha: 1 }).from('#kebab', { yPercent: -100 }, '-=0.16')
-  }
-
-  navIn.from(
-    '#headerCTA',
-    {
-      id: 'ctaIn',
-      yPercent: () => (playedOnce ? 0 : -100),
-      onStart: () => {
-        playedOnce = true
-        gsap.set('#headerCTA', { autoAlpha: 1 })
-      },
-    },
-    '-=0.16',
-  )
-  const navOut = gsap.to('#headerNav li, #kebab', { yPercent: -100 })
-
-  const inTl = gsap
-    .timeline({ paused: true, defaults: { ease: 'sine.out' } })
-    .add(hlb.tl.tweenTo(1, { duration, ease: 'power3.out' }), 0)
-    .add(hlc.tl.tweenTo(1, { duration, ease: 'power3.out' }), 0)
-    .from(
-      '#headerLogo',
-      {
-        id: 'logoIn',
-        yPercent: () => (playedOnce ? 0 : -100),
-        onStart: () => {
-          gsap.set('#headerLogo', { autoAlpha: 1 })
-        },
-      },
-      0,
-    )
-    .add(navIn, duration - navIn.duration())
-
-  const outTl = gsap
-    .timeline({ paused: true, defaults: { ease: 'sine.out' } })
-    .add(hlb.tl.tweenTo(0, { duration, ease: 'power3.out' }), 0)
-    .add(hlc.tl.tweenTo(0, { duration, ease: 'power3.out' }), 0)
-    .add(navOut, 0)
-  // .to('#headerLogo', { yPercent: -100 }, duration - 0.6)
-
   const header = document.getElementById('pageHeader')!
   const waitForReveal = header.hasAttribute('data-wait-for-reveal')
 
+  function hairlineDuration() {
+    const t = clamp(402, 2560, window?.innerWidth ?? 0)
+    return lerp(0.6, 1.6, t)
+  }
+
+  let heroAlreadyRevealed = false
   if (waitForReveal) {
-    window.addEventListener('heroRevealed', () => {
+    window.addEventListener(
+      'heroRevealed',
+      () => {
+        heroAlreadyRevealed = true
+      },
+      { once: true },
+    )
+  }
+
+  const mm = gsap.matchMedia()
+
+  mm.add({ isDesktop: '(min-width: 48rem)', isMobile: '(max-width: 47.999rem)' }, (context) => {
+    const { isDesktop } = context.conditions as { isDesktop: boolean }
+    const duration = hairlineDuration()
+    let playedOnce = false
+    let isScrolled = window.scrollY > 10
+
+    const navIn = gsap.timeline()
+    if (isDesktop) {
+      navIn
+        .set('#headerNav li', { autoAlpha: 1 })
+        .from('#headerNav li', { yPercent: -100, stagger: 0.16 })
+    } else {
+      navIn.set('#kebab', { autoAlpha: 1 }).from('#kebab', { yPercent: -100 })
+    }
+    navIn.from(
+      '#headerCTA',
+      {
+        id: 'ctaIn',
+        yPercent: () => (playedOnce ? 0 : -100),
+        onStart: () => {
+          playedOnce = true
+          gsap.set('#headerCTA', { autoAlpha: 1 })
+        },
+      },
+      '-=0.16',
+    )
+
+    const navOut = gsap.to(isDesktop ? '#headerNav li' : '#kebab', { yPercent: -100 })
+
+    const inTl = gsap
+      .timeline({ paused: true, defaults: { ease: 'sine.out' } })
+      .add(hlb.tl.tweenTo(1, { duration, ease: 'power3.out' }), 0)
+      .add(hlc.tl.tweenTo(1, { duration, ease: 'power3.out' }), 0)
+      .from(
+        '#headerLogo',
+        {
+          id: 'logoIn',
+          yPercent: () => (playedOnce ? 0 : -100),
+          onStart: () => gsap.set('#headerLogo', { autoAlpha: 1 }),
+        },
+        0,
+      )
+      .add(navIn, duration - navIn.duration() + 0.16)
+
+    const outTl = gsap
+      .timeline({ paused: true, defaults: { ease: 'sine.out' } })
+      .add(hlb.tl.tweenTo(0, { duration, ease: 'power3.out' }), 0)
+      .add(hlc.tl.tweenTo(0, { duration, ease: 'power3.out' }), 0)
+      .add(navOut, 0)
+
+    function settle() {
+      if (isScrolled) outTl.progress(1)
+      else inTl.progress(1)
+    }
+
+    function playIntro() {
       if (isScrolled) {
         inTl.progress(1)
         outTl.restart()
       } else {
         inTl.play()
       }
-    })
-  } else {
-    inTl.progress(1)
-  }
+    }
 
-  let isScrolled = false
+    if (waitForReveal) {
+      if (heroAlreadyRevealed) settle()
+      else window.addEventListener('heroRevealed', playIntro, { once: true })
+    } else {
+      settle()
+    }
 
-  window.addEventListener(
-    'scroll',
-    () => {
+    function onScroll() {
       const scrolled = window.scrollY > 10
       if (scrolled && !isScrolled) {
         isScrolled = true
@@ -175,7 +180,12 @@ const { class: cls, waitForReveal, variant = 'default' } = Astro.props
         inTl.getById('logoIn')?.invalidate()
         inTl.restart()
       }
-    },
-    { passive: true },
-  )
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('heroRevealed', playIntro)
+    }
+  })
 </script>
