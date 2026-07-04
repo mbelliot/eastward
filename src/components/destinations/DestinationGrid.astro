@@ -75,11 +75,11 @@ const { destinations, themes, class: cls, drawerId = 'destFilter' } = Astro.prop
     <div class="flex justify-end"><Button data-close-drawer name="x" outline={false} /></div>
     <div class="clamp-[px,12.5,25] h-full flex flex-col clamp-[pb,25px,50px]">
       <h3
-        class="font-title tracking-[-.03em] clamp-[text,38px,60px] uppercase mt-25 mb-12.5 leading-[1.1] text-center"
+        class="font-title tracking-[-.03em] clamp-[text,38px,60px] uppercase clamp-[mt,15,25] clamp-[mb,5,12.5] leading-[1.1] text-center"
       >
         Choose<br /> experiences
       </h3>
-      <ul class="flex flex-col gap-5">
+      <ul class="flex flex-col clamp-[gap,0,5]">
         {
           themes.map((theme) => (
             <li>
@@ -89,7 +89,7 @@ const { destinations, themes, class: cls, drawerId = 'destFilter' } = Astro.prop
                 data-theme-id={theme._id}
                 aria-pressed="false"
               >
-                <Theme class="size-16" theme={theme} />
+                <Theme class="clamp-[size,8,16]" theme={theme} />
                 <p class="flex-1 clamp-[text,20px,28px] text-nowrap">{theme.name}</p>
                 <div class="size-16 grid place-items-center">
                   <div class="size-1 rounded-full bg-text opacity-0 group-aria-pressed:opacity-100 transition-all duration-120" />

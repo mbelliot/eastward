@@ -13,17 +13,22 @@ const { foods } = Astro.props
 ---
 
 <section class="main-grid main-container main-spacing" data-flex-slider-root>
-  <div class="flex gap-5 col-[2/8] items-end">
+  <div
+    class="flex gap-5 col-[2/8] items-end max-lg:row-start-3 max-lg:col-span-full max-lg:justify-center"
+  >
     <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
     <Button name="arrow-right" data-next-slide aria-label="Next slide" />
   </div>
-  <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
+  <div class="max-lg:col-span-full col-[9/12] flex flex-col items-center lg:items-start gap-5 z-10">
     <SectionTitle
       title="The Flavors"
       desc="An aromatic heritage told through ancestral culinary craft."
     />
   </div>
-  <FlexSlider class="col-[2/13] pt-7.5 [--blur:12px]" trackClass="clamp-[gap-x,20px,25px]">
+  <FlexSlider
+    class="col-span-full lg:col-[2/13] pt-7.5 [--blur:12px]"
+    trackClass="clamp-[gap-x,20px,25px]"
+  >
     {
       foods.map((food) => (
         <OverlayCard class="aspect-3/4 clamp-[w,300px,512px,390px,2000px] foodCard [--blur:40px]">

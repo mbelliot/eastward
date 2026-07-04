@@ -39,19 +39,19 @@
 }
 
 @utility text-h2 {
-  @apply text-[42px] leading-[1.2em] font-body;
+  @apply clamp-[text,24px,42px] leading-[1.2em] font-body;
 }
 
 @utility text-h3 {
-  @apply text-[32px] leading-[1.4em] font-body;
+  @apply clamp-[text,20px,32px] leading-[1.4em] font-body;
 }
 
 @utility text-h4 {
-  @apply text-[24px] leading-[1.4em] font-body;
+  @apply clamp-[text,18px,24px] leading-[1.4em] font-body;
 }
 
 @utility text-byline {
-  @apply clamp-[text,20px,24px] leading-[1.6em] font-body italic font-light;
+  @apply clamp-[text,18px,24px] leading-[1.6em] font-body italic font-light;
 }
 
 @utility text-medium {

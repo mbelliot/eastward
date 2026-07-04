@@ -20,7 +20,7 @@ const { attractions, class: cls, ...attrs } = Astro.props
 <attractions-reel
   class:list={[
     'relative flex clamp-[gap-x,20px,25px] items-end overflow-visible',
-    'min-[640px]:-mt-45 min-[1200px]:clamp-[mt,-85px,-155px,1200px,2560px]',
+    'max-[1200px]:clamp-[mt,7,10] min-[1200px]:clamp-[mt,-85px,-155px,1200px,2560px]',
     cls,
   ]}
   {...attrs}

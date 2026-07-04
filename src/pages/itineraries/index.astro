@@ -26,9 +26,11 @@ const { themes, itineraries } = (await sanityClient.fetch(itinerariesIndexQuery,
       }
     </div>
   </header>
-  {
-    itineraries.map((itn, i) => (
-      <ItineraryCover itinerary={itn} variant={Boolean(i % 2) ? 'flipped' : 'default'} />
-    ))
-  }
+  <section class="max-lg:main-container">
+    {
+      itineraries.map((itn, i) => (
+        <ItineraryCover itinerary={itn} variant={Boolean(i % 2) ? 'flipped' : 'default'} />
+      ))
+    }
+  </section>
 </Layout>

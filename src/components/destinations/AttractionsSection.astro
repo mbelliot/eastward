@@ -7,9 +7,9 @@ const { attractions, title, desc } = Astro.props
 ---
 
 <section class="main-grid main-container main-spacing" data-focus-reel-root>
-  <div class="col-[9/12] flex flex-col items-start gap-5 z-10">
+  <div class="col-span-full lg:col-[9/12] max-lg:justify-center flex flex-col gap-5 z-10">
     <SectionTitle title={title} desc={desc} />
-    <div class="flex gap-5">
+    <div class="max-lg:hidden flex gap-5">
       <Button name="arrow-left" data-previous-slide aria-label="Previous slide" />
       <Button name="arrow-right" data-next-slide aria-label="Next slide" />
     </div>
