@@ -71,7 +71,7 @@ const { destinations, themes, class: cls, drawerId = 'destFilter' } = Astro.prop
       ))
     }
   </div>
-  <Drawer id={drawerId} class="flex flex-col h-full w-fit">
+  <Drawer data-cursor-backdrop="x" id={drawerId} class="flex flex-col h-full w-fit">
     <div class="flex justify-end"><Button data-close-drawer name="x" outline={false} /></div>
     <div class="clamp-[px,12.5,25] h-full flex flex-col clamp-[pb,25px,50px]">
       <h3

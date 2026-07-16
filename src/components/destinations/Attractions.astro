@@ -27,7 +27,7 @@ const { attractions, class: cls, ...attrs } = Astro.props
 >
   {
     attractions.map((attraction) => (
-      <button data-slide data-cursor-area="magnifier">
+      <button data-slide data-cursor-area="magnifier" data-cursor-blend>
         <figure class="flex flex-col gap-2.5 h-full min-h-0">
           <div class="flex-1 relative overflow-clip">
             <Picture

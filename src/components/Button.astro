@@ -27,9 +27,9 @@ const iconNames = {
 type Name = keyof typeof iconNames
 
 type Props = VariantProps<typeof variants> &
-  HTMLAttributes<'button'> & { name: Name; outline?: boolean }
+  HTMLAttributes<'button'> & { name: Name; outline?: boolean; rootAttrs?: HTMLAttributes<'div'> }
 
-const { class: cls, variant, name, outline = true, ...attrs } = Astro.props
+const { class: cls, variant, name, outline = true, rootAttrs, ...attrs } = Astro.props
 ---
 
 <IconButton
@@ -37,6 +37,7 @@ const { class: cls, variant, name, outline = true, ...attrs } = Astro.props
   {...attrs}
   direction={(directions as any)[name]}
   variant={outline ? 'outline' : 'ghost'}
+  rootAttrs={rootAttrs}
 >
   <Icon
     class:list={['size-[28px] group-aria-pressed:text-text', variants({ variant })]}

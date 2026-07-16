@@ -4,12 +4,13 @@ import { type HTMLAttributes } from 'astro/types'
 interface Props extends HTMLAttributes<'button'> {
   direction?: 'left' | 'right'
   variant?: 'outline' | 'ghost'
+  rootAttrs?: HTMLAttributes<'div'>
 }
 
-const { class: cls, direction, variant = 'outline', ...attrs } = Astro.props
+const { class: cls, direction, variant = 'outline', rootAttrs, ...attrs } = Astro.props
 ---
 
-<icon-button data-dir={direction} class="contents">
+<icon-button data-dir={direction} class="contents" {...rootAttrs}>
   <button
     class:list={[
       'group cursor-pointer aspect-square rounded-full overflow-clip relative **:pointer-events-none aria-pressed:text-text aria-expanded:bg-mono-a',

@@ -1,37 +1,43 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
-import { Icon } from 'astro-icon/components'
 
-const iconNames = { magnifier: 'ph:magnifying-glass-plus-fill' } as const
-
-type Props = HTMLAttributes<'svg'>
+type Props = HTMLAttributes<'div'>
 
 const { class: cls, ...attrs } = Astro.props
 ---
 
 <div
   id="cursor"
+  popover="manual"
   aria-hidden="true"
-  class="invisible mix-blend-exclusion fixed w-min pointer-events-none z-9999 -translate-1/2"
+  class:list={[
+    'invisible fixed w-min pointer-events-none z-9999 -translate-1/2 border-none bg-transparent p-0 m-0 overflow-visible',
+    'grid *:col-[1/2] *:row-[1/2]',
+    cls,
+  ]}
   {...attrs}
 >
-  <Icon
-    name={iconNames.magnifier}
-    data-cursor-name="magnifier"
-    class:list={['size-25 text-inverted', cls]}
-  />
+  <slot />
 </div>
 
 <script>
   import gsap from 'gsap'
 
-  export function createCursor(
+  function createCursor(
     cursor: HTMLElement | null,
     // animateProps = { ease: 'power1.inOut', duration: 0.01 },
     tweenProps?: GSAPTweenVars,
   ) {
     if (typeof window === 'undefined' || !cursor) return
     if (window.matchMedia('(pointer: coarse)').matches) return
+
+    let variants: Record<string, HTMLElement> = {}
+
+    for (let variant of cursor.children) {
+      let name = variant.dataset.cursorName
+      if (!name) throw new Error('data-cursor-name missing from cursor variant')
+      variants[name] = variant
+    }
 
     let isVisible = false,
       lastX = -100,
@@ -43,6 +49,24 @@ const { class: cls, ...attrs } = Astro.props
         ? gsap.quickTo(cursor, 'y', tweenProps)
         : (y: number) => gsap.set(cursor, { y })
 
+    // 1. Promotes the element to the CSS Top Layer on load
+    try {
+      cursor.showPopover()
+    } catch (e) {
+      console.warn('Popover API not supported')
+    }
+
+    window.addEventListener(
+      'toggle',
+      (event) => {
+        if (event.target !== cursor && event.newState === 'open') {
+          cursor.hidePopover()
+          cursor.showPopover()
+        }
+      },
+      { capture: true },
+    )
+
     window.addEventListener(
       'pointermove',
       (e) => {
@@ -53,18 +77,41 @@ const { class: cls, ...attrs } = Astro.props
     )
 
     const ticker: GSAPTickerCallback = () => {
-      const pointElem = document.elementFromPoint(lastX, lastY),
+      let pointElem = document.elementFromPoint(lastX, lastY),
         areaElem = pointElem?.closest('[data-cursor-area]')
 
       xTo(lastX)
       yTo(lastY)
 
+      if (
+        !areaElem &&
+        pointElem instanceof HTMLDialogElement &&
+        pointElem.open &&
+        pointElem.hasAttribute('data-cursor-backdrop')
+      ) {
+        const r = pointElem.getBoundingClientRect()
+        const onBackdrop = lastX < r.left || lastX > r.right || lastY < r.top || lastY > r.bottom
+        if (onBackdrop) areaElem = pointElem
+      }
+
       if (areaElem instanceof HTMLElement) {
-        // TODO: switch icons based on cursorName
-        // const cursorName = areaElem.dataset.cursorArea
         if (!isVisible) {
           isVisible = true
           document.body.setAttribute('data-hide-native-cursor', '')
+
+          for (let [k, v] of Object.entries(variants)) {
+            gsap.set(v, {
+              display:
+                k === (areaElem.dataset.cursorArea || areaElem.dataset.cursorBackdrop)
+                  ? ''
+                  : 'none',
+            })
+          }
+
+          gsap.set(cursor, {
+            mixBlendMode: areaElem.hasAttribute('data-cursor-blend') ? 'exclusion' : 'normal',
+          })
+
           gsap.to(cursor, { autoAlpha: 1, scale: 1, duration: 0.3, overwrite: 'auto' })
         }
       } else {

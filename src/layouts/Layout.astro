@@ -7,6 +7,8 @@ import Cursor from '@/Cursor.astro'
 import SlideModal from '@/SlideModal.astro'
 import Footer from '@/Footer.astro'
 import MobileSiteNav from '@/MobileSiteNav.astro'
+import { Icon } from 'astro-icon/components'
+import Button from '@/Button.astro'
 
 const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
 ---
@@ -24,7 +26,6 @@ const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
     <Font cssVariable="--font-tenor" preload />
   </head>
   <body class={cls}>
-    <Cursor />
     <SlideModal />
     <Header waitForReveal={isIndexPage} variant={variant} />
     <MobileSiteNav />
@@ -32,6 +33,18 @@ const { variant, title, class: cls, footerClass, isIndexPage } = Astro.props
       <slot />
     </main>
     <Footer class={footerClass ?? 'bg-brand'} />
+    <Cursor>
+      <Icon
+        name="ph:magnifying-glass-plus-fill"
+        data-cursor-name="magnifier"
+        class:list={['size-25 text-inverted']}
+      />
+      <Button
+        class="p-4 bg-inverted rounded-full shadow"
+        name="x"
+        rootAttrs={{ 'data-cursor-name': 'x' }}
+      />
+    </Cursor>
   </body>
 </html>
 
