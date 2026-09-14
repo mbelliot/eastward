@@ -1,0 +1,12 @@
+# Cloudflare Workers Static Assets headers.
+# Served from dist/_headers (copied from public/_headers by Astro).
+# Specific rules first: hashed Astro bundles in /_astro/* are content-addressed,
+# so they are safe to cache immutably for a year. Everything else gets a short
+# 1-day fresh window with a 1-year stale-while-revalidate grace period so the
+# Cloudflare edge can serve stale content while revalidating in the background.
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=31536000
